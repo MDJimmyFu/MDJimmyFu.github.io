@@ -12,6 +12,10 @@
             --header-bg: #e9ecef;
             --border-color: #dee2e6;
             --hover-color: #007bff;
+            --correct-bg: #d4edda;
+            --correct-text: #155724;
+            --incorrect-bg: #f8d7da;
+            --incorrect-text: #721c24;
         }
 
         body {
@@ -141,6 +145,11 @@
             padding-bottom: 8px;
             margin-top: 20px;
         }
+        
+        h4 {
+            color: #343a40;
+            margin-top: 25px;
+        }
 
         ul {
             padding-left: 20px;
@@ -202,7 +211,7 @@
             font-style: italic;
         }
         
-        #quiz {
+        #quiz-container {
             background-color: var(--secondary-color);
             padding: 20px;
             border-radius: 8px;
@@ -210,27 +219,48 @@
         }
         
         .quiz-question {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .quiz-question p {
+            font-weight: bold;
         }
         
-        #quiz-result {
-            margin-top: 20px;
+        .quiz-explanation {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+            border-left: 5px solid var(--hover-color);
+        }
+
+        #quiz-score {
             font-weight: bold;
             font-size: 1.2em;
             padding: 15px;
             border-radius: 5px;
+            text-align: center;
+            margin-bottom: 20px;
         }
 
-        #quiz-result.correct {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        #quiz-score.correct {
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
         }
-        #quiz-result.incorrect {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+        #quiz-score.incorrect {
+            background-color: var(--incorrect-bg);
+            color: var(--incorrect-text);
         }
+
+        .answer-feedback.correct {
+            color: var(--correct-text);
+        }
+        .answer-feedback.incorrect {
+            color: var(--incorrect-text);
+        }
+
 
         button {
             background-color: var(--primary-color);
@@ -241,10 +271,16 @@
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s;
+            margin-right: 10px;
         }
         
         button:hover {
             background-color: #004494;
+        }
+        
+        #quiz-controls {
+            text-align: center;
+            margin-top: 20px;
         }
 
         @media (max-width: 992px) {
@@ -361,37 +397,64 @@
                 </div>
                 <div class="collapsible-content">
                     <h3>A. 非去極化肌肉鬆弛劑 (Nondepolarizing Muscle Relaxants, NDMRs)</h3>
+                    <h4>作用機制 (Mechanism of Action)</h4>
                     <ul>
-                        <li><b>作用機制</b>：作為<span class="key-term">競爭性拮抗劑 (competitive antagonist)<span class="tooltip-text">與內源性配體(ACh)競爭相同的受體結合位點，但不產生生理效應，其作用可被增加的ACh濃度所克服。</span></span>，與 ACh 競爭突觸後膜 AChR 的結合位點，阻止離子通道打開。</li>
-                         <figure class="image-container">
-                            <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-05-9780323935920.jpg" alt="ACh 與 NDMR 對受體的作用 (Fig. 11.5)">
-                            <figcaption>Fig. 11.5 ACh 與 NDMR 對受體的作用</figcaption>
-                        </figure>
-                        <li><b>作用逆轉</b>：
+                        <li><b>競爭性拮抗 (Competitive Antagonism)</b>：NDMRs 作為<span class="key-term">競爭性拮抗劑 (competitive antagonist)<span class="tooltip-text">與內源性配體(ACh)競爭相同的受體結合位點，但不產生生理效應，其作用可被增加的ACh濃度所克服。</span></span>，與 ACh 競爭突觸後膜 AChR 上的兩個 α-次單元結合位點。只要其中一個位點被 NDMR 佔據，即使另一個位點結合了 ACh，受體也無法活化。</li>
+                        <li><b>親和力與效價 (Affinity and Potency)</b>：藥物與受體的結合能力稱為親和力。高親和力的 NDMR 意味著在較低濃度下就能有效佔據受體，因此其效價 (potency) 更高。</li>
+                    </ul>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-05-9780323935920.jpg" alt="ACh 與 NDMR 對受體的作用 (Fig. 11.5)">
+                        <figcaption>Fig. 11.5 ACh 與 NDMR 對受體的作用</figcaption>
+                    </figure>
+                    <h4>作用逆轉 (Reversal of Blockade)</h4>
+                    <ul>
+                        <li><b>抗膽鹼酯酶藥物 (Anticholinesterases)</b>：
                             <ul>
-                                <li><b>抗膽鹼酯酶藥物 (Anticholinesterases)</b>，如 Neostigmine，透過抑制 AChE，增加突觸間隙的 ACh 濃度，依據質量作用定律 (law of mass action) 將 NDMR 從受體上置換下來。</li>
-                                <li><b>Sugammadex</b> 是一種<span class="key-term">選擇性鬆弛劑結合劑 (Selective Relaxant Binding Agent, SRBA)<span class="tooltip-text">一種環糊精衍生物，能直接在血漿中包裹並中和固醇類NDMRs，形成穩定的複合物由腎臟排出。</span></span>，能直接包裹固醇類 NDMRs (如 Rocuronium)，使其失活，可在任何麻痺深度下快速逆轉。</li>
+                                <li>如 Neostigmine，透過抑制 AChE，使突觸間隙的 ACh 濃度累積，依據質量作用定律 (law of mass action) 將 NDMR 從受體上「擠走」。</li>
+                                <li><b>天花板效應 (Ceiling Effect)</b>：對於深度麻痺 (即大量受體被 NDMR 佔據)，單純增加 ACh 濃度不足以有效逆轉，此為其局限性。</li>
+                                <li><b>蕈毒鹼性副作用 (Muscarinic Side Effects)</b>：增加的 ACh 也會作用於心臟、腺體等的蕈毒鹼性受體，導致心跳變慢、分泌物增多等，因此臨床上需合併使用抗膽鹼藥物 (如 Atropine, Glycopyrrolate) 來對抗。</li>
                             </ul>
                         </li>
-                        <li><b>衰減現象 (Fade)</b>：在高頻刺激 (如 Train-of-Four, TOF) 下觀察到的反應逐漸減弱現象。主要機制是 NDMRs 阻斷了突觸前 AChR (presynaptic AChR)，干擾了 ACh 的動員與補充，導致後續刺激釋放的 ACh 減少。</li>
-                        <li><b>非肌肉作用</b>：NDMRs可結合到<span class="key-term">頸動脈體 (carotid body)<span class="tooltip-text">位於頸動脈分叉處的化學感受器，主要偵測血氧變化。</span></span>和免疫細胞上的受體，可能抑制缺氧通氣反應 (hypoxic ventilatory response) 並產生抗發炎作用。</li>
+                        <li><b>Sugammadex</b>：
+                            <ul>
+                                <li>一種<span class="key-term">選擇性鬆弛劑結合劑 (Selective Relaxant Binding Agent, SRBA)<span class="tooltip-text">一種環糊精衍生物，能直接在血漿中包裹並中和固醇類NDMRs，形成穩定的複合物由腎臟排出。</span></span>，其分子結構像一個「甜甜圈」，能特異性地將固醇類 NDMRs (如 Rocuronium) 包裹在其中心，形成穩定的複合物，使其從血漿中被清除。</li>
+                                <li>此機制與 ACh 無關，因此沒有天花板效應，即使在深度麻痺下也能快速、完全地逆轉。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h4>臨床監測與藥理現象</h4>
+                    <ul>
+                        <li><b>衰減現象 (Fade)</b>：在高頻刺激 (如 Train-of-Four, TOF) 下觀察到的反應逐漸減弱現象。主要機制是 NDMRs 阻斷了位於神經末梢的<span class="key-term">突觸前 AChR (presynaptic AChR)<span class="tooltip-text">一種正回饋受體，ACh結合後能促進更多ACh囊泡的動員與釋放。</span></span> (推測為 α3β2 亞型)，干擾了 ACh 的動員與補充，導致後續刺激釋放的 ACh 減少。</li>
+                        <li><b>非肌肉作用 (Non-muscular Actions)</b>：NDMRs可結合到<span class="key-term">頸動脈體 (carotid body)<span class="tooltip-text">位於頸動脈分叉處的化學感受器，主要偵測血氧變化。</span></span>和免疫細胞上的尼古丁受體，可能抑制缺氧通氣反應 (hypoxic ventilatory response) 並產生抗發炎作用。</li>
                     </ul>
 
                     <h3>B. 去極化肌肉鬆弛劑 (Depolarizing Muscle Relaxants)</h3>
                     <ul>
                         <li><b>代表藥物</b>：琥珀膽鹼 (Succinylcholine)。</li>
-                        <li><b>第一相阻斷 (Phase I Block)</b>：作為<span class="key-term">激動劑 (agonist)<span class="tooltip-text">能與受體結合並產生與內源性配體相似的生理效應。</span></span>，引起終板持續去極化，初期表現為<span class="key-term">肌束顫動 (fasciculations)<span class="tooltip-text">由突觸前神經末梢的去極化引起，導致整個運動單元不自主收縮。</span></span>，隨後因鄰近的電壓門控鈉離子通道進入不活化狀態 (inactivated state) 而導致麻痺。</li>
+                        <li><b>第一相阻斷 (Phase I Block)</b>：
+                            <ul>
+                                <li>作為<span class="key-term">激動劑 (agonist)<span class="tooltip-text">能與受體結合並產生與內源性配體相似的生理效應。</span></span>，模擬 ACh 作用，打開 AChR 通道。</li>
+                                <li><b>肌束顫動 (Fasciculations)</b>：由於同時激活突觸前和突觸後受體，導致短暫的全身肌肉不協調收縮。</li>
+                                <li><b>麻痺機制</b>：持續的終板去極化，導致鄰近的電壓門控鈉離子通道因長時間處於去極化環境而進入「不活化狀態 (inactivated state)」，無法再次被激發，稱為「調節 (accommodation)」，從而阻斷了動作電位的傳播。</li>
+                            </ul>
+                        </li>
                          <figure class="image-container">
                             <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-06-9780323935920.jpg" alt="鈉離子通道的三種狀態 (Fig. 11.6)">
-                            <figcaption>Fig. 11.6 鈉離子通道的三種狀態</figcaption>
+                            <figcaption>Fig. 11.6 鈉離子通道的三種狀態 (靜息、活化、不活化)</figcaption>
                         </figure>
-                        <li><b>第二相阻斷 (Phase II Block)</b>：長時間或大劑量使用後，NMJ 的特性轉變為類似 NDMR 造成的阻斷（如出現衰減）。其機制複雜，涉及受體<span class="key-term">脫敏 (desensitization)<span class="tooltip-text">受體蛋白構型改變，即使與激動劑結合也無法打開離子通道。</span></span>、突觸前阻斷及離子平衡失調，不建議用藥物逆轉。</li>
+                        <li><b>第二相阻斷 (Phase II Block)</b>：
+                            <ul>
+                                <li>長時間或大劑量使用後，NMJ 的特性轉變為類似 NDMR 造成的阻斷，臨床上會出現衰減現象。</li>
+                                <li>其機制複雜，涉及<span class="key-term">受體脫敏 (desensitization)<span class="tooltip-text">受體蛋白構型改變，即使與激動劑結合也無法打開離子通道。</span></span>、離子通道阻斷、以及鈉鉀幫浦 (Na⁺/K⁺ pump) 為維持離子梯度而過度活化等多重因素。</li>
+                                <li>臨床處理：由於對抗膽鹼酯酶藥物的反應不可預測（可能改善也可能惡化阻斷），一般不建議嘗試逆轉。</li>
+                            </ul>
+                        </li>
                     </ul>
 
-                    <h3>C. 藥物的非典型作用</h3>
+                    <h3>C. 藥物的非典型作用 (Non-classic Actions)</h3>
                     <ul>
-                        <li><b>脫敏阻斷 (Desensitization Block)</b>：受體蛋白構型改變，對激動劑的反應性下降。</li>
-                        <li><b>通道阻斷 (Channel Block)</b>：藥物分子物理性地堵塞 AChR 的離子通道，為非競爭性阻斷，無法被增加的 ACh 克服。</li>
+                        <li><b>脫敏阻斷 (Desensitization Block)</b>：受體蛋白構型改變，對激動劑的反應性下降。吸入性麻醉劑等藥物會促進此狀態，從而增強 NDMRs 的效果。</li>
+                        <li><b>通道阻斷 (Channel Block)</b>：藥物分子物理性地堵塞 AChR 的離子通道，為非競爭性阻斷。這種阻斷是<span class="key-term">使用依賴性 (use-dependent)<span class="tooltip-text">通道越頻繁地被激動劑打開，藥物分子進入並堵塞通道的機會就越多，阻斷效果越強。</span></span>的，無法被增加的 ACh 濃度克服。</li>
                     </ul>
                 </div>
             </div>
@@ -401,38 +464,88 @@
                     <h2>四、 AChR 的生物學與病生理學</h2>
                 </div>
                 <div class="collapsible-content">
-                    <h3>AChR 的亞型 (Isoforms)</h3>
+                    <h3>AChR 的亞型 (Isoforms) 與功能特性</h3>
                      <figure class="image-container">
                         <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-04-9780323935920.jpg" alt="AChR 亞型與通道特性 (Fig. 11.4)">
                         <figcaption>Fig. 11.4 AChR 亞型與通道特性</figcaption>
                     </figure>
                     <ul>
-                        <li><b>成熟型 (Mature, Junctional, ε-receptor)</b>：由 $2\alpha1, \beta1, \delta, \epsilon$ 次單元組成。通道開啟時間短 (~1ms)，電導率高。</li>
-                        <li><b>不成熟型 (Immature, Extrajunctional, Fetal, γ-receptor)</b>：由 $2\alpha1, \beta1, \delta, \gamma$ 次單元組成。通道開啟時間長 (2-10倍)，電導率低。</li>
-                        <li><b>神經元型 (Neuronal α7-receptor)</b>：由五個 $\alpha7$ 次單元組成的同聚體，在特定病理狀態下於肌肉中新表現 (de-novo expression)。</li>
+                        <li><b>成熟型 (Mature, Junctional, ε-receptor)</b>：由 $2\alpha1, \beta1, \delta, \epsilon$ 次單元組成。
+                            <ul>
+                                <li><b>特性</b>：通道開啟時間短 (~1ms)，離子電導率 (conductance) 高，代謝半衰期長 (約2週)。是正常成人 NMJ 的主要形式。</li>
+                            </ul>
+                        </li>
+                        <li><b>不成熟型 (Immature, Extrajunctional, Fetal, γ-receptor)</b>：由 $2\alpha1, \beta1, \delta, \gamma$ 次單元組成。
+                            <ul>
+                                <li><b>特性</b>：通道開啟時間長 (2-10倍)，電導率低，代謝半衰期短 (<24小時)。此特性是 Succinylcholine 引起高鉀血症的分子基礎。</li>
+                            </ul>
+                        </li>
+                        <li><b>神經元型 (Neuronal α7-receptor)</b>：由五個 $\alpha7$ 次單元組成的同聚體 (homopentamer)。
+                             <ul>
+                                <li><b>特性</b>：對 NDMRs 的親和力低，是造成 NDMRs 抗性的主因。可被 ACh 的代謝物膽鹼 (choline) 激活，且不易脫敏。</li>
+                            </ul>
+                        </li>
                     </ul>
 
-                    <h3>病理狀態下的受體變化 (Upregulation)</h3>
-                    <p>在失神經支配 (denervation)、燒傷 (burns)、敗血症 (sepsis)、長期不動 (immobilization) 等狀態下，由於缺乏神經活動的抑制信號，肌細胞會大量增生<b>不成熟型(γ)</b>和<b>神經元型(α7)</b>的 AChR，並擴散到整個肌纖維膜上（稱為<span class="key-term">接合處外受體 (extrajunctional receptors)<span class="tooltip-text">正常情況下不存在於運動終板以外區域的AChR，在病理狀態下會大量表現。</span></span>）。</p>
-                     <figure class="image-container">
-                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-07-9780323935920.jpg" alt="AChR 在不同狀態下的分佈 (Fig. 11.7)">
-                        <figcaption>Fig. 11.7 AChR 在不同狀態下的分佈</figcaption>
-                    </figure>
-                    <figure class="image-container">
-                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-09-9780323935920.jpg" alt="AChR 上調與鉀離子釋放 (Fig. 11.9)">
-                        <figcaption>Fig. 11.9 AChR 上調與鉀離子釋放</figcaption>
-                    </figure>
-                    
-                    <h3>上調的臨床後果</h3>
+                    <h3>AChR 基因表現的調控 (Regulation of Gene Expression)</h3>
+                    <p>肌細胞核內同時存在著製造各種 AChR 亞型的基因，其表現受到精密的調控：</p>
                     <ul>
-                        <li><b>對 Succinylcholine 的<span class="key-term">高鉀血症 (Hyperkalemia)<span class="tooltip-text">血液中鉀離子濃度異常升高。由於增生的受體通道開啟時間長，Succinylcholine會導致大量鉀離子從細胞內流出，可能引發致命心律不整。</span></span>反應</b>：大量增生的接合處外受體被激活，導致大量的鉀離子 ($K^+$) 從肌細胞內外流至血液中，可能引發心跳停止。</li>
-                        <li><b>對 NDMRs 的抗性 (Resistance)</b>：主要原因是增生的 α7 受體對 NDMRs 的親和力較低，需要更高劑量的藥物才能達到麻痺效果。</li>
-                        <li><b>α7 受體的角色</b>：α7 受體的表現可能是一種身體應對發炎的保護性抗發炎機制 (anti-inflammatory mechanism)。</li>
+                        <li><b>神經電活動 (Nerve Electrical Activity)</b>：是抑制接合處外受體基因表現的<b>最主要信號</b>。正常的肌肉收縮會產生抑制信號，使肌纖維膜上除了運動終板外的區域保持「乾淨」。</li>
+                        <li><b>信號傳導路徑 (Signaling Pathways)</b>：
+                            <ul>
+                                <li><b>Agrin/MuSK 路徑</b>：由神經末梢釋放的 Agrin 蛋白與肌肉上的 MuSK (Muscle-Specific Kinase) 受體結合，此路徑主要負責 AChR 在突觸後膜的<b>聚集 (clustering)</b> 與穩定。</li>
+                                <li><b>Neuregulin/ErbB 路徑</b>：Neuregulin (又稱 ARIA) 作用於 ErbB 受體，調控肌細胞核，促使 ε-次單元基因表現，並抑制 γ-次單元基因，是促使受體<b>從不成熟型轉換為成熟型</b>的關鍵。</li>
+                            </ul>
+                        </li>
                     </ul>
                      <figure class="image-container">
                         <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-08-9780323935920.jpg" alt="NMJ 成熟過程中的信號分子 (Fig. 11.8)">
                         <figcaption>Fig. 11.8 NMJ 成熟過程中的信號分子</figcaption>
                     </figure>
+
+                    <h3>臨床病生理學 (Clinical Pathophysiology)</h3>
+                    <h4>1. 受體增生 (Upregulation / Proliferation)</h4>
+                    <p>當上述的抑制信號消失或減弱時，肌細胞核會「解除抑制」，開始大量表現不成熟型 (γ) 和神經元型 (α7) 的 AChR，並將其散佈於整個肌纖維膜上。</p>
+                    <ul>
+                        <li><b>發生情境</b>：失神經支配 (denervation，如脊髓損傷)、燒傷 (burns)、敗血症 (sepsis)、長期不動 (immobilization)、中風 (stroke)、長期使用 NDMRs 導致的化學性去神經支配 (chemical denervation)。</li>
+                        <li><b>臨床後果</b>：
+                            <ul>
+                                <li><b>對 Succinylcholine 的<span class="key-term">高鉀血症 (Hyperkalemia)<span class="tooltip-text">血液中鉀離子濃度異常升高。由於增生的受體通道開啟時間長，Succinylcholine會導致大量鉀離子從細胞內流出，可能引發致命心律不整。</span></span>反應</b>：大量增生的接合處外受體被激活，導致大量的鉀離子 ($K^+$) 從肌細胞內外流至血液中，可能引發心跳停止。</li>
+                                <li><b>對 NDMRs 的抗性 (Resistance)</b>：主要原因是增生的 α7 受體對 NDMRs 的親和力較低，需要更高劑量的藥物才能達到麻痺效果。</li>
+                            </ul>
+                        </li>
+                    </ul>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-07-9780323935920.jpg" alt="AChR 在不同狀態下的分佈 (Fig. 11.7)">
+                        <figcaption>Fig. 11.7 AChR 在不同狀態下的分佈</figcaption>
+                    </figure>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-09-9780323935920.jpg" alt="AChR 上調與鉀離子釋放 (Fig. 11.9)">
+                        <figcaption>Fig. 11.9 AChR 上調與鉀離子釋放</figcaption>
+                    </figure>
+
+                    <h4>2. 受體減少 (Downregulation / Deficiency)</h4>
+                    <ul>
+                        <li><b>代表疾病：重症肌無力 (Myasthenia Gravis, MG)</b>：一種自體免疫疾病，身體產生抗體攻擊並破壞突觸後膜的 AChR，導致受體數量顯著減少，突觸後膜皺褶變得扁平。</li>
+                        <li><b>臨床後果</b>：
+                            <ul>
+                                <li><b>安全邊際降低</b>：傳導效率低下，易出現肌肉無力與疲勞。</li>
+                                <li><b>對 NDMRs 高度敏感 (Sensitive)</b>：由於受體數量已大幅減少，只需少量 NDMRs 即可達到阻斷效果。</li>
+                                <li><b>對 Succinylcholine 相對抗性 (Resistant)</b>：可供 Succinylcholine 作用的受體數量不足，需要更高劑量才能產生足夠的去極化效應。</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h4>3. 受體功能異常 (Channelopathies)</h4>
+                    <ul>
+                        <li><b>代表疾病：先天性肌無力症候群 (Congenital Myasthenic Syndromes, CMS)</b>：一組因編碼 NMJ 各蛋白（包括 AChR）的基因突變所引起的遺傳性疾病。</li>
+                        <li><b>範例</b>：
+                            <ul>
+                                <li><b>慢通道症候群 (Slow-channel syndrome)</b>：AChR 基因突變導致離子通道在激活後關閉過慢，陽離子過度流入，造成終板肌病變。</li>
+                                <li><b>快通道症候群 (Fast-channel syndrome)</b>：AChR 基因突變導致通道開啟時間過短或對 ACh 親和力下降，EPP 幅度不足，導致肌無力。</li>
+                            </ul>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -464,29 +577,12 @@
                     <h2>六、 課堂小測驗</h2>
                 </div>
                 <div class="collapsible-content">
-                    <div id="quiz">
-                        <form id="quizForm">
-                            <div class="quiz-question">
-                                <p><strong>問題 1:</strong> 在燒傷或長期不動的病人身上使用 Succinylcholine，最需要擔心的嚴重副作用是什麼？</p>
-                                <label><input type="radio" name="q1" value="a"> 過敏性休克 (Anaphylaxis)</label><br>
-                                <label><input type="radio" name="q1" value="b"> 嚴重的高鉀血症 (Hyperkalemia)</label><br>
-                                <label><input type="radio" name="q1" value="c"> 惡性高熱 (Malignant Hyperthermia)</label><br>
-                            </div>
-                            <div class="quiz-question">
-                                <p><strong>問題 2:</strong> 下列何種藥物是透過「包裹」固醇類肌肉鬆弛劑來達到逆轉效果？</p>
-                                <label><input type="radio" name="q2" value="a"> Neostigmine</label><br>
-                                <label><input type="radio" name="q2" value="b"> Atropine</label><br>
-                                <label><input type="radio" name="q2" value="c"> Sugammadex</label><br>
-                            </div>
-                            <div class="quiz-question">
-                                <p><strong>問題 3:</strong> 肉毒桿菌毒素 (Botox) 導致肌肉麻痺的主要機制為何？</p>
-                                <label><input type="radio" name="q3" value="a"> 分解 SNARE 蛋白，抑制乙醯膽鹼釋放</label><br>
-                                <label><input type="radio" name="q3" value="b"> 競爭性阻斷乙醯膽鹼受體</label><br>
-                                <label><input type="radio" name="q3" value="c"> 抑制乙醯膽鹼酯酶的活性</label><br>
-                            </div>
-                            <button type="submit">提交答案</button>
-                        </form>
-                        <div id="quiz-result"></div>
+                    <div id="quiz-container">
+                        <div id="quiz-form-container"></div>
+                        <div id="quiz-results-container"></div>
+                        <div id="quiz-controls">
+                            <button id="start-quiz-btn">開始測驗</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -496,6 +592,290 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Question Bank ---
+            const questionBank = [
+                {
+                    question: "在燒傷或長期不動的病人身上使用 Succinylcholine，最需要擔心的嚴重副作用是什麼？",
+                    options: { a: "過敏性休克 (Anaphylaxis)", b: "嚴重的高鉀血症 (Hyperkalemia)", c: "惡性高熱 (Malignant Hyperthermia)" },
+                    answer: "b",
+                    explanation: "詳解：在這些病理狀態下，肌肉會大量增生接合處外受體 (extrajunctional receptors)，特別是不成熟型(γ)受體。這種受體的離子通道開啟時間較長，當被 Succinylcholine 激活時，會導致大量鉀離子從細胞內流出，引發可能致命的高鉀血症。"
+                },
+                {
+                    question: "下列何種藥物是透過「包裹」固醇類肌肉鬆弛劑來達到逆轉效果？",
+                    options: { a: "Neostigmine", b: "Atropine", c: "Sugammadex" },
+                    answer: "c",
+                    explanation: "詳解：Sugammadex 是一種改良的環糊精，其分子結構可以特異性地包裹固醇類 NDMRs (如 Rocuronium, Vecuronium)，形成穩定的複合物，使其無法與 AChR 結合，並加速其從體內清除，從而達到快速且深度的逆轉效果。"
+                },
+                {
+                    question: "肉毒桿菌毒素 (Botox) 導致肌肉麻痺的主要機制為何？",
+                    options: { a: "分解 SNARE 蛋白，抑制乙醯膽鹼釋放", b: "競爭性阻斷乙醯膽鹼受體", c: "抑制乙醯膽鹼酯酶的活性" },
+                    answer: "a",
+                    explanation: "詳解：肉毒桿菌毒素是一種蛋白酶，它會進入神經末梢，選擇性地切割 SNARE 蛋白 (如 SNAP-25, Synaptobrevin)。SNARE 蛋白是突觸囊泡與神經末梢膜融合所必需的，被破壞後將無法釋放乙醯膽鹼，導致弛緩性麻痺。"
+                },
+                {
+                    question: "非去極化肌肉鬆弛劑 (NDMRs) 引起的 Train-of-Four (TOF) 衰減現象 (fade)，主要歸因於下列何種機制？",
+                    options: { a: "突觸後受體的脫敏", b: "突觸前受體的阻斷", c: "乙醯膽鹼酯酶的飽和" },
+                    answer: "b",
+                    explanation: "詳解：衰減現象主要是因為 NDMRs 阻斷了位於神經末梢的突觸前尼古丁受體。這些受體在正常情況下參與正回饋機制，促進 ACh 的動員和釋放。被阻斷後，在高頻刺激下，ACh 的補充能力下降，導致後續釋放的 ACh 越來越少。"
+                },
+                {
+                    question: "哪一種乙醯膽鹼受體亞型 (isoform) 的離子通道開啟時間最長，且與高鉀血症風險最相關？",
+                    options: { a: "成熟型 (ε-receptor)", b: "不成熟型 (γ-receptor)", c: "神經元型 (α7-receptor)" },
+                    answer: "b",
+                    explanation: "詳解：不成熟型 (γ-receptor) 的通道開啟時間是成熟型 (ε-receptor) 的 2-10 倍。在受體上調的病患中，大量表現的不成熟型受體被 Succinylcholine 激活後，長時間的通道開啟會導致更顯著的鉀離子外流。"
+                },
+                {
+                    question: "重症肌無力 (Myasthenia Gravis) 患者對肌肉鬆弛劑的反應為何？",
+                    options: { a: "對 NDMRs 敏感，對 Succinylcholine 敏感", b: "對 NDMRs 敏感，對 Succinylcholine 有抗性", c: "對 NDMRs 有抗性，對 Succinylcholine 敏感" },
+                    answer: "b",
+                    explanation: "詳解：重症肌無力患者因自身抗體攻擊，導致突觸後 AChR 數量顯著減少，安全邊際降低。因此，只需較低劑量的 NDMRs 就能達到阻斷效果（敏感）。對於 Succinylcholine，由於可供其作用的受體數量減少，需要更高劑量才能達到相同的去極化效果（抗性）。"
+                },
+                {
+                    question: "下列何者不是神經肌肉接合處 (NMJ) 的主要組成部分？",
+                    options: { a: "運動終板 (Motor End Plate)", b: "許旺細胞 (Schwann Cell)", c: "蘭氏結 (Node of Ranvier)" },
+                    answer: "c",
+                    explanation: "詳解：蘭氏結是髓鞘化軸突上沒有髓鞘覆蓋的區域，負責跳躍式傳導，位於神經末梢之前，不屬於 NMJ 的核心結構。NMJ 主要由神經末梢、許旺細胞、突觸間隙和運動終板構成。"
+                },
+                {
+                    question: "微小終板電位 (MEPP) 是由什麼事件引起的？",
+                    options: { a: "單一分子的 ACh 與受體結合", b: "單一囊泡的 ACh 自發性釋放", c: "一個神經動作電位" },
+                    answer: "b",
+                    explanation: "詳解：MEPP 是神經肌肉接合處在靜息狀態下，單一突觸囊泡自發性釋放其內含的 ACh (一個量子) 所引起的微小去極化事件。其幅度不足以觸發肌肉收縮，但反映了突觸的基礎釋放活性。"
+                },
+                {
+                    question: "Succinylcholine 引起的第二相阻斷 (Phase II Block) 的特徵為何？",
+                    options: { a: "對高頻刺激沒有衰減現象", b: "可被 Neostigmine 有效逆轉", c: "類似非去極化藥物造成的阻斷，出現衰減現象" },
+                    answer: "c",
+                    explanation: "詳解：第二相阻斷是長時間或大劑量使用 Succinylcholine 後出現的複雜現象。其臨床表現（如 TOF 衰減）與 NDMRs 造成的阻斷相似，但其機制涉及受體脫敏、離子通道阻斷等多重因素，且對抗膽鹼酯酶藥物的反應不可預測。"
+                },
+                {
+                    question: "新生兒對 NDMRs 較為敏感的主要原因是什麼？",
+                    options: { a: "體脂肪比例較高", b: "NMJ 尚未發育成熟，安全邊際較低", c: "腎功能尚未完全" },
+                    answer: "b",
+                    explanation: "詳解：新生兒的 NMJ 結構尚未完全成熟，突觸後膜皺褶較淺，AChR 數量較少，導致神經肌肉傳導的安全邊際較低。因此，他們對 NDMRs 的阻斷效應比成人更為敏感。"
+                },
+                {
+                    question: "乙醯膽鹼酯酶 (AChE) 在突觸間隙中的主要功能是什麼？",
+                    options: { a: "合成乙醯膽鹼", b: "將乙醯膽鹼運回神經末梢", c: "快速水解乙醯膽鹼" },
+                    answer: "c",
+                    explanation: "詳解：AChE 的功能是極快地將 ACh 分解為膽鹼和乙酸，從而終止其對突觸後受體的作用。這個過程確保了神經信號的精確性和短暫性，使肌肉能夠快速反應並為下一次信號做好準備。"
+                },
+                {
+                    question: "下列哪種情況下，病患對 NDMRs 可能會表現出抗性 (resistance)？",
+                    options: { a: "重症肌無力 (Myasthenia Gravis)", b: "伊頓-藍伯特症候群 (Eaton-Lambert Syndrome)", c: "大面積燒傷後一週" },
+                    answer: "c",
+                    explanation: "詳解：大面積燒傷會引發全身性發炎反應，導致肌肉細胞大量增生接合處外受體，特別是 α7-AChR。由於 α7-AChR 對 NDMRs 的親和力較低，因此病患會表現出抗性，需要更高劑量的藥物。"
+                },
+                {
+                    question: "電壓門控鈉離子通道在 NMJ 的哪個位置密度最高？",
+                    options: { a: "突觸後膜皺褶的頂肩部", b: "突觸後膜皺褶的深處", c: "突觸前神經末梢膜上" },
+                    answer: "b",
+                    explanation: "詳解：這種空間配置是為了高效傳導。AChR 位於皺褶頂部，接收信號並產生 EPP。EPP 擴散到皺褶深處，激活高密度的電壓門控鈉離子通道，從而有效地將局部去極化轉化為沿整個肌纖維傳播的動作電位。"
+                },
+                {
+                    question: "伊頓-藍伯特肌無力症候群 (Eaton-Lambert Myasthenic Syndrome) 的病理生理學基礎是什麼？",
+                    options: { a: "突觸後 AChR 被抗體破壞", b: "突觸前電壓門控鈣離子通道被抗體攻擊", c: "AChE 活性異常增高" },
+                    answer: "b",
+                    explanation: "詳解：此症候群是一種自身免疫性疾病，其抗體主要攻擊神經末梢的電壓門控鈣離子通道。這導致神經衝動到達時，鈣離子內流減少，從而使 ACh 的釋放量大幅下降，引起肌肉無力。"
+                },
+                {
+                    question: "Succinylcholine 引起的肌束顫動 (fasciculations) 是由於其作用於何處？",
+                    options: { a: "僅作用於突觸後肌肉受體", b: "同時作用於突觸前和突觸後受體", c: "直接刺激肌肉纖維" },
+                    answer: "b",
+                    explanation: "詳解：肌束顫動是整個運動單元的同步收縮，這需要神經的參與。Succinylcholine 不僅激活突觸後的 AChR 導致肌肉去極化，也激活突觸前的 AChR 導致神經末梢發放動作電位，從而引發肌束顫動。"
+                },
+                {
+                    question: "下列哪種離子對 ACh 的量子釋放最為關鍵？",
+                    options: { a: "鈉離子 (Na⁺)", b: "鉀離子 (K⁺)", c: "鈣離子 (Ca²⁺)" },
+                    answer: "c",
+                    explanation: "詳解：當動作電位到達神經末梢時，會打開電壓門控鈣離子通道。鈣離子的內流是觸發突觸囊泡與突觸前膜融合並釋放 ACh 的直接信號。"
+                },
+                {
+                    question: "何謂「安全邊際 (Margin of Safety)」？",
+                    options: { a: "肌肉鬆弛劑的治療指數", b: "神經釋放的 ACh 量遠超過產生動作電位所需的量", c: "AChE 的最大代謝速率" },
+                    answer: "b",
+                    explanation: "詳解：安全邊際指的是正常情況下，單一神經衝動所釋放的 ACh 數量，遠遠超過了使突觸後膜去極化至閾值並產生肌肉動作電位所需的最低數量。這個緩衝確保了傳導的可靠性。"
+                },
+                {
+                    question: "長期使用抗膽鹼酯酶藥物 (如治療重症肌無力) 可能導致什麼後果？",
+                    options: { a: "AChR 數量上調", b: "AChR 數量下調與功能障礙", c: "ACh 合成增加" },
+                    answer: "b",
+                    explanation: "詳解：長期暴露於高濃度的 ACh (因 AChE 被抑制) 會導致突觸後 AChR 的代償性下調 (downregulation) 和脫敏，這可能反而削弱神經肌肉傳導，甚至導致膽鹼性危象 (cholinergic crisis)。"
+                },
+                {
+                    question: "下列何種藥物組合最可能產生協同增強的肌肉鬆弛效果？",
+                    options: { a: "Rocuronium 和 Sugammadex", b: "Vecuronium 和 Aminoglycoside 類抗生素", c: "Succinylcholine 和 Neostigmine" },
+                    answer: "b",
+                    explanation: "詳解：Aminoglycoside 類抗生素 (如 Gentamicin) 會抑制突觸前 ACh 的釋放，並可能阻斷突觸後 AChR。這種效應會增強 NDMRs (如 Vecuronium) 的阻斷效果，延長麻痺時間。"
+                },
+                {
+                    question: "神經元型 α7-AChR 在病理狀態下的肌肉中表現，其藥理學特性為何？",
+                    options: { a: "對 NDMRs 高度敏感", b: "對 NDMRs 具抗性", c: "不與任何肌肉鬆弛劑作用" },
+                    answer: "b",
+                    explanation: "詳解：α7-AChR 對傳統的 NDMRs (如 Rocuronium) 的親和力較低。因此，當肌肉因病理狀態而大量表現這種受體時，會導致對 NDMRs 的臨床抗性，需要更高劑量才能達到預期效果。"
+                },
+                {
+                    question: "為何給予 Neostigmine 逆轉時，通常需要合併使用 Atropine 或 Glycopyrrolate？",
+                    options: { a: "為了增強 Neostigmine 的效果", b: "為了對抗 Neostigmine 的蕈毒鹼性副作用", c: "為了加速 NDMR 的代謝" },
+                    answer: "b",
+                    explanation: "詳解：Neostigmine 增加全身的 ACh 濃度，不僅作用於骨骼肌的尼古丁受體，也作用於副交感神經節後的蕈毒鹼性受體 (muscarinic receptors)，導致心跳變慢、分泌物增多等副作用。Atropine 等抗膽鹼藥物可以阻斷這些蕈毒鹼性效應。"
+                },
+                {
+                    question: "描述眼外肌 (extraocular muscles) 的神經支配有何特點？",
+                    options: { a: "單一神經支配 (Singly innervated)", b: "多重神經支配 (Multiply innervated)", c: "沒有神經支配" },
+                    answer: "b",
+                    explanation: "詳解：與大多數骨骼肌不同，眼外肌的肌纖維上有多個神經肌肉接合處，這種多重神經支配的特性與其精細、持續的張力調節功能有關。"
+                },
+                {
+                    question: "在肌少症 (sarcopenia) 的老年人中，NMJ 會出現何種變化？",
+                    options: { a: "突觸後膜皺褶變深，AChR 密度增加", b: "結構保持不變，但 ACh 釋放增加", c: "突觸後膜變得扁平，AChR 聚集變得零散" },
+                    answer: "c",
+                    explanation: "詳解：老化伴隨的肌少症會讓 NMJ 結構退化，包括突觸後膜皺褶變淺、面積縮小，AChR 的分布變得不規則和破碎，神經末梢也可能萎縮，這些都降低了傳導效率。"
+                },
+                {
+                    question: "下列哪項關於成熟型 (ε) 與不成熟型 (γ) AChR 的描述是錯誤的？",
+                    options: { a: "不成熟型受體的通道開啟時間較長", b: "成熟型受體的電導率較高", c: "正常成人肌肉中同時大量表現兩種受體" },
+                    answer: "c",
+                    explanation: "詳解：正常、有神經支配的成人骨骼肌中，絕大多數是成熟型 (ε) AChR，僅集中在運動終板。不成熟型 (γ) AChR 只在胎兒期或特定病理狀態下才會大量表現。"
+                },
+                {
+                    question: "高濃度鎂離子 (Magnesium) 對神經肌肉傳導有何影響？",
+                    options: { a: "增加 ACh 的釋放", b: "抑制突觸前 ACh 的釋放", c: "增強 AChR 的功能" },
+                    answer: "b",
+                    explanation: "詳解：鎂離子會與鈣離子競爭進入突觸前電壓門控鈣離子通道。高濃度的鎂會阻礙鈣離子內流，從而減少 ACh 的釋放量，產生肌肉鬆弛的效果，並會增強 NDMRs 的作用。"
+                },
+                {
+                    question: "何謂通道阻斷 (Channel Block)？",
+                    options: { a: "藥物與 ACh 競爭受體結合位點", b: "藥物物理性地堵塞在開啟的離子通道內", c: "藥物使受體對 ACh 變得不敏感" },
+                    answer: "b",
+                    explanation: "詳解：通道阻斷是一種非競爭性的抑制機制，藥物分子直接進入並堵塞 AChR 的離子通道孔道，阻止離子流動。這種阻斷通常是使用依賴性 (use-dependent) 的，即通道越常開啟，越容易被阻斷。"
+                },
+                {
+                    question: "Succinylcholine 的代謝主要依賴下列何種酵素？",
+                    options: { a: "突觸間隙的乙醯膽鹼酯酶 (AChE)", b: "血漿中的丁醯膽鹼酯酶 (Pseudocholinesterase)", c: "肝臟的細胞色素 P450" },
+                    answer: "b",
+                    explanation: "詳解：Succinylcholine 的作用終止並非依賴突觸間隙的 AChE，而是被血漿中的丁醯膽鹼酯酶（又稱偽膽鹼酯酶）水解。因此，缺乏或此酵素功能異常的患者，其作用時間會顯著延長。"
+                },
+                {
+                    question: "Agrin 和 Neuregulin 在 NMJ 的發育中扮演什麼角色？",
+                    options: { a: "它們是抑制性的神經傳導物質", b: "它們是促進 AChR 聚集和成熟的信號分子", c: "它們負責分解突觸間隙的蛋白質" },
+                    answer: "b",
+                    explanation: "詳解：Agrin 和 Neuregulin (ARIA) 是由神經末梢釋放的關鍵生長因子。Agrin 透過 MuSK 受體誘導 AChR 在突觸後膜聚集，而 Neuregulin 則參與調控受體亞型的轉換（從 γ 到 ε），共同促進 NMJ 的形成與成熟。"
+                },
+                {
+                    question: "為何 NDMRs 對快縮肌 (fast-twitch fibers) 和慢縮肌 (slow-twitch fibers) 的作用可能不同？",
+                    options: { a: "兩者表達完全不同的 AChR 亞型", b: "NMJ 的結構形態和安全邊際不同", c: "慢縮肌沒有 AChE" },
+                    answer: "b",
+                    explanation: "詳解：一般來說，快縮肌的 NMJ 結構更複雜，突觸後膜皺褶更深，安全邊際可能也較高。這些結構上的差異會影響藥物到達受體的擴散速率以及對傳導的抑制效果，導致不同肌群對鬆弛劑的敏感度和恢復速度有所差異。"
+                },
+                {
+                    question: "在老年衰弱 (frailty) 的病人中，對肌肉鬆弛劑的藥物動力學 (pharmacokinetics) 可能有何改變？",
+                    options: { a: "藥物分佈體積減少，清除率下降", b: "藥物分佈體積增加，清除率上升", c: "藥物動力學沒有改變" },
+                    answer: "a",
+                    explanation: "詳解：老年衰弱病人通常肌肉量減少（藥物分佈的主要組織之一）、體液量改變、肝腎功能下降。這會導致水溶性藥物（如多數 NDMRs）的分佈體積減少，血中濃度相對較高，且藥物清除率下降，作用時間延長。"
+                }
+            ];
+
+            let currentQuestions = [];
+
+            const startQuizBtn = document.getElementById('start-quiz-btn');
+            const quizFormContainer = document.getElementById('quiz-form-container');
+            const quizResultsContainer = document.getElementById('quiz-results-container');
+            const quizControls = document.getElementById('quiz-controls');
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+
+            function generateQuiz() {
+                shuffleArray(questionBank);
+                currentQuestions = questionBank.slice(0, 5);
+                
+                let quizHTML = '<form id="quizForm">';
+                currentQuestions.forEach((q, index) => {
+                    quizHTML += `<div class="quiz-question" id="q-container-${index}">`;
+                    quizHTML += `<p><strong>問題 ${index + 1}:</strong> ${q.question}</p>`;
+                    for (const key in q.options) {
+                        quizHTML += `<label><input type="radio" name="q${index}" value="${key}"> ${q.options[key]}</label><br>`;
+                    }
+                    quizHTML += `</div>`;
+                });
+                quizHTML += '</form>';
+                
+                quizFormContainer.innerHTML = quizHTML;
+                quizResultsContainer.innerHTML = '';
+                
+                const submitBtn = document.createElement('button');
+                submitBtn.type = 'submit';
+                submitBtn.textContent = '提交答案';
+                submitBtn.setAttribute('form', 'quizForm');
+
+                const newQuizBtn = document.createElement('button');
+                newQuizBtn.textContent = '產生新測驗';
+                newQuizBtn.addEventListener('click', generateQuiz);
+
+                quizControls.innerHTML = '';
+                quizControls.appendChild(submitBtn);
+                quizControls.appendChild(newQuizBtn);
+                
+                startQuizBtn.style.display = 'none';
+
+                document.getElementById('quizForm').addEventListener('submit', showResults);
+            }
+
+            function showResults(e) {
+                e.preventDefault();
+                
+                let score = 0;
+                
+                currentQuestions.forEach((q, index) => {
+                    const form = document.getElementById('quizForm');
+                    const selected = form.querySelector(`input[name="q${index}"]:checked`);
+                    const questionContainer = document.getElementById(`q-container-${index}`);
+                    
+                    const resultFeedback = document.createElement('div');
+                    resultFeedback.className = 'answer-feedback';
+
+                    const explanationDiv = document.createElement('div');
+                    explanationDiv.className = 'quiz-explanation';
+                    explanationDiv.innerHTML = q.explanation;
+                    
+                    if (selected) {
+                        if (selected.value === q.answer) {
+                            score++;
+                            resultFeedback.innerHTML = `您的答案: <strong>${q.options[selected.value]}</strong> <span class="correct">(正確)</span>`;
+                        } else {
+                            resultFeedback.innerHTML = `您的答案: <strong>${q.options[selected.value]}</strong> <span class="incorrect">(錯誤)</span><br>正確答案: <strong>${q.options[q.answer]}</strong>`;
+                        }
+                    } else {
+                        resultFeedback.innerHTML = `<span class="incorrect">未作答</span><br>正確答案: <strong>${q.options[q.answer]}</strong>`;
+                    }
+                    
+                    questionContainer.appendChild(resultFeedback);
+                    questionContainer.appendChild(explanationDiv);
+                    
+                    // Disable further changes
+                    const inputs = questionContainer.querySelectorAll('input');
+                    inputs.forEach(input => input.disabled = true);
+                });
+
+                const totalQuestions = currentQuestions.length;
+                const scoreDiv = document.createElement('div');
+                scoreDiv.id = 'quiz-score';
+                scoreDiv.innerHTML = `測驗完成！您答對了 ${score} / ${totalQuestions} 題。`;
+                scoreDiv.className = (score / totalQuestions) > 0.5 ? 'correct' : 'incorrect';
+                
+                quizResultsContainer.prepend(scoreDiv);
+
+                // Hide submit button
+                quizControls.querySelector('button[type="submit"]').style.display = 'none';
+            }
+
+            startQuizBtn.addEventListener('click', generateQuiz);
+            
             // Collapsible sections functionality
             const headers = document.querySelectorAll('.collapsible-header');
             headers.forEach(header => {
@@ -510,55 +890,19 @@
                 });
             });
 
-            // Quiz functionality
-            const quizForm = document.getElementById('quizForm');
-            quizForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const answers = {
-                    q1: 'b',
-                    q2: 'c',
-                    q3: 'a'
-                };
-                
-                let score = 0;
-                const totalQuestions = Object.keys(answers).length;
-                
-                for (const q in answers) {
-                    const selected = document.querySelector(`input[name="${q}"]:checked`);
-                    if (selected && selected.value === answers[q]) {
-                        score++;
-                    }
-                }
-                
-                const resultDiv = document.getElementById('quiz-result');
-                resultDiv.innerHTML = `測驗完成！您答對了 ${score} / ${totalQuestions} 題。`;
-                
-                if (score === totalQuestions) {
-                    resultDiv.className = 'correct';
-                    resultDiv.innerHTML += '<br>太棒了，完全正確！';
-                } else {
-                     resultDiv.className = 'incorrect';
-                     resultDiv.innerHTML += '<br>再接再厲，可以回頭複習一下喔！';
-                }
-            });
-
             // Smooth scrolling and active nav link
             const navLinks = document.querySelectorAll('nav a');
             navLinks.forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     
-                    // Remove active class from all links
                     navLinks.forEach(l => l.classList.remove('active'));
-                    // Add active class to clicked link
                     this.classList.add('active');
                     
                     const targetId = this.getAttribute('href');
                     const targetElement = document.querySelector(targetId);
                     
                     if(targetElement) {
-                        // Ensure the target section is visible before scrolling
                         const header = targetElement.querySelector('.collapsible-header');
                         const content = targetElement.querySelector('.collapsible-content');
                         if (header && content && content.style.display !== 'block') {
