@@ -182,20 +182,24 @@
             opacity: 1;
         }
         
-        .image-placeholder {
-            width: 80%;
-            max-width: 500px;
-            height: 300px;
-            background-color: #e9ecef;
-            border: 2px dashed #adb5bd;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px auto;
+        .image-container {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-container figcaption {
+            margin-top: 10px;
+            font-size: 0.9em;
             color: #6c757d;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-radius: 10px;
+            font-style: italic;
         }
         
         #quiz {
@@ -295,7 +299,10 @@
                         <li><b>肌肉運動終板 (Muscle End Plate)</b>：肌纖維膜上與神經末梢相對的特化區域，其表面形成許多深邃的皺褶 (junctional folds)，大幅增加表面積。</li>
                     </ul>
                     
-                    <div class="image-placeholder"><img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-01-9780323935920.jpg"></div>
+                    <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-01-9780323935920.jpg" alt="神經肌肉接合處結構圖 (Fig. 11.1)">
+                        <figcaption>Fig. 11.1 神經肌肉接合處結構圖</figcaption>
+                    </figure>
 
                     <h3>精細結構與功能分佈：</h3>
                     <ul>
@@ -317,6 +324,7 @@
                 </div>
                 <div class="collapsible-content">
                     <p>神經肌肉傳導是一個精密調控的過程，確保神經衝動能準確地觸發肌肉收縮。</p>
+                    <h3>ACh 的合成、儲存與釋放</h3>
                     <ol>
                         <li><b>ACh 的合成與儲存</b>：神經末梢利用膽鹼 (choline) 和乙醯輔酶A (acetyl CoA)，在膽鹼乙醯轉移酶 (choline acetyltransferase, CAT) 催化下合成 ACh，並儲存在突觸囊泡 (synaptic vesicles) 中。</li>
                         <li>
@@ -325,6 +333,10 @@
                                 <li>ACh 是以固定大小的「量子 (quanta)」形式釋放。自發性的單一囊泡釋放會產生一個微小終板電位 <span class="key-term">(Miniature End-Plate Potential, MEPP)<span class="tooltip-text">單一量子ACh釋放所引起的微小去極化，不足以觸發肌肉收縮，反映了突觸的基本活性。</span></span>。</li>
                                 <li>一個神經動作電位 (action potential) 會同步觸發數百個囊泡釋放，其總和效應產生一個遠大於閾值的<span class="key-term">終板電位 (End-Plate Potential, EPP)<span class="tooltip-text">由大量ACh釋放引起的突觸後膜去極化，若達到閾值，則會引發肌肉動作電位。</span></span>。</li>
                             </ul>
+                             <figure class="image-container">
+                                <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-02-9780323935920.jpg" alt="化學突觸運作圖 (Fig. 11.2)">
+                                <figcaption>Fig. 11.2 化學突觸運作圖</figcaption>
+                            </figure>
                         </li>
                         <li>
                             <b>胞吐作用 (Exocytosis)</b>：
@@ -332,7 +344,10 @@
                                 <li>動作電位使 Ca²⁺ 內流，Ca²⁺ 與囊泡上的感應器結合，啟動由 <span class="key-term">SNARE 蛋白<span class="tooltip-text">包含囊泡上的 Synaptobrevin 和細胞膜上的 Syntaxin/SNAP-25，它們像拉鍊一樣將囊泡拉向細胞膜進行融合。</span></span> 複合體介導的囊泡融合與釋放過程。</li>
                                 <li><b>肉毒桿菌毒素 (Botulinum Toxin)</b> 是一種蛋白酶，能選擇性地切割 SNARE 蛋白，從而阻斷 ACh 釋放，導致弛緩性麻痺 (flaccid paralysis)。</li>
                             </ul>
-                            <div class="image-placeholder">示意圖: 胞吐作用與肉毒桿菌毒素作用 (Fig. 11.3)</div>
+                            <figure class="image-container">
+                                <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-03-9780323935920.jpg" alt="胞吐作用與肉毒桿菌毒素作用機制 (Fig. 11.3)">
+                                <figcaption>Fig. 11.3 胞吐作用與肉毒桿菌毒素作用機制</figcaption>
+                            </figure>
                         </li>
                         <li><b>訊號終止</b>：釋放的 ACh 被 AChE 在毫秒內迅速水解，確保訊號的精確與短暫性。</li>
                         <li><b>安全邊際 (Margin of Safety)</b>：正常釋放的 ACh 數量遠超觸發肌肉收縮所需，這個緩衝區間即為安全邊際。在重症肌無力 (Myasthenia Gravis) 等疾病中，由於 AChR 數量減少，安全邊際大幅降低，因此對非去極化肌肉鬆弛劑極為敏感。</li>
@@ -348,6 +363,10 @@
                     <h3>A. 非去極化肌肉鬆弛劑 (Nondepolarizing Muscle Relaxants, NDMRs)</h3>
                     <ul>
                         <li><b>作用機制</b>：作為<span class="key-term">競爭性拮抗劑 (competitive antagonist)<span class="tooltip-text">與內源性配體(ACh)競爭相同的受體結合位點，但不產生生理效應，其作用可被增加的ACh濃度所克服。</span></span>，與 ACh 競爭突觸後膜 AChR 的結合位點，阻止離子通道打開。</li>
+                         <figure class="image-container">
+                            <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-05-9780323935920.jpg" alt="ACh 與 NDMR 對受體的作用 (Fig. 11.5)">
+                            <figcaption>Fig. 11.5 ACh 與 NDMR 對受體的作用</figcaption>
+                        </figure>
                         <li><b>作用逆轉</b>：
                             <ul>
                                 <li><b>抗膽鹼酯酶藥物 (Anticholinesterases)</b>，如 Neostigmine，透過抑制 AChE，增加突觸間隙的 ACh 濃度，依據質量作用定律 (law of mass action) 將 NDMR 從受體上置換下來。</li>
@@ -362,6 +381,10 @@
                     <ul>
                         <li><b>代表藥物</b>：琥珀膽鹼 (Succinylcholine)。</li>
                         <li><b>第一相阻斷 (Phase I Block)</b>：作為<span class="key-term">激動劑 (agonist)<span class="tooltip-text">能與受體結合並產生與內源性配體相似的生理效應。</span></span>，引起終板持續去極化，初期表現為<span class="key-term">肌束顫動 (fasciculations)<span class="tooltip-text">由突觸前神經末梢的去極化引起，導致整個運動單元不自主收縮。</span></span>，隨後因鄰近的電壓門控鈉離子通道進入不活化狀態 (inactivated state) 而導致麻痺。</li>
+                         <figure class="image-container">
+                            <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-06-9780323935920.jpg" alt="鈉離子通道的三種狀態 (Fig. 11.6)">
+                            <figcaption>Fig. 11.6 鈉離子通道的三種狀態</figcaption>
+                        </figure>
                         <li><b>第二相阻斷 (Phase II Block)</b>：長時間或大劑量使用後，NMJ 的特性轉變為類似 NDMR 造成的阻斷（如出現衰減）。其機制複雜，涉及受體<span class="key-term">脫敏 (desensitization)<span class="tooltip-text">受體蛋白構型改變，即使與激動劑結合也無法打開離子通道。</span></span>、突觸前阻斷及離子平衡失調，不建議用藥物逆轉。</li>
                     </ul>
 
@@ -379,7 +402,10 @@
                 </div>
                 <div class="collapsible-content">
                     <h3>AChR 的亞型 (Isoforms)</h3>
-                    <div class="image-placeholder">示意圖: AChR 亞型與通道特性 (Fig. 11.4)</div>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-04-9780323935920.jpg" alt="AChR 亞型與通道特性 (Fig. 11.4)">
+                        <figcaption>Fig. 11.4 AChR 亞型與通道特性</figcaption>
+                    </figure>
                     <ul>
                         <li><b>成熟型 (Mature, Junctional, ε-receptor)</b>：由 $2\alpha1, \beta1, \delta, \epsilon$ 次單元組成。通道開啟時間短 (~1ms)，電導率高。</li>
                         <li><b>不成熟型 (Immature, Extrajunctional, Fetal, γ-receptor)</b>：由 $2\alpha1, \beta1, \delta, \gamma$ 次單元組成。通道開啟時間長 (2-10倍)，電導率低。</li>
@@ -388,7 +414,14 @@
 
                     <h3>病理狀態下的受體變化 (Upregulation)</h3>
                     <p>在失神經支配 (denervation)、燒傷 (burns)、敗血症 (sepsis)、長期不動 (immobilization) 等狀態下，由於缺乏神經活動的抑制信號，肌細胞會大量增生<b>不成熟型(γ)</b>和<b>神經元型(α7)</b>的 AChR，並擴散到整個肌纖維膜上（稱為<span class="key-term">接合處外受體 (extrajunctional receptors)<span class="tooltip-text">正常情況下不存在於運動終板以外區域的AChR，在病理狀態下會大量表現。</span></span>）。</p>
-                    <div class="image-placeholder">示意圖: AChR 上調與鉀離子釋放 (Fig. 11.9)</div>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-07-9780323935920.jpg" alt="AChR 在不同狀態下的分佈 (Fig. 11.7)">
+                        <figcaption>Fig. 11.7 AChR 在不同狀態下的分佈</figcaption>
+                    </figure>
+                    <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-09-9780323935920.jpg" alt="AChR 上調與鉀離子釋放 (Fig. 11.9)">
+                        <figcaption>Fig. 11.9 AChR 上調與鉀離子釋放</figcaption>
+                    </figure>
                     
                     <h3>上調的臨床後果</h3>
                     <ul>
@@ -396,6 +429,10 @@
                         <li><b>對 NDMRs 的抗性 (Resistance)</b>：主要原因是增生的 α7 受體對 NDMRs 的親和力較低，需要更高劑量的藥物才能達到麻痺效果。</li>
                         <li><b>α7 受體的角色</b>：α7 受體的表現可能是一種身體應對發炎的保護性抗發炎機制 (anti-inflammatory mechanism)。</li>
                     </ul>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-08-9780323935920.jpg" alt="NMJ 成熟過程中的信號分子 (Fig. 11.8)">
+                        <figcaption>Fig. 11.8 NMJ 成熟過程中的信號分子</figcaption>
+                    </figure>
                 </div>
             </div>
 
@@ -404,7 +441,10 @@
                     <h2>五、 NMJ 的發育與老化</h2>
                 </div>
                 <div class="collapsible-content">
-                     <div class="image-placeholder">示意圖: NMJ 從新生兒到老化的變化 (Fig. 11.10)</div>
+                     <figure class="image-container">
+                        <img src="https://MDJimmyFu.github.io/MillerCh12/img/f11-10-9780323935920.jpg" alt="NMJ 從新生兒到老化的變化 (Fig. 11.10)">
+                        <figcaption>Fig. 11.10 NMJ 從新生兒到老化的變化</figcaption>
+                    </figure>
                     <h3>新生兒 (Newborn)</h3>
                     <ul>
                         <li>NMJ 尚未發育成熟，突觸後膜皺褶少，AChR 數量較少，安全邊際低。</li>
