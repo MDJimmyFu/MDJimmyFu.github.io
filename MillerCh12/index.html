@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式神經肌肉生理學與藥理學</title>
+    <style>
+        :root {
+            --primary-color: #0056b3;
+            --secondary-color: #f0f8ff;
+            --text-color: #333;
+            --header-bg: #e9ecef;
+            --border-color: #dee2e6;
+            --hover-color: #007bff;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            flex: 0 0 280px;
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-right: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        nav h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        nav ul li a {
+            display: block;
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        nav ul li a:hover, nav ul li a.active {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .collapsible-header {
+            background-color: var(--header-bg);
+            padding: 15px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #343a40;
+        }
+
+        .collapsible-header:hover {
+            background-color: #d1d9e0;
+        }
+        
+        .collapsible-header::after {
+            content: '▼'; /* Down arrow */
+            font-size: 1em;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .collapsible-header.active::after {
+            transform: rotate(180deg); /* Up arrow */
+        }
+
+        .collapsible-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h3 {
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .key-term {
+            color: var(--primary-color);
+            font-weight: bold;
+            border-bottom: 2px dotted var(--hover-color);
+            cursor: help;
+            position: relative;
+        }
+
+        .key-term .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+
+        .key-term:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .image-placeholder {
+            width: 80%;
+            max-width: 500px;
+            height: 300px;
+            background-color: #e9ecef;
+            border: 2px dashed #adb5bd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            color: #6c757d;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 10px;
+        }
+        
+        #quiz {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        
+        .quiz-question {
+            margin-bottom: 15px;
+        }
+        
+        #quiz-result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        #quiz-result.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        #quiz-result.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #004494;
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+            }
+            nav {
+                position: static;
+                height: auto;
+                width: 100%;
+                box-sizing: border-box;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <nav>
+            <h3>課程目錄</h3>
+            <ul>
+                <li><a href="#section1">一、結構與功能</a></li>
+                <li><a href="#section2">二、神經肌肉傳導過程</a></li>
+                <li><a href="#section3">三、肌肉鬆弛劑藥理學</a></li>
+                <li><a href="#section4">四、AChR 的生物學與病生理學</a></li>
+                <li><a href="#section5">五、NMJ 的發育與老化</a></li>
+                <li><a href="#section6">六、課堂小測驗</a></li>
+            </ul>
+        </nav>
+        <main>
+            <header>
+                <h1>神經肌肉生理學與藥理學</h1>
+                <p>Chap 12 Neuromuscular Physiology and Pharmacology 重點整理</p>
+            </header>
+
+            <div id="section1" class="section">
+                <div class="collapsible-header">
+                    <h2>一、 神經肌肉接合處的結構與功能</h2>
+                </div>
+                <div class="collapsible-content">
+                    <p>神經肌肉接合處 (Neuromuscular Junction, NMJ) 是一個複雜的突觸結構，由四個主要部分組成，是藥物作用的重要區域。</p>
+                    <h3>主要組成：</h3>
+                    <ul>
+                        <li><b>遠端神經末梢 (Distal nerve terminal)</b>：負責合成、儲存並釋放神經傳導物質。</li>
+                        <li><b>許旺細胞 (Schwann cell)</b>：覆蓋在神經末梢上，提供支持與保護。</li>
+                        <li><b>突觸間隙 (Synaptic cleft)</b>：位於神經與肌肉之間的空隙，內含<span class="key-term">乙醯膽鹼酯酶 (AChE)<span class="tooltip-text">一種酵素，可快速水解乙醯膽鹼，終止神經訊號傳遞。</span></span>。</li>
+                        <li><b>肌肉運動終板 (Muscle end plate)</b>：肌肉細胞膜上特化的區域，佈滿了<span class="key-term">乙醯膽鹼受體 (AChR)<span class="tooltip-text">一種位於肌膜上的蛋白質，能與乙醯膽鹼結合，引發肌肉去極化。</span></span>。</li>
+                    </ul>
+                    
+                    <div class="image-placeholder">示意圖: 神經肌肉接合處結構 (Fig. 12.1)</div>
+
+                    <h3>精細結構：</h3>
+                    <ul>
+                        <li>運動神經元從脊髓腹角發出，接近肌肉時會分支，支配多個肌纖維，形成一個<span class="key-term">運動單元 (Motor unit)<span class="tooltip-text">單一運動神經元及其所支配的所有肌纖維的總稱。</span></span>。</li>
+                        <li>肌肉終板表面有許多皺褶，形成<b>初級與次級突觸間隙</b>，大幅增加了表面積。</li>
+                        <li><b>乙醯膽鹼受體 (AChR)</b> 主要密集分佈在皺褶的頂肩部 (shoulders)。</li>
+                        <li><b>電壓門控鈉離子通道</b>則位於皺褶的深處，負責將終板電位傳播至整個肌纖維。</li>
+                    </ul>
+
+                    <h3>特殊肌肉 - 眼外肌 (Extraocular Muscles)：</h3>
+                    <ul>
+                        <li>與多數骨骼肌不同，眼外肌屬於張力性肌肉 (tonic muscles)，其肌纖維上有多個神經肌肉接合處。</li>
+                        <li>對去極化肌肉鬆弛劑 (如 Succinylcholine) 的反應不同，會產生持續性的<span class="key-term">攣縮 (contracture)<span class="tooltip-text">肌肉在持續刺激下產生的持續性收縮，而非短暫抽動。</span></span>，而非短暫收縮後麻痺，這可能導致眼內壓升高。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="section2" class="section">
+                <div class="collapsible-header">
+                    <h2>二、 神經肌肉傳導過程</h2>
+                </div>
+                <div class="collapsible-content">
+                    <p>神經肌肉傳導的核心是乙醯膽鹼 (Acetylcholine, ACh) 作為主要的神經傳導物質。</p>
+                    <ol>
+                        <li><b>ACh 的合成與儲存</b>：神經末梢利用膽鹼和乙醯輔酶A，在特定酵素作用下合成 ACh，並儲存在<b>囊泡</b>中。</li>
+                        <li>
+                            <b>量子釋放理論 (Quantal Theory)</b>：
+                            <ul>
+                                <li>ACh 是以固定大小的「量子」形式釋放的，每個量子對應一個囊泡的內容物。</li>
+                                <li>神經衝動到達末梢，使 Ca²⁺ 內流，觸發囊泡釋放 ACh。</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <b>胞吐作用 (Exocytosis)</b>：
+                            <ul>
+                                <li>由一系列 <span class="key-term">SNARE 蛋白<span class="tooltip-text">一組蛋白質，負責介導囊泡與細胞膜的融合，是胞吐作用的核心。</span></span> 介導囊泡與神經末梢膜融合。</li>
+                                <li><b>肉毒桿菌毒素</b>會分解 SNARE 蛋白，抑制 ACh 釋放，導致肌肉麻痺。</li>
+                            </ul>
+                            <div class="image-placeholder">示意圖: 胞吐作用與肉毒桿菌毒素作用 (Fig. 12.3)</div>
+                        </li>
+                        <li><b>訊號終止</b>：釋放的 ACh 被突觸間隙中的<b>乙醯膽鹼酯酶 (AChE)</b> 迅速水解，終止其作用。</li>
+                        <li><b>安全邊際 (Margin of Safety)</b>：正常釋放的 ACh 數量遠超所需，為神經傳導提供了巨大的安全儲備。</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div id="section3" class="section">
+                <div class="collapsible-header">
+                    <h2>三、 肌肉鬆弛劑藥理學</h2>
+                </div>
+                <div class="collapsible-content">
+                    <h3>A. 非去極化肌肉鬆弛劑 (NDMRs)</h3>
+                    <ul>
+                        <li><b>作用機制</b>：作為<b>拮抗劑</b>，與 ACh 競爭突觸後膜上 AChR 的結合位點，阻止離子通道打開。</li>
+                        <li><b>作用逆轉</b>：可被<b>抗膽鹼酯酶藥物</b>（如 Neostigmine）或<b>Sugammadex</b>（僅針對固醇類 NDMRs）逆轉。</li>
+                        <li><b>衰減現象 (Fade)</b>：NDMRs 也會作用於突觸前受體，抑制 ACh 釋放，導致在高頻刺激下出現衰減現象。</li>
+                    </ul>
+
+                    <h3>B. 去極化肌肉鬆弛劑</h3>
+                    <ul>
+                        <li><b>代表藥物</b>：琥珀膽鹼 (Succinylcholine)。</li>
+                        <li><b>第一相阻斷 (Phase I Block)</b>：作為<b>激動劑</b>，引起終板持續去極化，初期表現為<span class="key-term">肌束顫動<span class="tooltip-text">單一運動單元內所有肌纖維的同步不自主收縮。</span></span>，隨後因鈉離子通道不活化而導致麻痺。</li>
+                        <li><b>第二相阻斷 (Phase II Block)</b>：長時間使用後，會出現類似 NDMR 阻斷的特徵，機制複雜，涉及受體<span class="key-term">脫敏<span class="tooltip-text">受體在持續接觸激動劑後，反應性下降的現象。</span></span>等，不建議用藥物逆轉。</li>
+                    </ul>
+
+                    <h3>C. 藥物的非典型作用</h3>
+                    <ul>
+                        <li><b>脫敏阻斷 (Desensitization Block)</b>：受體與激動劑結合後，通道卻不打開的狀態。</li>
+                        <li><b>通道阻斷 (Channel Block)</b>：藥物直接堵塞 AChR 的離子通道，為非競爭性阻斷。</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="section4" class="section">
+                <div class="collapsible-header">
+                    <h2>四、 AChR 的生物學與病生理學</h2>
+                </div>
+                <div class="collapsible-content">
+                    <h3>AChR 的亞型 (Isoforms)</h3>
+                    <div class="image-placeholder">示意圖: AChR 亞型與通道特性 (Fig. 12.4)</div>
+                    <ul>
+                        <li><b>成熟型 (ε-receptor)</b>：分佈於正常的成人 NMJ，通道開啟時間短、電導率高。</li>
+                        <li><b>不成熟型 (γ-receptor)</b>：在胎兒期或病理狀態下表現，通道開啟時間長、電導率低。</li>
+                        <li><b>神經元型 (α7-receptor)</b>：在某些病理狀態下於肌肉中新表現。</li>
+                    </ul>
+
+                    <h3>病理狀態下的受體變化 (Upregulation)</h3>
+                    <p>在失神經支配、燒傷、敗血症、長期不動等狀態下，肌肉會大量增生<b>不成熟型(γ)</b>和<b>神經元型(α7)</b>的 AChR，並擴散到整個肌纖維膜上。</p>
+                    <div class="image-placeholder">示意圖: AChR 上調與鉀離子釋放 (Fig. 12.9)</div>
+                    
+                    <h3>上調的臨床後果</h3>
+                    <ul>
+                        <li><b>對 Succinylcholine 的<span class="key-term">高鉀血症<span class="tooltip-text">血液中鉀離子濃度異常升高，可能導致嚴重的心律不整。</span></span>反應</b>：大量增生的受體被激活，導致大量鉀離子外流，可能致命。</li>
+                        <li><b>對 NDMRs 的抗性</b>：主要原因是增生的 α7 受體對 NDMRs 的親和力較低。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="section5" class="section">
+                <div class="collapsible-header">
+                    <h2>五、 NMJ 的發育與老化</h2>
+                </div>
+                <div class="collapsible-content">
+                     <div class="image-placeholder">示意圖: NMJ 從新生兒到老化的變化 (Fig. 12.10)</div>
+                    <h3>新生兒 (Newborn)</h3>
+                    <ul>
+                        <li>NMJ 尚未發育成熟，突觸後膜皺褶少，AChR 數量較少。</li>
+                        <li>傳導效率較低，類似重症肌無力，因此對 NDMRs 較為敏感。</li>
+                    </ul>
+
+                    <h3>老年 (Old Age)</h3>
+                    <ul>
+                        <li>NMJ 會出現退化性改變，與<span class="key-term">肌少症 (sarcopenia)<span class="tooltip-text">與老化相關的肌肉質量、力量和功能持續性下降。</span></span>相關。</li>
+                        <li>儘管結構改變，但巨大的安全邊際通常能維持正常功能。</li>
+                    </ul>
+                </div>
+            </div>
+            
+             <div id="section6" class="section">
+                <div class="collapsible-header">
+                    <h2>六、 課堂小測驗</h2>
+                </div>
+                <div class="collapsible-content">
+                    <div id="quiz">
+                        <form id="quizForm">
+                            <div class="quiz-question">
+                                <p><strong>問題 1:</strong> 在燒傷或長期不動的病人身上使用 Succinylcholine，最需要擔心的嚴重副作用是什麼？</p>
+                                <label><input type="radio" name="q1" value="a"> 過敏性休克</label><br>
+                                <label><input type="radio" name="q1" value="b"> 嚴重的高鉀血症</label><br>
+                                <label><input type="radio" name="q1" value="c"> 惡性高熱</label><br>
+                            </div>
+                            <div class="quiz-question">
+                                <p><strong>問題 2:</strong> 下列何種藥物是透過「包裹」固醇類肌肉鬆弛劑來達到逆轉效果？</p>
+                                <label><input type="radio" name="q2" value="a"> Neostigmine</label><br>
+                                <label><input type="radio" name="q2" value="b"> Atropine</label><br>
+                                <label><input type="radio" name="q2" value="c"> Sugammadex</label><br>
+                            </div>
+                            <div class="quiz-question">
+                                <p><strong>問題 3:</strong> 肉毒桿菌毒素 (Botox) 導致肌肉麻痺的主要機制為何？</p>
+                                <label><input type="radio" name="q3" value="a"> 分解 SNARE 蛋白，抑制乙醯膽鹼釋放</label><br>
+                                <label><input type="radio" name="q3" value="b"> 競爭性阻斷乙醯膽鹼受體</label><br>
+                                <label><input type="radio" name="q3" value="c"> 抑制乙醯膽鹼酯酶的活性</label><br>
+                            </div>
+                            <button type="submit">提交答案</button>
+                        </form>
+                        <div id="quiz-result"></div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collapsible sections functionality
+            const headers = document.querySelectorAll('.collapsible-header');
+            headers.forEach(header => {
+                header.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            });
+
+            // Quiz functionality
+            const quizForm = document.getElementById('quizForm');
+            quizForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const answers = {
+                    q1: 'b',
+                    q2: 'c',
+                    q3: 'a'
+                };
+                
+                let score = 0;
+                const totalQuestions = Object.keys(answers).length;
+                
+                for (const q in answers) {
+                    const selected = document.querySelector(`input[name="${q}"]:checked`);
+                    if (selected && selected.value === answers[q]) {
+                        score++;
+                    }
+                }
+                
+                const resultDiv = document.getElementById('quiz-result');
+                resultDiv.innerHTML = `測驗完成！您答對了 ${score} / ${totalQuestions} 題。`;
+                
+                if (score === totalQuestions) {
+                    resultDiv.className = 'correct';
+                    resultDiv.innerHTML += '<br>太棒了，完全正確！';
+                } else {
+                     resultDiv.className = 'incorrect';
+                     resultDiv.innerHTML += '<br>再接再厲，可以回頭複習一下喔！';
+                }
+            });
+
+            // Smooth scrolling and active nav link
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if(targetElement) {
+                        // Ensure the target section is visible before scrolling
+                        const header = targetElement.querySelector('.collapsible-header');
+                        const content = targetElement.querySelector('.collapsible-content');
+                        if (header && content && content.style.display !== 'block') {
+                            header.click();
+                        }
+                        
+                        targetElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
