@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式麻醉評估表單 (完整最終版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f1f5f9; /* bg-slate-100 */
+        }
+        details > summary {
+            list-style: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease-in-out;
+            border-left: 4px solid transparent;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .chevron-down {
+            transform: rotate(180deg);
+        }
+        /* 新增的視覺化樣式 */
+        summary.is-filled {
+            background-color: #ecfdf5; /* green-50 */
+            border-left-color: #22c55e; /* green-500 */
+        }
+        summary.is-filled:hover {
+            background-color: #d1fae5; /* green-100 */
+        }
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .checkbox-group, .radio-group-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .options-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .input-wrapper {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+            padding-left: 1.75rem;
+            width: 100%;
+        }
+        .conditional-text-input {
+            margin-top: 0.25rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            border: 1px solid #cbd5e1; /* border-slate-300 */
+            width: 100%;
+        }
+        .conditional-textarea {
+             display: none;
+             width: 100%;
+             padding: 0.5rem;
+             border-radius: 0.375rem;
+             border: 1px solid #cbd5e1;
+             min-height: 80px;
+             margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8">
+    <div class="max-w-7xl mx-auto bg-white p-6 sm:p-8 rounded-2xl shadow-lg">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4 border-slate-200">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-800">麻醉前評估與計畫</h1>
+            <div class="text-sm text-slate-500 mt-2 sm:mt-0">
+                <p>日期: <span id="current-date"></span></p>
+            </div>
+        </div>
+
+        <!-- 麻醉前評估紀錄 -->
+        <h2 class="text-xl font-bold text-slate-700 mb-4">麻醉前評估紀錄</h2>
+        <div class="space-y-3" id="evaluation-section">
+            <!-- JavaScript 動態生成評估區塊 -->
+        </div>
+
+        <!-- 麻醉計畫 -->
+        <h2 class="text-xl font-bold text-slate-700 mt-8 mb-4">麻醉計畫</h2>
+        <div class="space-y-3" id="plan-section">
+            <!-- JavaScript 動態生成計畫區塊 -->
+        </div>
+
+        <div class="mt-8 flex justify-end">
+            <button type="button" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-all">
+                儲存表單
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 顯示目前日期
+            document.getElementById('current-date').textContent = new Date().toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const evaluationData = [
+                {
+                    title: '心血管系統 (Cardiovascular System)',
+                    fields: [
+                        { label: '高血壓 (Hypertension)', type: 'checkbox', id: 'htn', options: ['規則控制', '控制不佳'] },
+                        { label: '冠狀動脈疾病 (CAD)', type: 'checkbox', id: 'cad', options: ['POBA/POBAS', 'CABG', '其他'] },
+                        { label: '瓣膜性心臟病 (Valvular disease)', type: 'text', id: 'vhd' },
+                        { label: '心律不整 & ECG 異常', type: 'checkbox', id: 'arr', options: ['Pacemaker', 'Atrial fibrillation', 'AV Block', 'ST-T Abnormality', 's/p ablation', '其他'] },
+                        { label: '心臟衰竭 (Heart failure)', type: 'checkbox', id: 'hf', options: ['NYHA Class: I', 'II', 'III', 'IV'] },
+                        { label: '高血脂 (Dyslipidemia)', type: 'checkbox', id: 'lipid', options: ['Medical control'] },
+                        { label: '周邊動脈阻塞性疾病 (PAOD)', type: 'checkbox', id: 'paod' },
+                        { label: '血管疾病 (Vascular disease)', type: 'checkbox', id: 'vasc', options: ['Aortic Aneurysm', 'Aortic Dissection', '其他'] },
+                        { label: '先天性心臟病 (Congenital Heart Disease)', type: 'text', id: 'chd' },
+                        { label: '肺高壓 (Pulmonary Hypertension)', type: 'checkbox', id: 'ph' },
+                    ]
+                },
+                {
+                    title: '神經與精神系統 (Neurologic & Psychiatric System)',
+                    fields: [
+                        { label: '腦血管意外 (CVA)', type: 'checkbox', id: 'cva', options: ['Ischemic', 'Hemorrhagic', 'Hemiparesis: Right/Left', '其他'] },
+                        { label: '創傷性腦損傷 (Traumatic Brain Injury)', type: 'text', id: 'tbi' },
+                        { label: '巴金森氏症 (Parkinson disease)', type: 'checkbox', id: 'pd' },
+                        { label: '癲癇 (Seizure)', type: 'checkbox', id: 'seizure', options: ['規則控制'] },
+                        { label: '動脈瘤/動靜脈畸形 (Aneurysm/AVM)', type: 'checkbox', id: 'avm', options: ['Medical control', 'Surgery/Intervention'] },
+                        { label: '失智症 (Dementia)', type: 'checkbox', id: 'dementia' },
+                        { label: '精神疾病 (Psychiatric Problem)', type: 'checkbox', id: 'psych', options: ['Schizophrenia', 'Bipolar Disease', 'Depression', 'Personality Disorder', '其他'] },
+                        { label: '昏迷指數 (GCS)', type: 'text', id: 'gcs', placeholder: 'E_V_M_' },
+                        { label: '腦性麻痺 (Cerebral Palsy)', type: 'checkbox', id: 'cp' },
+                    ]
+                },
+                {
+                    title: '內分泌系統 (Endocrine System)',
+                    fields: [
+                        { label: '糖尿病 (DM)', type: 'checkbox', id: 'dm', options: ['OAD', 'Insulin', '其他'] },
+                        { label: '甲狀腺疾病 (Thyroid disease)', type: 'checkbox', id: 'thyroid', options: ['Hyperthyroidism', 'Hypothyroidism', '其他'] },
+                    ]
+                },
+                {
+                    title: '呼吸系統 (Respiratory System)',
+                    fields: [
+                        { label: '氣喘 (Asthma)', type: 'checkbox', id: 'asthma', options: ['Inhaled bronchodilators', 'Inhaled steroid', 'Oral steroid', 'Last exacerbation', 'Classification: Intermittent/Persistent', '其他'] },
+                        { label: '慢性阻塞性肺病 (COPD)', type: 'checkbox', id: 'copd', options: ['Inhaled bronchodilators', 'Inhaled steroid', 'Oral steroid', 'FEV1 (% predicted)', 'Last exacerbation', 'Exacerbation/year: 0-1 / >=2', '其他'] },
+                        { label: '抽菸 (Smoking)', type: 'checkbox', id: 'smoking', options: ['Quit (日期)'] },
+                        { label: '空氣或飛沫傳染 (Airborne or droplet infection)', type: 'text', id: 'infection' },
+                    ]
+                },
+                {
+                    title: '呼吸道 (Airway)',
+                    fields: [
+                        { label: 'Mallampati score', type: 'radio', id: 'mallampati', options: ['I', 'II', 'III', 'IV', '不適用'] },
+                        { label: '頸部活動度 (Neck ROM)', type: 'radio', id: 'neck_rom', options: ['Limited', 'Free', '不適用'] },
+                        { label: '張口程度 (Mouth opening)', type: 'radio', id: 'mouth_opening', options: ['>= 2FB', '1-2FB', '< 1FB', '不適用'] },
+                        { label: '牙齒狀況 (Dentition)', type: 'checkbox', id: 'dentition', options: ['Normal', 'Loose Teeth', '活動假牙', '鬆動假牙', '其他'] },
+                        { label: '頭頸癌 (Head/Neck Cancer)', type: 'checkbox', id: 'hnc', options: ['Previous Surgery', 'Previous RT', '其他'] },
+                        { label: '阻塞性睡眠呼吸中止症 (Obstructive sleep apnea)', type: 'checkbox', id: 'osa' },
+                        { label: '預期困難插管 (Expected difficult airway)', type: 'checkbox', id: 'difficult_airway' },
+                    ]
+                },
+                {
+                    title: '腎臟系統 (Renal System)',
+                    fields: [
+                        { label: '末期腎病 (ESRD)', type: 'checkbox', id: 'esrd', options: ['HD', 'PD', '其他'] },
+                        { label: '急性腎損傷 (Acute Kidney Injury)', type: 'checkbox', id: 'aki' },
+                        { label: '慢性腎功能不全 (Chronic Renal Insufficiency)', type: 'checkbox', id: 'cri' },
+                        { label: '阻塞性病變 (Obstructive lesion)', type: 'checkbox', id: 'obstruct' },
+                        { label: '電解質不平衡 (Electrolyte Imbalance)', type: 'checkbox', id: 'electrolyte' },
+                    ]
+                },
+                {
+                    title: '血液系統 (Hematologic System)',
+                    fields: [
+                        { label: '貧血 (Anemia)', type: 'checkbox', id: 'anemia' },
+                        { label: '白血球增多 (Leukocytosis)', type: 'checkbox', id: 'leukocytosis' },
+                        { label: '白血球分類異常 (Leukocyte D/C Abnormality)', type: 'checkbox', id: 'leukocyte_ab' },
+                        { label: '凝血功能評估', type: 'checkbox', id: 'coagulation', options: ['Decreased Platelet Count', 'Abnormal PT/PTT', 'Anticoagulants/Anti-Platelet Drugs', '醫師評估', '藥物史'] },
+                    ]
+                },
+                {
+                    title: '消化系統 (Digestive System)',
+                    fields: [
+                        { label: '帶原', type: 'checkbox', id: 'carrier', options: ['HBV', 'HCV', 'HBV&HCV'] },
+                        { label: '肝硬化 (Cirrhosis)', type: 'checkbox', id: 'cirrhosis' },
+                        { label: '黃疸 (Jaundice)', type: 'checkbox', id: 'jaundice' },
+                        { label: '肝細胞癌 (HCC)', type: 'checkbox', id: 'hcc' },
+                        { label: '腸阻塞 (Ileus)', type: 'checkbox', id: 'ileus' },
+                        { label: '消化性潰瘍 (Peptic Ulcer)', type: 'checkbox', id: 'pu' },
+                        { label: '胃食道逆流 (GERD)', type: 'checkbox', id: 'gerd' },
+                        { label: '腸胃道出血 (GI Bleeding)', type: 'checkbox', id: 'gib' },
+                    ]
+                },
+                {
+                    title: '藥物/食物/輸血反應',
+                    fields: [
+                        { label: '過敏 (Allergy)', type: 'text', id: 'allergy' },
+                        { label: '其他不良反應 (Other Adverse Effect)', type: 'text', id: 'adverse_effect' },
+                    ]
+                },
+                {
+                    title: '手術與麻醉史',
+                    fields: [
+                        { label: '病史 (History)', type: 'textarea', id: 'history' },
+                        { label: '事件 (Events)', type: 'text', id: 'events' },
+                    ]
+                },
+                {
+                    title: 'ASA & 雜項',
+                    fields: [
+                        { label: 'ASA 分級', type: 'radio', id: 'asa', options: ['1', '2', '3', '4 (高風險)', '5 (高風險)', '6 (高風險)'] },
+                        { label: '緊急手術 (Emergency)', type: 'checkbox', id: 'emergency' },
+                        { label: '肥胖 (Obesity)', type: 'checkbox', id: 'obesity' },
+                        { label: '懷孕 (Pregnancy)', type: 'checkbox', id: 'pregnancy' },
+                        { label: 'HIV 帶原', type: 'checkbox', id: 'hiv' },
+                        { label: '青光眼 (Glaucoma)', type: 'text', id: 'glaucoma' },
+                        { label: '安眠藥使用 (Hypnotics use)', type: 'text', id: 'hypnotics' },
+                        { label: '基因異常 (Gene Abnormality)', type: 'text', id: 'gene' },
+                        { label: '臨床衰弱評分>=5', type: 'checkbox', id: 'frailty' },
+                        { label: '惡性高熱風險', type: 'checkbox', id: 'mh_risk' },
+                    ]
+                },
+            ];
+            
+            const planData = [
+                {
+                    title: '全身麻醉 (General Anesthesia)',
+                    fields: [
+                        { label: 'GA with Endotracheal Tube', type: 'checkbox', id: 'ga_ett' },
+                        { label: 'GA with Supraglottic Airway Device (LMA)', type: 'checkbox', id: 'ga_lma' },
+                        { label: 'Face Mask / IVGA', type: 'checkbox', id: 'ga_ivga' },
+                        { label: 'TCI', type: 'checkbox', id: 'ga_tci', options: ['with Propofol', 'with Remifentanil: 50/25/12.5 mcg/mL'] },
+                        { label: '特定藥物 (Specific Medication)', type: 'checkbox', id: 'ga_meds', options: ['Ondansetron', 'Etomidate', 'Ketamine', 'Dexmedetomidine', 'Thiamylal', 'Alfentanil', 'Midazolam', 'Dexamethasone', 'Ketorolac', 'Succinylcholine', 'Sugammadex', 'Propacetamol', '其他'] },
+                    ]
+                },
+                {
+                    title: '區域麻醉/止痛 (Regional Anesthesia/Analgesia)',
+                    fields: [
+                        { label: 'SA', type: 'checkbox', id: 'ra_sa' },
+                        { label: 'EA', type: 'checkbox', id: 'ra_ea', options: ['Lumbar', 'Thoracic', 'Caudal', 'Cervical'] },
+                        { label: 'SA/EA Medication', type: 'checkbox', id: 'ra_meds', options: ['Bupivacaine: Plain', 'Bupivacaine: Heavy', 'Ropivacaine', 'Lidocaine', 'Fentanyl', '其他'] },
+                        { label: '周邊神經阻斷 (Peripheral Nerve Block)', type: 'checkbox', id: 'ra_pnb', options: ['Scalp Nerve', 'Superficial Cervical Plexus', 'Interscalene', 'Supraclavicular', 'Infraclavicular', 'Axillary', 'Forearm', 'Sciatic Nerve', 'Femoral Nerve', 'Obturator Nerve', 'Saphenous Nerve', 'Ankle', 'Paravertebral', 'Transversus Abdominus Plane', '其他'] },
+                        { label: 'PNB Medication', type: 'checkbox', id: 'pnb_meds', options: ['Bupivacaine', 'Levobupivacaine', 'Lidocaine', 'Ropivacaine', '其他'] },
+                        { label: '神經刺激器 (Nerve Stimulator)', type: 'checkbox', id: 'nerve_stim' },
+                        { label: '鎮靜/全身麻醉 (Sedation/GA)', type: 'text', id: 'sedation_ga' },
+                    ]
+                },
+                {
+                    title: '監測與管路 (CV monitors And IV access)',
+                    fields: [
+                        { label: '動脈導管 (ABP)', type: 'nested_checkbox', id: 'mon_abp', options: [ { label: 'Awake A-line' }, { label: 'Pressure Kit', sub_options: ['1-Dome', '2-Dome', '3-Dome'] }, { label: 'with:', sub_options: ['FloTrac', 'ProAQT', 'EV1000', 'HPI'] }, { label: '其他' } ] },
+                        { label: '中央靜脈導管 (CVC)', type: 'checkbox', id: 'mon_cvc', options: ['Coated 14x14', 'Non-coated 14x14', 'Coated 16x18x18', 'Non-coated 16x18x18', '12x12x16', '20x22x22', 'Cook 16x18x18', 'ScvO2, 15x18x18', '其他'] },
+                        { label: '肺動脈導管 (PAC)', type: 'checkbox', id: 'mon_pac' },
+                        { label: 'PICCO', type: 'checkbox', id: 'mon_picco' },
+                        { label: '大口徑靜脈導管 (Large-bore IV)', type: 'checkbox', id: 'mon_large_iv', options: ['>=16G', '其他'] },
+                        { label: '經食道心臟超音波 (TEE)', type: 'checkbox', id: 'mon_tee' },
+                        { label: 'LIDCO', type: 'checkbox', id: 'mon_lidco' },
+                        { label: '五導程心電圖 (Five leads ECG)', type: 'checkbox', id: 'mon_ecg5' },
+                    ]
+                },
+                {
+                    title: '呼吸道管理 (Airway management)',
+                    fields: [
+                        { label: '氣管內管 (ET tube)', type: 'nested_checkbox', id: 'am_ett', options: [ { label: 'Oral', sub_options: ['一般', 'RAE', 'Reinforced'] }, { label: 'Nasal', sub_options: ['一般', 'RAE', 'Reinforced'] }, { label: 'Laser' }, { label: '其他' } ] },
+                        { label: '喉罩 (LMA)', type: 'text', id: 'am_lma' },
+                        { label: '雙腔管 (DLT)', type: 'checkbox', id: 'am_dlt', options: ['35L', '37L', '32L', '其他'] },
+                        { label: '支氣管阻斷管 (Blocker)', type: 'checkbox', id: 'am_blocker' },
+                        { label: '快速誘導插管 (RSI)', type: 'checkbox', id: 'am_rsi' },
+                        { label: '特殊工具/耗材', type: 'checkbox', id: 'am_tools', options: ['GlideScope', 'MAC', 'TOUREn', 'Storz', 'Bronchoscope: Awake/Not Awake', 'Trachway', 'Bougie', 'Tube Exchanger', 'Optiflow THRIVE', 'AirKeeper', 'Optiflow HFNC', '其他'] },
+                    ]
+                },
+                {
+                    title: '神經/肌肉監測 (Neurologic/NM monitors)',
+                    fields: [
+                        { label: 'TOF', type: 'checkbox', id: 'nm_tof' },
+                        { label: 'OMT (自費)', type: 'checkbox', id: 'nm_omt' },
+                        { label: '麻醉深度監測', type: 'checkbox_group', id: 'nm_depth', options: ['BIS', 'Entrophy', 'Sedline'] },
+                        { label: '腦氧監測 (Cerebral oximetry)', type: 'checkbox_group', id: 'nm_cerebral', options: ['INVOS', 'O3'] },
+                    ]
+                },
+                {
+                    title: 'ICU & 雜項',
+                    fields: [
+                        { label: 'ICU admission', type: 'checkbox', id: 'misc_icu' },
+                        { label: '術後止痛', type: 'nested_checkbox', id: 'misc_pca', options: [{label: '完成PCA評估解釋一般止痛'}, {label: 'IVPCA'}, {label: 'PCEA'}, {label: 'NBPCA'}] },
+                        { label: '自費項目', type: 'checkbox', id: 'misc_selfpay', options: ['眼睛保護貼片', '空氣保溫套', '溫度貼片', 'Mepilex貼片'] },
+                    ]
+                },
+                {
+                    title: '禁食 (NPO)',
+                    fields: [
+                        { label: '時間', type: 'nested_checkbox', id: 'npo_time', options: [{label: '清水>2hrs, 母乳>4hrs, 固體食物>8hrs'}, {label: '其他'}] }
+                    ]
+                },
+                {
+                    title: '恢復室 (POR)',
+                    fields: [
+                        { label: '麻醉後恢復一般照護', type: 'text', id: 'por_care', placeholder: '如恢復室作業標準' },
+                    ]
+                }
+            ];
+
+
+            function createField(field) {
+                const group = document.createElement('div');
+                group.className = 'form-group';
+                let content = `<label class="font-medium text-slate-600">${field.label}</label>`;
+
+                switch (field.type) {
+                    case 'checkbox':
+                        content += `<div class="checkbox-group">
+                                        <input type="checkbox" id="${field.id}_main" name="${field.id}_main" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                        <label for="${field.id}_main" class="font-normal">有</label>
+                                        ${field.options ? `<div class="input-wrapper">
+                                            ${field.options.map((opt, i) => `
+                                                <div class="flex items-center gap-2">
+                                                    <input type="checkbox" id="${field.id}_opt${i}" name="${field.id}_option" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                    <label for="${field.id}_opt${i}" class="font-normal">${opt}</label>
+                                                    ${opt === '其他' ? '<input type="text" placeholder="請說明" class="conditional-text-input ml-2 flex-1">' : ''}
+                                                </div>
+                                            `).join('')}
+                                        </div>` : ''}
+                                    </div>`;
+                        break;
+                    case 'radio':
+                        content += `<div class="options-group">
+                                        ${field.options.map((opt, i) => `
+                                            <div class="flex items-center gap-2">
+                                                <input type="radio" id="${field.id}_opt${i}" name="${field.id}" class="h-4 w-4 border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                <label for="${field.id}_opt${i}" class="font-normal">${opt}</label>
+                                            </div>
+                                        `).join('')}
+                                    </div>`;
+                        break;
+                    case 'checkbox_group':
+                         content += `<div class="options-group">
+                                        ${field.options.map((opt, i) => `
+                                            <div class="flex items-center gap-2">
+                                                <input type="checkbox" id="${field.id}_opt${i}" name="${field.id}_options" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                <label for="${field.id}_opt${i}" class="font-normal">${opt}</label>
+                                            </div>
+                                        `).join('')}
+                                    </div>`;
+                        break;
+                    case 'nested_checkbox':
+                        content += `<div class="checkbox-group">
+                                        <input type="checkbox" id="${field.id}_main" name="${field.id}_main" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                        <label for="${field.id}_main" class="font-normal">有</label>
+                                        <div class="input-wrapper">
+                                            ${field.options.map((opt, i) => {
+                                                let optContent = `<div class="form-group p-2 -ml-4">
+                                                                    <div class="flex items-center gap-2">
+                                                                        <input type="checkbox" id="${field.id}_opt${i}" name="${field.id}_option" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                                        <label for="${field.id}_opt${i}" class="font-semibold">${opt.label}</label>
+                                                                        ${opt.label === '其他' ? '<input type="text" placeholder="請說明" class="conditional-text-input ml-2 flex-1">' : ''}
+                                                                    </div>`;
+                                                if (opt.sub_options) {
+                                                    optContent += `<div class="input-wrapper pl-6" style="display: flex; gap: 0.75rem;">
+                                                                    ${opt.sub_options.map((sub_opt, j) => `
+                                                                        <div class="flex items-center gap-2">
+                                                                            <input type="checkbox" id="${field.id}_opt${i}_sub${j}" name="${field.id}_opt${i}_sub" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                                                            <label for="${field.id}_opt${i}_sub${j}" class="font-normal">${sub_opt}</label>
+                                                                        </div>
+                                                                    `).join('')}
+                                                                </div>`;
+                                                }
+                                                optContent += `</div>`;
+                                                return optContent;
+                                            }).join('')}
+                                        </div>
+                                    </div>`;
+                        break;
+                    case 'text':
+                        content += `<div class="checkbox-group">
+                                        <input type="checkbox" id="${field.id}_main" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                        <label for="${field.id}_main" class="font-normal">有</label>
+                                        <input type="text" placeholder="${field.placeholder || '請說明'}" class="conditional-text-input ml-2 flex-1" style="display:none;">
+                                    </div>`;
+                        break;
+                    case 'textarea':
+                         content += `<div class="checkbox-group">
+                                        <input type="checkbox" id="${field.id}_main" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                                        <label for="${field.id}_main" class="font-normal">有</label>
+                                     </div>
+                                     <textarea id="${field.id}_area" placeholder="請說明" class="conditional-textarea"></textarea>`;
+                        break;
+                }
+                group.innerHTML = content;
+                return group;
+            }
+
+            function createSection(sectionData) {
+                const details = document.createElement('details');
+                details.className = 'bg-slate-50 rounded-lg border border-slate-200 overflow-hidden';
+                const fieldsHTML = sectionData.fields.map(field => createField(field).outerHTML).join('');
+                details.innerHTML = `
+                    <summary class="flex justify-between items-center p-4 hover:bg-slate-100 transition-colors">
+                        <span class="font-semibold text-slate-700">${sectionData.title}</span>
+                        <svg class="w-5 h-5 text-slate-500 transition-transform transform chevron-down" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                    </summary>
+                    <div class="p-4 border-t border-slate-200 form-section">${fieldsHTML}</div>`;
+                return details;
+            }
+
+            function updateSectionVisualState(detailsElement) {
+                const summary = detailsElement.querySelector('summary');
+                if (!summary) return;
+
+                const inputs = detailsElement.querySelectorAll('input[type="checkbox"], input[type="radio"], input[type="text"], textarea');
+                
+                const isAnyInputFilled = Array.from(inputs).some(input => {
+                    if (input.type === 'checkbox' || input.type === 'radio') {
+                        return input.checked;
+                    }
+                    if (input.type === 'text' || input.type === 'textarea') {
+                        return input.value.trim() !== '';
+                    }
+                    return false;
+                });
+
+                summary.classList.toggle('is-filled', isAnyInputFilled);
+            }
+
+
+            function buildForm() {
+                const evaluationContainer = document.getElementById('evaluation-section');
+                evaluationData.forEach(section => evaluationContainer.appendChild(createSection(section)));
+
+                const planContainer = document.getElementById('plan-section');
+                planData.forEach(section => planContainer.appendChild(createSection(section)));
+
+                // Event Listeners for conditional logic
+                document.querySelectorAll('input[type="checkbox"][id$="_main"]').forEach(mainCheckbox => {
+                    mainCheckbox.addEventListener('change', (e) => {
+                        const parent = e.target.closest('.form-group, .checkbox-group');
+                        const wrapper = parent.querySelector('.input-wrapper');
+                        const textInput = parent.querySelector('.conditional-text-input');
+                        const textarea = parent.querySelector('.conditional-textarea');
+
+                        if (wrapper) {
+                            wrapper.style.display = e.target.checked ? 'flex' : 'none';
+                        }
+                        if (textInput) {
+                            textInput.style.display = e.target.checked ? 'block' : 'none';
+                        }
+                        if (textarea) {
+                            textarea.style.display = e.target.checked ? 'block' : 'none';
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('input[name$="_option"]').forEach(optionCheckbox => {
+                    optionCheckbox.addEventListener('change', (e) => {
+                        const parent = e.target.closest('.form-group');
+                        if (!parent) return;
+                        const subWrapper = parent.querySelector('.input-wrapper.pl-6');
+                         if (subWrapper) {
+                             subWrapper.style.display = e.target.checked ? 'flex' : 'none';
+                         }
+                    });
+                });
+
+                // ----- 視覺化與連動邏輯 -----
+                document.querySelectorAll('details').forEach(details => {
+                    const inputs = details.querySelectorAll('input, textarea');
+                    inputs.forEach(input => {
+                        const eventType = (input.type === 'text' || input.type === 'textarea') ? 'input' : 'change';
+                        input.addEventListener(eventType, () => updateSectionVisualState(details));
+                    });
+                });
+
+                // POR 和 ICU 的特定邏輯
+                const porCheckbox = document.getElementById('por_care_main');
+                const icuCheckbox = document.getElementById('misc_icu_main');
+
+                if (porCheckbox) {
+                    // 1. 預設勾選 POR
+                    porCheckbox.checked = true;
+                    // 手動觸發 change 事件以顯示輸入框並更新視覺狀態
+                    porCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
+                if (icuCheckbox && porCheckbox) {
+                    // 2. 當 ICU 勾選時，取消勾選 POR
+                    icuCheckbox.addEventListener('change', () => {
+                        if (icuCheckbox.checked) {
+                            porCheckbox.checked = false;
+                            // 手動觸發 change 事件以隱藏輸入框並更新視覺狀態
+                            porCheckbox.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    });
+                }
+            }
+
+            buildForm();
+        });
+    </script>
+</body>
+</html>
