@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>術前評估互動式教學指引 — 麻醉專護版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            color: #ffffff;
+            background-color: #2563eb; /* blue-600 */
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .accordion-content {
+            display: none;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        .accordion-button.active .accordion-arrow {
+            transform: rotate(180deg);
+        }
+        .accordion-arrow {
+            transition: transform 0.3s;
+        }
+        .key-points {
+            background-color: #eef2ff; /* indigo-50 */
+            border-left: 4px solid #4f46e5; /* indigo-600 */
+        }
+        .clinical-case {
+            background-color: #fefce8; /* yellow-50 */
+            border-left: 4px solid #ca8a04; /* yellow-600 */
+        }
+        .quiz-explanation {
+            background-color: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            border-radius: 0.25rem;
+        }
+        .prose ul ul {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        .assessment-image {
+            width: 100%;
+            height: 250px;
+            object-fit: contain;
+        }
+        .risk-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .risk-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">術前評估互動式教學指引</h1>
+            <p class="text-lg text-gray-600 mt-2">一份專為教學設計，整合臨床核心概念的全面指南 — <span class="font-bold text-blue-600">麻醉專科護理師進階版</span></p>
+        </header>
+
+        <!-- Tabs Navigation -->
+        <div class="mb-8 bg-white rounded-lg shadow-sm p-2 flex flex-wrap gap-2 justify-center">
+            <button onclick="changeTab(event, 'objectives')" class="tab-button active flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                目標與效益
+            </button>
+            <button onclick="changeTab(event, 'history')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" /><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h.01a1 1 0 100-2H10zm3 0a1 1 0 000 2h.01a1 1 0 100-2H13z" clip-rule="evenodd" /></svg>
+                病史詢問
+            </button>
+            <button onclick="changeTab(event, 'physical')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" /></svg>
+                身體檢查
+            </button>
+             <button onclick="changeTab(event, 'risk')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
+                風險分層
+            </button>
+            <button onclick="changeTab(event, 'labs')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7 4a3 3 0 016 0v1h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2V4zm2 2V4a1 1 0 10-2 0v2h2zm4 0V4a1 1 0 10-2 0v2h2z" clip-rule="evenodd" /></svg>
+                實驗室評估
+            </button>
+            <button onclick="changeTab(event, 'meds')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z" /></svg>
+                藥物管理
+            </button>
+            <button onclick="changeTab(event, 'quiz')" class="tab-button flex-grow sm:flex-none flex items-center justify-center gap-2 py-2 px-4 rounded-md font-medium text-sm text-gray-600 hover:bg-blue-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>
+                🧠 隨堂測驗
+            </button>
+        </div>
+
+        <!-- Tab Content -->
+        <div id="objectives" class="tab-content active">
+             <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-blue-800">目標與效益</h2>
+                <div class="key-points p-4 rounded-md mb-6">
+                    <h3 class="font-semibold text-lg text-indigo-800 mb-2">教學重點 (Key Points)</h3>
+                    <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                        <li>術前評估是指導圍手術期病人管理的臨床基礎，旨在降低圍手術期發病率和死亡率。</li>
+                        <li>其根本目的是獲取病人相關病史，評估圍手術期風險，並制定臨床優化計畫。</li>
+                        <li>麻醉醫師作為圍手術期醫療專家，在此過程中扮演獨特的評估、溝通與管理角色。</li>
+                        <li>一個成功的術前評估診所能提升手術室效率、減少手術取消、降低成本並提高病人照護品質。</li>
+                    </ul>
+                </div>
+                <div class="prose max-w-none">
+                    <p>術前評估不僅是例行公事，更是圍手術期照護的基石。其核心目標是系統性地識別並處理潛在風險，以確保病人在手術過程中的安全，並促進術後順利康復。</p>
+                    <ul>
+                        <li><strong>建立醫病關係與溝通：</strong> 這是一個關鍵的機會，讓麻醉醫師與病人建立信任。透過詳細解釋麻醉計畫、風險及術後疼痛管理方案，可以顯著降低病人的術前焦慮。一個充分被告知的病人，更能配合術前指示（如禁食），並對術後恢復有合理的預期。</li>
+                        <li><strong>制定個人化的麻醉策略：</strong> 沒有一體適用的麻醉方式。評估結果將直接影響麻醉計畫的選擇，例如：全身麻醉、區域麻醉或監測麻醉。對於呼吸道評估困難的病人，需預先準備困難插管工具；對於心血管功能不佳的病人，則需選擇對血行動力影響較小的藥物與監測方式。</li>
+                        <li><strong>系統性的風險評估與優化：</strong> 此階段旨在識別可能影響手術結果的共病症。例如，未受控制的高血壓或糖尿病會增加術後心血管事件和感染的風險。評估後可啟動優化措施，如調整藥物、建議戒菸或轉診至專科醫師，將病人的生理狀態調整至最佳水平再進行手術。</li>
+                        <li><strong>提升手術室效率與資源運用：</strong> 完善的術前評估能大幅減少手術當天因病人因素（如未禁食、血壓過高、未處理的醫療問題）而導致的延遲或取消。這不僅節省了寶貴的手術室時間，也避免了醫療資源的浪費。</li>
+                        <li><strong>降低醫療成本與併發症：</strong> 透過避免不必要的常規檢查，並針對高風險病人進行重點評估，可以有效控制醫療成本。更重要的是，預先處理潛在問題（如術前貧血治療、呼吸道感染控制），能顯著降低術後肺炎、心肌梗塞等嚴重併發症的發生率，從而縮短住院天數並改善病人預後。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="history" class="tab-content">
+            <div class="space-y-4">
+                <div class="bg-white rounded-lg shadow-md">
+                    <button onclick="toggleAccordion(event)" class="accordion-button w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-gray-800 focus:outline-none">
+                        <span>系統性病史詢問 (進階)</span>
+                        <svg class="accordion-arrow w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 prose max-w-none">
+                         <div class="key-points p-4 rounded-md my-4">
+                            <h3 class="font-semibold text-lg text-indigo-800 mb-2">專護級重點</h3>
+                            <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                                <li>從病史中連結病生理變化，預測麻醉中可能的生理反應。</li>
+                                <li>過去的麻醉史是黃金標準，務必取得舊有麻醉紀錄以釐清困難插管或藥物不良反應的細節。</li>
+                                <li>主動探詢社交史，特別是酒精與藥物濫用，這關係到麻醉藥物需求量與術後戒斷症候群的風險。</li>
+                            </ul>
+                        </div>
+                        <ul>
+                            <li><strong>心血管系統：</strong>
+                                <ul>
+                                    <li><strong>缺血性心臟病 (IHD)：</strong> 最近一次心絞痛發作的頻率與誘因？是否穩定？過去心導管報告或心臟功能指數 (LVEF)？近期是否放置支架？這些決定了術中心肌缺血的風險與監測強度。</li>
+                                    <li><strong>心衰竭 (Heart Failure)：</strong> 是收縮性或舒張性心衰竭？目前 NYHA 功能分級？是否有端坐呼吸或陣發性夜間呼吸困難？這影響術中輸液策略與藥物選擇。</li>
+                                    <li><strong>高血壓 (Hypertension)：</strong> 平時血壓控制範圍？是否有靶器官損害（如蛋白尿、左心室肥厚）？控制不佳的高血壓易導致術中血壓劇烈波動。</li>
+                                </ul>
+                            </li>
+                            <li><strong>呼吸系統：</strong>
+                                <ul>
+                                    <li><strong>氣喘/COPD：</strong> 最近是否使用口服類固醇？痰液顏色與量？是否需要術前優化治療（如支氣管擴張劑、抗生素）？</li>
+                                    <li><strong>阻塞性睡眠呼吸中止症 (OSA)：</strong> 是否確診？CPAP 壓力設定與遵從性？STOP-Bang 問卷評分？OSA 病人對鎮靜及鴉片類藥物極度敏感，術後呼吸抑制風險高。</li>
+                                </ul>
+                            </li>
+                            <li><strong>內分泌系統：</strong>
+                                <ul>
+                                    <li><strong>糖尿病 (DM)：</strong> HbA1c 數值？是否有自主神經病變（如姿態性低血壓、胃輕癱）？後者會增加麻醉誘導時低血壓和肺吸入的風險。</li>
+                                </ul>
+                            </li>
+                             <li><strong>麻醉相關史：</strong>
+                                <ul>
+                                    <li><strong>困難插管史：</strong> 當時是如何解決的？清醒插管還是使用影像輔助工具？</li>
+                                    <li><strong>術後噁心嘔吐 (PONV)：</strong> 是否為高風險族群 (女性、非吸菸者、有暈車史、術後使用鴉片類藥物)？需規劃多模式預防策略。</li>
+                                    <li><strong>惡性高熱 (MH)：</strong> 個人或家族史？若有，必須採用安全的麻醉方式（如全靜脈麻醉）並備妥急救藥物 Dantrolene。</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button onclick="toggleAccordion(event)" class="accordion-button w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-gray-800 focus:outline-none">
+                        <span>功能能力評估 (METs)</span>
+                        <svg class="accordion-arrow w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 prose max-w-none">
+                        <p>功能能力是心肺儲備功能的重要指標。METs (代謝當量) 是一種標準化的評估方式，但單純的口頭詢問可能不夠準確，因為病人可能高估自己的能力，或因關節疼痛等非心肺因素限制活動。</p>
+                        <p><strong>評估重點：</strong></p>
+                        <ul>
+                            <li><strong>關鍵閾值：</strong> <strong>4 METs</strong> 是一個重要的分水嶺。一般認為，能夠達到4 METs活動量（例如，不休息爬上兩層樓梯）的病人，其術後發生心臟併發症的風險較低。</li>
+                            <li><strong>具體詢問：</strong> 與其問「您平常有沒有運動？」，不如問更具體的問題，例如：「您能不休息地走完兩個街區嗎？」、「您能提著購物袋爬一層樓梯嗎？」。</li>
+                            <li><strong>客觀工具：</strong> 在高風險病人中，可考慮使用更客觀的評估工具，如杜克活動狀態指數（DASI）問卷，或安排心肺運動測試（CPET）來精準評估。</li>
+                        </ul>
+                        <div class="clinical-case p-4 rounded-md mt-4">
+                             <h3 class="font-semibold text-lg text-yellow-800 mb-2">臨床案例討論</h3>
+                             <p class="text-yellow-900">一位計畫接受腹部大手術的70歲病人，自述因膝蓋痛很少出門，連走平地都會喘。這表示其功能能力可能小於4 METs，屬於高風險族群，需要進一步的心臟評估（如心臟壓力測試），並考慮術後入住加護病房監測。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="physical" class="tab-content">
+             <div class="space-y-4">
+                <div class="bg-white rounded-lg shadow-md">
+                    <button onclick="toggleAccordion(event)" class="accordion-button w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-gray-800 focus:outline-none">
+                        <span>呼吸道評估 (進階)</span>
+                        <svg class="accordion-arrow w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 prose max-w-none">
+                        <div class="key-points p-4 rounded-md my-4">
+                            <h3 class="font-semibold text-lg text-indigo-800 mb-2">專護級重點</h3>
+                            <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                                <li>困難面罩通氣 (Difficult Mask Ventilation) 與困難插管 (Difficult Intubation) 是兩回事，需分別評估。</li>
+                                <li>結合多種評估工具 (如 LEMON score) 比單一指標更具預測力。</li>
+                                <li>評估後需在心中形成腹案：Plan A (直接喉頭鏡), Plan B (影像輔助工具), Plan C (聲門上呼吸道), Plan D (緊急外科氣道)。</li>
+                            </ul>
+                        </div>
+                        <p>一個通暢的呼吸道是麻醉安全的基礎。評估的目的在於預測面罩通氣或氣管插管時可能遇到的困難，並預先制定應對計畫。</p>
+                        <ul>
+                            <li><strong>Mallampati 分類：</strong> Class III 或 IV 表示舌頭相對較大，可能阻礙聲門的視野，是預測插管困難的重要指標。</li>
+                            <li><strong>3-3-2 法則：</strong> 是一個快速評估工具。<strong>3指</strong>：張口寬度。<strong>3指</strong>：下頷骨長度（下巴尖到舌骨）。<strong>2指</strong>：舌骨到甲狀軟骨（喉結）的距離。若任何一項不符合，則困難插管風險增加。</li>
+                            <li><strong>困難面罩通氣的預測因子 (BONES):</strong> 鬍鬚(Beard)、肥胖(Obese, BMI>26)、無牙(No teeth)、高齡(Elderly, >55歲)、打鼾史(Snoring)。符合項目越多，風險越高。</li>
+                        </ul>
+                        <div class="mt-6">
+                            <h4 class="font-semibold text-lg mb-2">評估圖示</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <img src="https://www.clinicaladvisor.com/wp-content/uploads/sites/11/2018/12/mallampatiscore_913672.jpg" alt="Mallampati 分類圖示" class="mx-auto rounded-lg shadow-sm border assessment-image" onerror="this.onerror=null;this.src='https://placehold.co/400x250/e2e8f0/4a5568?text=Mallampati+%E5%88%86%E9%A1%9E';">
+                                    <p class="text-sm mt-2 font-medium">Mallampati 分類</p>
+                                </div>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <img src="https://aneskey.com/wp-content/uploads/2016/06/C2-FF3-2.gif" alt="3-3-2 法則示意圖" class="mx-auto rounded-lg shadow-sm border assessment-image" onerror="this.onerror=null;this.src='https://placehold.co/400x250/e2e8f0/4a5568?text=3-3-2+Rule';">
+                                    <p class="text-sm mt-2 font-medium">3-3-2 法則</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-lg shadow-md">
+                    <button onclick="toggleAccordion(event)" class="accordion-button w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-gray-800 focus:outline-none">
+                        <span>心肺及其他系統檢查 (進階)</span>
+                        <svg class="accordion-arrow w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 prose max-w-none">
+                        <div class="key-points p-4 rounded-md my-4">
+                            <h3 class="font-semibold text-lg text-indigo-800 mb-2">專護級重點</h3>
+                            <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                                <li>理學檢查的發現應與病史相互印證，形成完整的臨床圖像。</li>
+                                <li>聽診到的心雜音需判斷其血流動力學意義，以預測病人對麻醉藥物血管擴張效應的耐受度。</li>
+                                <li>肺部聽診異常，需思考其對術中換氣與術後恢復的影響。</li>
+                                <li>建立術前神經學基準線，對於涉及特殊擺位或區域麻醉的手術至關重要。</li>
+                            </ul>
+                        </div>
+                        <ul>
+                            <li><strong>心臟聽診：</strong>
+                                <ul>
+                                    <li><strong>主動脈瓣狹窄 (Aortic Stenosis):</strong> 聽診到收縮期射出型心雜音，傳至頸動脈。這代表左心室出口固定性阻塞，病人呈現「前負荷依賴」(preload-dependent) 狀態。麻醉目標是維持正常竇性心律、足夠的前負荷及較高的全身血管阻力，嚴格避免低血壓。脊椎麻醉造成的交感神經阻斷可能引發災難性後果。</li>
+                                    <li><strong>二尖瓣逆流 (Mitral Regurgitation):</strong> 聽診到心尖部的全收縮期心雜音。此類病人對「後負荷」(afterload) 敏感。麻醉目標是維持略快的心率並降低全身血管阻力（輕微後負荷減少），以促進血液前向流動，減少逆流。</li>
+                                    <li><strong>S3/S4 心音:</strong> S3 (心室奔馬音) 代表心室快速填充期撞擊過度擴張或順應性差的心室壁，是心衰竭的警訊。S4 (心房奔馬音) 則是心房收縮將血液打入僵硬心室所產生，常見於長期高血壓或左心室肥厚的病人。</li>
+                                </ul>
+                            </li>
+                            <li><strong>肺部聽診：</strong>
+                                <ul>
+                                    <li><strong>囉音 (Crackles/Rales):</strong> 需區分是來自心因性肺水腫還是肺炎。心衰竭的囉音通常是雙側對稱性，且可能伴隨 JVD 和下肢水腫。這提示麻醉中需謹慎輸液，並可能需要利尿劑。</li>
+                                    <li><strong>喘鳴音 (Wheezing):</strong> 代表氣道狹窄，需術前優化（如給予支氣管擴張劑）。麻醉誘導應平順，避免氣道刺激，並考慮使用對氣道較友善的藥物（如 Ketamine, Propofol）。</li>
+                                </ul>
+                            </li>
+                            <li><strong>周邊血管與容積狀態評估：</strong>
+                                <ul>
+                                    <li><strong>頸靜脈怒張 (JVD):</strong> 是評估右心房壓力的窗口。若病人平躺45度時頸靜脈仍怒張超過鎖骨上3公分，表示容積過多或右心功能不全。</li>
+                                    <li><strong>頸動脈雜音 (Carotid Bruit):</strong> 雖然本身不是圍手術期中風的強烈預測因子，但它代表全身性動脈粥樣硬化，暗示病人同時有冠狀動脈疾病的風險也較高。麻醉中應更積極維持腦灌注壓。</li>
+                                </ul>
+                            </li>
+                            <li><strong>神經學檢查：</strong>
+                                <ul>
+                                    <li><strong>建立基準線:</strong> 記錄術前已存在的任何運動或感覺異常，特別是計畫執行區域麻醉或需採俯臥等特殊姿勢的手術。這有助於術後區分是麻醉併發症還是原有問題。</li>
+                                </ul>
+                            </li>
+                        </ul>
+                         <div class="clinical-case p-4 rounded-md mt-4">
+                             <h3 class="font-semibold text-lg text-yellow-800 mb-2">臨床案例討論</h3>
+                             <p class="text-yellow-900">一位80歲老先生，因髖關節骨折預計接受半身麻醉手術。理學檢查發現心尖部有全收縮期心雜音，雙下肺野有囉音，且雙腳有凹陷性水腫。這些發現高度懷疑病人有未受控制的心衰竭合併二尖瓣逆流。此時若貿然執行半身麻醉，可能因交感神經阻斷導致嚴重低血壓。應立即安排床邊心臟超音波，並考慮延後手術，先以利尿劑等藥物進行心臟功能優化。 </p>
+                        </div>
+                    </div>
+                </div>
+                 <div class="bg-white rounded-lg shadow-md">
+                    <button onclick="toggleAccordion(event)" class="accordion-button w-full flex justify-between items-center p-4 text-left font-semibold text-lg text-gray-800 focus:outline-none">
+                        <span>老年病人特別評估</span>
+                        <svg class="accordion-arrow w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content px-4 pb-4 prose max-w-none">
+                        <p>老年病人的生理儲備功能下降，術後併發症風險較高。除了常規評估，還需關注以下幾點：</p>
+                        <ul>
+                            <li><strong>衰弱 (Frailty)：</strong> 衰弱是比年齡更準確的預後指標。可通過簡單測試評估，如「計時起走測試」(Timed Up-and-Go test)。衰弱的病人術後功能恢復慢，併發症風險高。</li>
+                            <li><strong>認知功能：</strong> 術前存在認知功能障礙是術後瞻妄（一種急性意識混亂狀態）的最強預測因子。可使用簡易認知評估工具（如 Mini-Cog）進行篩檢。</li>
+                            <li><strong>營養狀況：</strong> 營養不良（如低白蛋白血症、近期體重非自願性下降）會影響傷口癒合，增加感染風險。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="risk" class="tab-content">
+            <div class="space-y-6">
+                <!-- ASA Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md risk-card">
+                    <h3 class="text-xl font-bold mb-4 text-blue-800">ASA 身體狀況分級</h3>
+                    <p class="mb-4 text-gray-600">評估病人的整體生理狀態，與圍手術期風險及死亡率高度相關。</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-4 rounded-lg border border-green-200 bg-green-50">
+                            <p class="font-bold text-green-800">ASA 1</p>
+                            <p class="text-sm text-green-700">正常健康的病人</p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-yellow-200 bg-yellow-50">
+                            <p class="font-bold text-yellow-800">ASA 2</p>
+                            <p class="text-sm text-yellow-700">有輕度全身性疾病，無功能限制</p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-orange-200 bg-orange-50">
+                            <p class="font-bold text-orange-800">ASA 3</p>
+                            <p class="text-sm text-orange-700">有中重度全身性疾病，具功能限制</p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-red-200 bg-red-50">
+                            <p class="font-bold text-red-800">ASA 4</p>
+                            <p class="text-sm text-red-700">有重度全身性疾病，持續威脅生命</p>
+                        </div>
+                        <div class="p-4 rounded-lg border border-red-300 bg-red-100">
+                            <p class="font-bold text-red-900">ASA 5</p>
+                            <p class="text-sm text-red-800">瀕死病人</p>
+                        </div>
+                         <div class="p-4 rounded-lg border border-gray-300 bg-gray-100">
+                            <p class="font-bold text-gray-800">ASA 6</p>
+                            <p class="text-sm text-gray-700">腦死器官捐贈者</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RCRI Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md risk-card">
+                    <h3 class="text-xl font-bold mb-2 text-blue-800">心血管風險：修訂版心臟風險指數 (RCRI)</h3>
+                    <p class="mb-4 text-gray-600">評估非心臟手術後30天內主要心臟併發症的風險。每項計1分。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>高風險手術</span></div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg><span>缺血性心臟病史</span></div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8l2-2m0 0l2 2m-2-2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h12z" /></svg><span>心衰竭史</span></div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.546-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>腦血管疾病史</span></div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg><span>需胰島素治療的糖尿病</span></div>
+                        <div class="flex items-center p-3 bg-gray-50 rounded-lg"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg><span>術前肌酸酐 > 2.0 mg/dL</span></div>
+                    </div>
+                    <div class="mt-4 text-center p-4 bg-blue-50 rounded-lg">
+                        <p class="font-bold">總分: <span class="text-blue-600">0分</span> (低風險), <span class="text-yellow-600">1分</span> (中度風險), <span class="text-red-600">≥2分</span> (高風險)</p>
+                    </div>
+                </div>
+
+                <!-- STOP-Bang Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md risk-card">
+                    <h3 class="text-xl font-bold mb-2 text-blue-800">呼吸道風險：STOP-Bang 阻塞性睡眠呼吸中止症 (OSA) 篩檢</h3>
+                    <p class="mb-4 text-gray-600">評估病人是否有未診斷的OSA風險，這對呼吸道管理及術後照護至關重要。</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h4 class="font-semibold mb-2">病人自述 (STOP):</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>S</strong>noring (大聲打鼾)</li>
+                                <li><strong>T</strong>ired (白天疲倦)</li>
+                                <li><strong>O</strong>bserved (目擊呼吸暫停)</li>
+                                <li><strong>P</strong>ressure (高血壓)</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold mb-2">客觀指標 (BANG):</h4>
+                            <ul class="list-disc list-inside space-y-1">
+                                <li><strong>B</strong>MI > 35 kg/m²</li>
+                                <li><strong>A</strong>ge > 50 歲</li>
+                                <li><strong>N</strong>eck circumference > 40 cm (頸圍)</li>
+                                <li><strong>G</strong>ender: Male (男性)</li>
+                            </ul>
+                        </div>
+                    </div>
+                     <div class="mt-4 text-center p-4 bg-blue-50 rounded-lg">
+                        <p class="font-bold">總分 ≥ 3分: <span class="text-red-600">OSA 高風險</span></p>
+                    </div>
+                </div>
+
+                <!-- CHA2DS2-VASc Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md risk-card">
+                    <h3 class="text-xl font-bold mb-2 text-blue-800">血栓風險：CHA₂DS₂-VASc 心房顫動中風風險評分</h3>
+                    <p class="mb-4 text-gray-600">用於評估心房顫動病人發生中風的風險，是決定是否需要抗凝血治療及術前橋接策略的依據。</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong>C</strong>ongestive heart failure (心衰竭) - 1分</li>
+                        <li><strong>H</strong>ypertension (高血壓) - 1分</li>
+                        <li><strong>A</strong>ge ≥ 75 歲 - <strong>2分</strong></li>
+                        <li><strong>D</strong>iabetes Mellitus (糖尿病) - 1分</li>
+                        <li><strong>S</strong>troke/TIA/Thromboembolism (中風/暫時性腦缺血/血栓病史) - <strong>2分</strong></li>
+                        <li><strong>V</strong>ascular disease (血管疾病，如心肌梗塞、周邊動脈疾病) - 1分</li>
+                        <li><strong>A</strong>ge 65-74 歲 - 1分</li>
+                        <li><strong>S</strong>ex <strong>c</strong>ategory: Female (女性) - 1分</li>
+                    </ul>
+                    <div class="mt-4 text-center p-4 bg-blue-50 rounded-lg">
+                        <p class="font-bold">分數越高，中風風險越高，通常 ≥ 2分 (男性) 或 ≥ 3分 (女性) 建議長期抗凝治療。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="labs" class="tab-content">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-blue-800">實驗室評估 (進階)</h2>
+                <div class="key-points p-4 rounded-md mb-6">
+                    <h3 class="font-semibold text-lg text-indigo-800 mb-2">專護級重點</h3>
+                    <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                        <li>反對「常規」檢查，提倡基於臨床評估的「選擇性」檢查。</li>
+                        <li>檢查的目的是為了回答特定的臨床問題（例如「病人是否有高血鉀？」），或建立高風險病人的術後比較基準。</li>
+                        <li>異常的檢查結果必須有相應的臨床處置計畫，否則檢查本身就失去意義。</li>
+                        <li>對於高風險病人，考慮檢測心臟生物標記 (如 BNP, Troponin) 以輔助風險分層。</li>
+                    </ul>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-2 px-4 border-b">檢查項目</th>
+                                <th class="py-2 px-4 border-b">臨床適應症</th>
+                                <th class="py-2 px-4 border-b">臨床意義與麻醉考量</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">心電圖 (ECG)</td>
+                                <td class="py-2 px-4 border-b">心臟病史/風險因子、≥65歲、中高風險手術。</td>
+                                <td class="py-2 px-4 border-b">尋找Q波(舊心梗)、LVH伴隨應變(strain pattern)、傳導阻滯(block)。這些發現會影響麻醉藥物選擇及術中監測（如放置A-line）。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">全血球計數 (CBC)</td>
+                                <td class="py-2 px-4 border-b">預期大出血手術、貧血/出血病史、肝腎疾病、化療。</td>
+                                <td class="py-2 px-4 border-b">貧血會降低組織氧氣輸送，增加心肌缺血風險。血小板<8-10萬/μL是區域麻醉的相對禁忌症。白血球過高可能代表有潛在感染。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">腎功能/電解質</td>
+                                <td class="py-2 px-4 border-b">高血壓、DM、心/肝/腎病史、服用利尿劑/ACEI/ARB。</td>
+                                <td class="py-2 px-4 border-b">eGFR比Cr更能反映腎功能。高血鉀(>5.5)會增加Succinylcholine引發心跳停止的風險。低血鉀會增強非去極化肌肉鬆弛劑的效果。</td>
+                            </tr>
+                             <tr>
+                                <td class="py-2 px-4 border-b font-medium">凝血功能 (PT/aPTT)</td>
+                                <td class="py-2 px-4 border-b">出血病史、肝病、服用抗凝血劑。</td>
+                                <td class="py-2 px-4 border-b">INR > 1.5 是執行區域麻醉的重要警訊。肝病造成的凝血異常，可能需要術前輸注新鮮冷凍血漿(FFP)或維生素K。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">肝功能 (LFTs)</td>
+                                <td class="py-2 px-4 border-b">肝病史、酒精濫用、不明原因疲倦/黃疸。</td>
+                                <td class="py-2 px-4 border-b">低白蛋白血症會增加藥物游離濃度(free fraction)，增強藥效。肝功能不全會延長Rocuronium等經肝代謝藥物的作用時間。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">血糖/糖化血色素 (HbA1c)</td>
+                                <td class="py-2 px-4 border-b">糖尿病史、肥胖、長期類固醇使用者。</td>
+                                <td class="py-2 px-4 border-b">HbA1c > 8.5% 代表長期血糖控制不佳，術後感染與傷口癒合不良風險顯著增加。可能需要延後擇期手術以優化血糖控制。</td>
+                            </tr>
+                             <tr>
+                                <td class="py-2 px-4 border-b font-medium">心臟生物標記 (BNP, Troponin)</td>
+                                <td class="py-2 px-4 border-b">高風險心血管疾病病人(RCRI≥2)接受大型手術前。</td>
+                                <td class="py-2 px-4 border-b">術前BNP或Troponin升高是術後心臟併發症的強力預測因子，即使病人無症狀。此結果可作為術後監測的基準，並可能觸發進一步的心臟評估。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="clinical-case p-4 rounded-md mt-4">
+                     <h3 class="font-semibold text-lg text-yellow-800 mb-2">臨床案例討論</h3>
+                     <p class="text-yellow-900">一位75歲男性預計接受主動脈瘤修補術，術前抽血顯示 K+ = 5.8 mEq/L，ECG 呈現高尖T波。此為高血鉀症，是麻醉急症。應立即通知外科醫師暫緩手術，並開始給予降鉀治療（如 Insulin+Glucose, Bicarbonate, Kayexalate）。在血鉀降至安全範圍並確認ECG改善前，絕不可進行麻醉誘導，特別是應避免使用 Succinylcholine。 </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="meds" class="tab-content">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-blue-800">藥物管理 (進階)</h2>
+                 <div class="key-points p-4 rounded-md mb-6">
+                    <h3 class="font-semibold text-lg text-indigo-800 mb-2">專護級重點</h3>
+                    <ul class="list-disc list-inside space-y-2 text-indigo-700">
+                        <li>核心原則：在避免術中不良反應與預防慢性病惡化之間取得平衡。</li>
+                        <li>大部分維持生命徵象穩定的藥物（如心血管用藥）應持續服用。</li>
+                        <li>影響凝血功能或血糖的藥物則需要特別計畫。</li>
+                        <li>與病人、外科醫師、內科醫師的多方溝通是制定最佳藥物計畫的關鍵。</li>
+                        <li>熟悉新型口服抗凝血劑 (DOACs) 與傳統 Warfarin 的停藥與橋接策略差異。</li>
+                    </ul>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border">
+                         <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-2 px-4 border-b">藥物類別</th>
+                                <th class="py-2 px-4 border-b">圍手術期建議</th>
+                                <th class="py-2 px-4 border-b">麻醉相關影響與注意事項</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">心血管用藥 (β-阻斷劑, CCB)</td>
+                                <td class="py-2 px-4 border-b text-green-600 font-semibold">持續服用</td>
+                                <td class="py-2 px-4 border-b">突然停用可能導致反彈性高血壓或心搏過速。手術當天早上應用一小口水吞服。β-阻斷劑可鈍化插管時的交感神經反應。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">ACEI / ARB</td>
+                                <td class="py-2 px-4 border-b text-orange-600 font-semibold">考慮停用</td>
+                                <td class="py-2 px-4 border-b">可能加重麻醉誘導時的低血壓，且對傳統升壓藥反應不佳。通常建議手術當天早上停用一次。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">抗血小板藥物 (Aspirin, Clopidogrel)</td>
+                                <td class="py-2 px-4 border-b text-orange-600 font-semibold">個案決定</td>
+                                <td class="py-2 px-4 border-b">需權衡血栓風險（如心臟支架）與手術出血風險。若停用，需注意停藥時間 (Aspirin 7天, Clopidogrel 5-7天)。執行區域麻醉前必須停藥。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">抗凝血劑 (Warfarin, DOACs)</td>
+                                <td class="py-2 px-4 border-b text-red-600 font-semibold">必須停用</td>
+                                <td class="py-2 px-4 border-b">停藥時間依藥物半衰期與腎功能而定。高血栓風險病人需以短效肝素進行「橋接治療」。需有明確的術後恢復用藥計畫。</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2 px-4 border-b font-medium">口服降血糖藥</td>
+                                <td class="py-2 px-4 border-b text-red-600 font-semibold">停用</td>
+                                <td class="py-2 px-4 border-b">禁食期間有低血糖風險。Metformin 需注意乳酸中毒風險，SGLT-2 抑制劑需提早3-4天停藥以防 DKA。</td>
+                            </tr>
+                             <tr>
+                                <td class="py-2 px-4 border-b font-medium">胰島素</td>
+                                <td class="py-2 px-4 border-b text-orange-600 font-semibold">調整劑量</td>
+                                <td class="py-2 px-4 border-b">不可完全停用，以免發生酮酸中毒。長效型胰島素劑量通常減半或打2/3，短效/速效型則停用。術中需密集監測血糖。</td>
+                            </tr>
+                             <tr>
+                                <td class="py-2 px-4 border-b font-medium">精神科用藥 (SSRI, MAOI)</td>
+                                <td class="py-2 px-4 border-b text-green-600 font-semibold">持續服用</td>
+                                <td class="py-2 px-4 border-b">突然停藥可能導致戒斷症候群或精神狀況不穩。MAOI 使用者需避免使用 Meperidine, Ephedrine 等藥物，以防血清素症候群或高血壓危象。</td>
+                            </tr>
+                             <tr>
+                                <td class="py-2 px-4 border-b font-medium">草藥/保健品 (魚油, 銀杏, 人參)</td>
+                                <td class="py-2 px-4 border-b text-red-600 font-semibold">建議停用</td>
+                                <td class="py-2 px-4 border-b">許多草藥會影響凝血功能，增加術中出血風險。因成分不明確且缺乏研究，最安全的做法是建議術前1-2週停用。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div id="quiz" class="tab-content">
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold mb-4 text-blue-800">隨堂測驗</h2>
+                <div id="quiz-intro" class="text-center">
+                    <p class="mb-4">測試您對術前評估核心概念的理解程度。系統將從題庫中隨機抽取5道題目。</p>
+                    <button id="start-quiz-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+                        開始測驗
+                    </button>
+                </div>
+                <div id="quiz-container" class="hidden">
+                    <!-- Questions will be injected here by JavaScript -->
+                </div>
+                <div id="quiz-results" class="hidden mt-6">
+                    <!-- Results and explanations will be injected here -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const questionBank = [
+            {
+                question: "根據ASA身體狀況分級，一位有控制良好的高血壓（無功能限制）的病人應歸類為？",
+                options: ["ASA 1", "ASA 2", "ASA 3", "ASA 4"],
+                answer: "ASA 2",
+                explanation: "ASA 2 指的是有輕度全身性疾病但無功能限制的病人。控制良好的高血壓即為此類。"
+            },
+            {
+                question: "在呼吸道評估中，Mallampati Class IV 的特徵是？",
+                options: ["可見完整的懸雍垂", "僅可見懸雍垂底部", "僅可見軟顎", "僅可見硬顎"],
+                answer: "僅可見硬顎",
+                explanation: "Mallampati Class IV 表示口咽部視野最差，僅能看到硬顎，通常預示著插管困難度較高。"
+            },
+            {
+                question: "評估病人的功能能力時，哪個代謝當量 (METs) 水平常被視為區分心血管風險高低的重要閾值？",
+                options: ["1 MET", "2 METs", "4 METs", "10 METs"],
+                answer: "4 METs",
+                explanation: "能夠完成大於或等於 4 METs 的活動（如不休息爬兩層樓梯）的病人，其圍手術期心臟併發症的風險相對較低。"
+            },
+            {
+                question: "對於一位正在服用 Warfarin 的病人，計畫進行擇期手術，通常建議術前停藥幾天？",
+                options: ["1天", "3天", "5天", "7天"],
+                answer: "5天",
+                explanation: "Warfarin 的作用時間較長，通常需要停藥約5天，讓其抗凝血效果消退至安全範圍 (INR < 1.5)，才能進行手術。"
+            },
+            {
+                question: "以下何者是區域麻醉（如脊椎麻醉）的絕對禁忌症？",
+                options: ["病人焦慮", "周邊神經病變", "敗血症", "服用阿斯匹靈"],
+                answer: "敗血症",
+                explanation: "敗血症 (Sepsis) 或穿刺部位感染是區域麻醉的絕對禁忌症，因為可能將細菌帶入中樞神經系統，導致腦膜炎或膿瘍等嚴重併發症。病人拒絕、嚴重低血溶量和凝血功能障礙也是絕對禁忌症。"
+            },
+            {
+                question: "根據ASA的禁食指引，病人在手術前可以喝清流質（如開水、無渣果汁）直到術前幾小時？",
+                options: ["8小時", "6小時", "4小時", "2小時"],
+                answer: "2小時",
+                explanation: "ASA指引建議，清流質的禁食時間為2小時，輕食（如吐司）為6小時，油膩食物則需8小時以上。"
+            },
+            {
+                question: "修訂版心臟風險指數 (RCRI) 不包含以下哪個風險因子？",
+                options: ["缺血性心臟病史", "高血壓", "需胰島素治療的糖尿病", "術前肌酸酐 > 2.0 mg/dL"],
+                answer: "高血壓",
+                explanation: "RCRI 的六個風險因子為：高風險手術、缺血性心臟病史、心衰竭史、腦血管疾病史、需胰島素治療的糖尿病、術前腎功能不全 (Cr > 2.0)。高血壓本身並非其中之一，但其併發症可能包含在內。"
+            },
+            {
+                question: "對於一位長期服用類固醇的病人，圍手術期最重要的考量是？",
+                options: ["高血糖風險", "出血風險", "腎上腺功能不全", "藥物過敏"],
+                answer: "腎上腺功能不全",
+                explanation: "長期外源性類固醇會抑制下視丘-腦下垂體-腎上腺軸 (HPA axis)，導致身體在面對手術壓力時無法分泌足夠的皮質醇，可能引發致命的低血壓。因此，術中可能需要給予壓力劑量的類固醇。"
+            },
+            {
+                question: "下列何種情況最需要安排術前心電圖 (ECG) 檢查？",
+                options: ["一位25歲健康男性要進行疝氣修補術", "一位30歲孕婦要進行闌尾切除術", "一位70歲有糖尿病史的病人要進行膝關節置換術", "一位40歲女性要進行乳房腫塊切除術"],
+                answer: "一位70歲有糖尿病史的病人要進行膝關節置換術",
+                explanation: "高齡、有心血管風險因子（如糖尿病）且要接受中大型手術的病人，是術前ECG檢查的強烈適應症，以評估潛在的心臟問題。"
+            },
+            {
+                question: "術前評估的主要目標不包含下列何者？",
+                options: ["降低圍手術期 morbidity and mortality", "建立醫病關係", "為手術提供「許可」(clearance)", "制定麻醉計畫"],
+                answer: "為手術提供「許可」(clearance)",
+                explanation: "術前評估的目的是評估與優化風險，並非單純地給予「許可」。麻醉醫師的角色是風險管理者與顧問，與外科醫師及病人共同制定最安全的治療計畫。"
+            },
+            {
+                question: "一位病人的甲狀軟骨到下巴尖端距離 (Thyromental Distance) 為5公分，這在呼吸道評估中代表什麼意義？",
+                options: ["正常，無特殊風險", "可能預示著插管困難", "可能預示著面罩通氣困難", "此測量與插管無關"],
+                answer: "可能預示著插管困難",
+                explanation: "正常的甲狀軟骨到下巴尖端距離應大於6公分。小於6公分表示下顎空間不足，喉頭位置可能較高且靠前，會增加插管時聲門暴露的難度。"
+            },
+            {
+                question: "對於一位有嚴重、有症狀的主動脈瓣狹窄病人，計畫進行擇期的膽囊切除術，最恰當的處置是？",
+                options: ["直接進行膽囊切除術", "術中加強血壓監測即可", "建議先處理主動脈瓣問題（如瓣膜置換）再進行手術", "給予預防性抗生素後即可手術"],
+                answer: "建議先處理主動脈瓣問題（如瓣膜置換）再進行手術",
+                explanation: "有症狀的嚴重主動脈瓣狹窄是圍手術期極高的風險因子，麻醉誘導時的血管擴張可能導致致命的低血壓。因此，除非是緊急救命手術，否則應先處理心臟問題。"
+            },
+            {
+                question: "一位病人正在服用 SGLT-2 抑制劑 (一種降血糖藥)，術前藥物管理建議為何？",
+                options: ["持續服用至手術當天", "手術當天早上停用", "術前至少停用3天", "術後再開始服用即可"],
+                answer: "術前至少停用3天",
+                explanation: "SGLT-2 抑制劑會增加術後發生正常血糖酮酸中毒 (euglycemic DKA) 的風險，這是一種危險的併發症。因此，指引建議在擇期手術前至少停用3-4天。"
+            },
+            {
+                question: "下列何者是預測術後肺部併發症 (PPC) 的最重要風險因子之一？",
+                options: ["病人身高", "手術部位", "術前肺功能測試 (PFT) 結果", "血型"],
+                answer: "手術部位",
+                explanation: "手術部位離橫膈膜越近，對呼吸功能的影響越大。因此，上腹部和胸腔手術是PPC最強的預測因子之一。"
+            },
+            {
+                question: "一位病人自述對「麻藥」過敏，反應是上次手術後噁心嘔吐了兩天。這種情況最可能的原因是？",
+                options: ["真正的 IgE 介導的過敏反應", "麻醉藥物的預期副作用", "惡性高熱的前兆", "對消毒藥水過敏"],
+                answer: "麻醉藥物的預期副作用",
+                explanation: "術後噁心嘔吐 (PONV) 是麻醉藥物（特別是吸入性麻醉劑和鴉片類藥物）常見的副作用，而非真正的過敏反應。但仍需詳細詢問以排除罕見的過敏可能。"
+            },
+            {
+                question: "一位ASA 3級病人，其定義最貼切的是？",
+                options: ["一位健康無系統性疾病的病人", "一位有輕度系統性疾病，如控制良好的高血壓", "一位有重度系統性疾病且具功能限制，如洗腎病人", "一位瀕死的病人"],
+                answer: "一位有重度系統性疾病且具功能限制，如洗腎病人",
+                explanation: "ASA 3級指的是病人有中度至重度的全身性疾病，且此疾病已造成日常活動的功能性限制。例如，需要定期洗腎的慢性腎衰竭病人。"
+            },
+            {
+                question: "在老年病人的術前評估中，下列何者是預測術後瞻妄 (postoperative delirium) 最強的風險因子？",
+                options: ["高齡", "術前已存在的認知功能障礙", "手術時間長短", "男性"],
+                answer: "術前已存在的認知功能障礙",
+                explanation: "雖然高齡和手術類型都是風險因子，但術前已有的認知功能障礙（即使是輕微的）是術後發生瞻妄最強的獨立預測因子。"
+            },
+            {
+                question: "對於一位計畫接受半身麻醉的病人，術前發現其血小板為 70,000/μL，應如何處理？",
+                options: ["可安全執行半身麻醉", "半身麻醉風險極高，應避免", "可考慮輸注血小板後再執行", "此數值與半身麻醉無關"],
+                answer: "半身麻醉風險極高，應避免",
+                explanation: "血小板低下是執行區域麻醉（如脊椎或硬脊膜外麻醉）的相對或絕對禁忌症，因為會大幅增加發生脊椎內血腫的風險，可能導致永久性神經損傷。一般安全閾值建議在80,000-100,000/μL以上。"
+            },
+            {
+                question: "一位吸菸者應在術前多久戒菸，才能顯著降低術後呼吸道併發症的風險？",
+                options: ["24小時", "1週", "至少4週", "戒菸與否影響不大"],
+                answer: "至少4週",
+                explanation: "雖然任何時候戒菸都有好處（如改善氧合），但研究顯示，要顯著降低術後肺部併發症，需要至少4-8週的戒菸時間，讓呼吸道黏膜功能有時間恢復。"
+            },
+            {
+                question: "術前訪視時，病人表示有睡眠呼吸中止症 (Obstructive Sleep Apnea)，並在家使用CPAP（連續正壓呼吸器）。麻醉醫師應如何建議？",
+                options: ["手術期間不需要，可將機器留在家中", "建議手術當天務必將自己的CPAP機器帶來醫院", "術前一週停用CPAP", "CPAP與麻醉無關"],
+                answer: "建議手術當天務必將自己的CPAP機器帶來醫院",
+                explanation: "OSA病人對鴉片類止痛藥和鎮靜劑非常敏感，術後易發生呼吸道阻塞。術後及早使用自己習慣的CPAP，是維持呼吸道通暢、預防缺氧的重要措施。"
+            },
+            {
+                question: "一位病人正在服用口服避孕藥，術前是否需要停用？",
+                options: ["是，所有手術前都應停用", "否，應持續服用", "僅在大型手術前需停用", "個案決定，需權衡血栓風險與懷孕風險"],
+                answer: "個案決定，需權衡血栓風險與懷孕風險",
+                explanation: "口服避孕藥會增加靜脈血栓栓塞(VTE)的風險。對於低風險的小手術，持續服用通常是安全的。但對於大型或長時間的手術，特別是骨科手術，需與病人及外科醫師討論，權衡停藥增加的懷孕風險與服藥的血栓風險。"
+            },
+            {
+                question: "下列何種實驗室檢查結果，最可能導致擇期手術被延後？",
+                options: ["血鈉 133 mEq/L", "血色素 11.5 g/dL", "空腹血糖 150 mg/dL", "血鉀 6.2 mEq/L"],
+                answer: "血鉀 6.2 mEq/L",
+                explanation: "嚴重高血鉀 (正常值約 3.5-5.0 mEq/L) 會增加心臟傳導異常和心律不整的風險，是麻醉的急症，必須在術前積極矯正，因此最可能導致手術延後。"
+            },
+            {
+                question: "一位病人有氣喘病史，術前評估時最重要的問題是？",
+                options: ["上次發作是什麼時候？", "目前正在使用哪些藥物？", "是否有因氣喘住院或插管過？", "以上皆是"],
+                answer: "以上皆是",
+                explanation: "評估氣喘的嚴重程度與穩定性需要全面性的資訊，包括發作頻率、目前控制藥物，以及過去是否曾有危及生命的嚴重發作史，這些都是制定安全麻醉計畫的關鍵。"
+            },
+            {
+                question: "對於一位正在接受血液透析（洗腎）的病人，安排擇期手術的最佳時間點是？",
+                options: ["洗腎當天早上", "洗腎結束後立刻", "洗腎後的隔天", "任何時間都可以"],
+                answer: "洗腎後的隔天",
+                explanation: "洗腎後病人可能有體液和電解質的急性變化，血壓也可能不穩定。安排在洗腎後隔天手術，可以讓病人的生理狀態有時間達到一個相對穩定的平衡。"
+            },
+            {
+                question: "術前給予 H2 拮抗劑 (H2 blocker) 的主要目的是？",
+                options: ["預防術後噁心嘔吐", "減少胃酸量與提高胃液pH值", "促進腸胃蠕動", "提供術前鎮靜效果"],
+                answer: "減少胃酸量與提高胃液pH值",
+                explanation: "給予H2拮抗劑或質子泵抑制劑(PPI)是為了預防肺部吸入性肺炎。透過減少胃酸量並提高其pH值，即使發生胃內容物吸入，對肺部的損傷也能減輕。"
+            },
+            {
+                question: "一位病人即將接受腹腔鏡膽囊切除術，他的 ASA 分級為 2 級，RCRI 分數為 0。他的心血管風險屬於？",
+                options: ["極高風險", "高風險", "中度風險", "低風險"],
+                answer: "低風險",
+                explanation: "腹腔鏡手術屬於中度風險手術，但病人的生理狀態良好 (ASA 2) 且無任何 RCRI 風險因子，綜合評估其心血管風險屬於低風險。"
+            },
+            {
+                question: "下列關於術前常規胸部X光檢查的敘述，何者正確？",
+                options: ["所有超過65歲的病人都應接受檢查", "對於無心肺症狀的健康病人，此檢查效益很低", "是評估肺功能的好方法", "可以取代心電圖檢查"],
+                answer: "對於無心肺症狀的健康病人，此檢查效益很低",
+                explanation: "目前的指引不建議對無症狀病人進行常規術前胸部X光檢查，因為其發現有臨床意義異常的機率很低，且不會改變麻醉處置。應基於臨床需要（如懷疑肺炎或心衰竭）才安排。"
+            },
+            {
+                question: "一位病人正在服用 ACEI 類降血壓藥，術前應如何處理？",
+                options: ["增加劑量", "持續服用", "手術當天早上考慮停用一次", "術前三天即停用"],
+                answer: "手術當天早上考慮停用一次",
+                explanation: "ACEI/ARB 類藥物可能加劇麻醉誘導時的低血壓反應。目前的共識是，在手術當天早上停用一次是合理的做法，並在術後血壓穩定時盡快恢復使用。"
+            },
+            {
+                question: "在評估一位肥胖病人時，除了呼吸道和心血管系統，還需特別注意哪個潛在問題？",
+                options: ["低血糖", "胃食道逆流與肺吸入風險", "凝血功能異常", "甲狀腺功能低下"],
+                answer: "胃食道逆流與肺吸入風險",
+                explanation: "肥胖會增加腹內壓力，使得胃食道逆流的發生率增高，進而增加麻醉誘導時胃內容物吸入肺部的風險。因此，常會考慮採取快速誘導插管等預防措施。"
+            },
+            {
+                question: "一位病人對盤尼西林 (Penicillin) 過敏，反應是皮膚紅疹。他需要術前預防性抗生素，外科醫師計畫使用 Cefazolin (第一代頭孢菌素)，麻醉醫師的建議應為？",
+                options: ["絕對不可以使用", "可以使用，交叉過敏反應機率很低", "建議改用 Vancomycin", "建議先做皮膚測試"],
+                answer: "可以使用，交叉過敏反應機率很低",
+                explanation: "過去認為盤尼西林與頭孢菌素有很高的交叉過敏性，但新的證據顯示，對於非嚴重型過敏（如單純皮疹）的病人，與第一代頭孢菌素（如Cefazolin）的交叉反應率非常低 (<1%)，通常可以安全使用。"
+            },
+            {
+                question: "術前評估時發現病人有心房顫動 (Atrial Fibrillation)，最重要的處置是？",
+                options: ["評估心室速率是否過快或過慢", "評估抗凝血藥物的使用與停藥計畫", "尋找潛在的心臟結構問題", "以上皆是"],
+                answer: "以上皆是",
+                explanation: "心房顫動的術前評估是多面向的：首先要確保心室速率得到良好控制；其次，要制定安全的抗凝血藥物停藥與橋接計畫，以平衡血栓與出血風險；最後，需考慮是否有潛在的瓣膜或心肌病變問題。"
+            },
+            {
+                question: "一位病人有惡性高熱 (Malignant Hyperthermia) 的家族史，麻醉計畫應如何調整？",
+                options: ["避免使用所有麻醉藥物", "避免使用吸入性麻醉劑與琥珀膽鹼 (Succinylcholine)", "術前給予大量鎮靜劑", "改為半身麻醉即可"],
+                answer: "避免使用吸入性麻醉劑與琥珀膽鹼 (Succinylcholine)",
+                explanation: "惡性高熱是一種罕見但致命的遺傳性疾病，其觸發因子主要是揮發性吸入麻醉劑和去極化肌肉鬆弛劑琥珀膽鹼。麻醉計畫應改為全靜脈麻醉 (TIVA) 並備妥丹曲林 (Dantrolene) 以應對緊急情況。"
+            },
+            {
+                question: "「功能性依賴」(functionally dependent) 是指什麼情況，且為何在術前評估中重要？",
+                options: ["依賴藥物才能活動；代表疼痛控制不佳", "需要他人協助完成日常活動；是術後併發症的強烈預測因子", "依賴呼吸器維生；無法接受擇期手術", "依賴家人經濟支援；與醫療無關"],
+                answer: "需要他人協助完成日常活動；是術後併發症的強烈預測因子",
+                explanation: "功能性依賴指的是病人無法獨立完成基本的日常活動（如洗澡、穿衣、進食）。這反映了其生理儲備功能極差，是預測術後死亡率和嚴重併發症的一個非常重要的獨立風險因子。"
+            },
+            {
+                question: "一位病人即將接受白內障手術，術前需要做哪些常規檢查？",
+                options: ["心電圖、胸部X光、全套抽血", "僅需心電圖", "僅需抽血檢查", "對於低風險的白內障手術，若病人無症狀，通常不需要常規檢查"],
+                answer: "對於低風險的白內-障手術，若病人無症狀，通常不需要常規檢查",
+                explanation: "白內障手術屬於極低風險手術，對生理的干擾極小。目前的指引強調，對於無特定臨床適應症的病人進行常規術前檢查是沒有效益的，反而可能因偽陽性結果導致不必要的手術延遲。"
+            },
+            {
+                question: "病人有肝硬化，Child-Pugh 分級為 C 級，這代表什麼？",
+                options: ["肝功能尚可，手術風險低", "肝功能中度受損，手術風險中等", "肝功能嚴重代償不全，圍手術期死亡率極高", "此分級與手術風險無關"],
+                answer: "肝功能嚴重代償不全，圍手術期死亡率極高",
+                explanation: "Child-Pugh C 級代表最嚴重的肝硬化，其特徵包括明顯的腹水、腦病變、高膽紅素和低白蛋白。這類病人的手術死亡率可高達50%以上，應盡量避免非緊急手術。"
+            },
+            {
+                question: "一位病人有糖尿病且 BMI 為 38 kg/m²，術前評估時應特別警覺哪個問題？",
+                options: ["惡性高熱", "潛在的困難呼吸道與阻塞性睡眠呼吸中止症", "對肌肉鬆弛劑過敏", "血友病"],
+                answer: "潛在的困難呼吸道與阻塞性睡眠呼吸中止症",
+                explanation: "肥胖 (高BMI) 和糖尿病都是阻塞性睡眠呼吸中止症 (OSA) 的高風險因子。OSA 會增加呼吸道阻塞和對麻醉藥物敏感的風險。同時，肥胖也常伴隨著頸圍粗、軟組織增厚等困難呼吸道的特徵。"
+            },
+            {
+                question: "術前訪視時，一位病人表示他每天都喝半瓶高粱酒，最重要的下一步是？",
+                options: ["建議他手術當天早上喝一些以避免戒斷", "評估酒精戒斷症候群的風險並制定預防計畫", "告知他手術風險很高並取消手術", "不需特別處理"],
+                answer: "評估酒精戒斷症候群的風險並制定預防計畫",
+                explanation: "長期大量飲酒者在術後因禁食和壓力，可能出現危及生命的酒精戒斷症候群（如瞻妄、癲癇）。術前應評估其風險，並計畫在圍手術期使用苯二氮平類 (Benzodiazepines) 藥物進行預防或治療。"
+            },
+            {
+                question: "ASA 身體狀況分級系統的主要用途是？",
+                options: ["決定手術費用", "預測手術需要的時間", "評估病人的術前生理健康狀況，以作為風險溝通的標準", "選擇外科醫師"],
+                answer: "評估病人的術前生理健康狀況，以作為風險溝通的標準",
+                explanation: "ASA 分級並非直接預測併發症的工具，而是對病人術前整體健康狀況的標準化描述。它有助於醫療團隊成員之間溝通病人風險，並與圍手術期死亡率有很強的相關性。"
+            },
+            {
+                question: "一位病人近期曾有上呼吸道感染（感冒），但目前症狀已緩解，距離手術還有4週，應如何建議？",
+                options: ["取消手術，至少延後三個月", "可以如期手術，風險已降低", "建議延後一週即可", "需要抗生素治療才能手術"],
+                answer: "可以如期手術，風險已降低",
+                explanation: "上呼吸道感染會引起氣道高反應性，增加術中支氣管痙攣等風險，此效應通常持續2-6週。若症狀已緩解且距離手術尚有4週，氣道反應性已大幅下降，通常可以安全地進行手術。"
+            },
+            {
+                question: "下列何者並非術前評估診所 (Preoperative evaluation clinic) 的主要效益？",
+                options: ["減少手術當日取消率", "降低醫療費用", "保證由同一位麻醉醫師執行麻醉", "提升病人滿意度"],
+                answer: "保證由同一位麻醉醫師執行麻醉",
+                explanation: "雖然病人可能偏好由同一位醫師服務，但在大型醫院的運作模式下，很難保證評估與執行麻醉的是同一位醫師。術前評估診所的主要效益在於系統性地處理問題、提升效率與安全，而非指定醫師。"
+            }
+        ];
+
+        let currentQuizQuestions = [];
+
+        // Function to switch between tabs
+        function changeTab(event, tabID) {
+            let tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active");
+            }
+
+            let tabbuttons = document.getElementsByClassName("tab-button");
+            for (let i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+                tabbuttons[i].classList.add("text-gray-600");
+                 tabbuttons[i].style.backgroundColor = '';
+
+            }
+
+            document.getElementById(tabID).style.display = "block";
+            document.getElementById(tabID).classList.add("active");
+            event.currentTarget.classList.add("active");
+            event.currentTarget.classList.remove("text-gray-600");
+        }
+
+        // Function to toggle accordion sections
+        function toggleAccordion(event) {
+            const button = event.currentTarget;
+            const content = button.nextElementSibling;
+            const isActive = button.classList.contains('active');
+
+            const parent = button.closest('.space-y-4');
+            if (parent) {
+                const allButtons = parent.querySelectorAll('.accordion-button');
+                allButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    const cont = btn.nextElementSibling;
+                    cont.style.maxHeight = null;
+                    cont.style.display = 'none';
+                });
+            }
+
+            if (!isActive) {
+                button.classList.add('active');
+                content.style.display = 'block';
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+        
+        // --- Quiz Logic ---
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const quizIntro = document.getElementById('quiz-intro');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizResults = document.getElementById('quiz-results');
+
+        startQuizBtn.addEventListener('click', startQuiz);
+
+        function startQuiz() {
+            quizIntro.classList.add('hidden');
+            quizResults.classList.add('hidden');
+            quizContainer.innerHTML = ''; // Clear previous quiz
+            
+            // Randomly select 5 questions
+            const shuffled = [...questionBank].sort(() => 0.5 - Math.random());
+            currentQuizQuestions = shuffled.slice(0, 5);
+            
+            displayQuestions();
+            quizContainer.classList.remove('hidden');
+        }
+
+        function displayQuestions() {
+            let quizHTML = '';
+            currentQuizQuestions.forEach((q, index) => {
+                quizHTML += `
+                    <div class="mb-6 pb-4 border-b">
+                        <p class="font-semibold mb-2">${index + 1}. ${q.question}</p>
+                        <div class="space-y-2">
+                `;
+                q.options.forEach(option => {
+                    quizHTML += `
+                        <div>
+                            <label class="flex items-center">
+                                <input type="radio" name="question${index}" value="${option}" class="mr-2">
+                                <span>${option}</span>
+                            </label>
+                        </div>
+                    `;
+                });
+                quizHTML += `</div></div>`;
+            });
+            quizHTML += `<button id="submit-quiz-btn" class="w-full bg-green-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-700 transition duration-300">提交答案</button>`;
+            quizContainer.innerHTML = quizHTML;
+
+            document.getElementById('submit-quiz-btn').addEventListener('click', submitQuiz);
+        }
+
+        function submitQuiz() {
+            let score = 0;
+            let resultsHTML = '';
+            
+            currentQuizQuestions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : null;
+                const isCorrect = userAnswer === q.answer;
+
+                if (isCorrect) {
+                    score++;
+                }
+
+                resultsHTML += `
+                    <div class="mb-6 pb-4 border-b">
+                        <p class="font-semibold">${index + 1}. ${q.question}</p>
+                        <p class="mt-2">您的答案: <span class="${isCorrect ? 'text-green-600' : 'text-red-600'} font-bold">${userAnswer || '未作答'}</span></p>
+                        <p>正確答案: <span class="text-green-600 font-bold">${q.answer}</span></p>
+                        ${isCorrect ? '<p class="text-green-600 font-bold">✔ 答對了！</p>' : '<p class="text-red-600 font-bold">✘ 答錯了</p>'}
+                        <div class="quiz-explanation">
+                            <h4 class="font-bold">詳解：</h4>
+                            <p>${q.explanation}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            quizContainer.classList.add('hidden');
+
+            const finalScoreHTML = `
+                <h3 class="text-2xl font-bold text-center mb-4">測驗結果</h3>
+                <p class="text-center text-xl mb-6">您答對了 <span class="text-blue-600 font-bold">${score}</span> / 5 題</p>
+            `;
+            
+            quizResults.innerHTML = finalScoreHTML + resultsHTML + `<button onclick="startQuiz()" class="w-full mt-4 bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">再試一次</button>`;
+            quizResults.classList.remove('hidden');
+        }
+
+        // Initialize the first tab
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.tab-button').click();
+        });
+    </script>
+
+</body>
+</html>
