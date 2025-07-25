@@ -562,13 +562,17 @@
                                 let values = [];
                                 
                                 const mainCheckbox = group.querySelector('input[id$="_main"]');
-                                // If it's a simple checkbox without sub-options and it's checked
-                                if (mainCheckbox && mainCheckbox.checked && !group.querySelector('.input-wrapper')) {
-                                    values.push(label); // Use the label as the value
-                                } else if (mainCheckbox && !mainCheckbox.checked) {
-                                    return; // Skip if main checkbox is not checked
-                                }
+                                if (mainCheckbox && !mainCheckbox.checked) return;
 
+                                // For simple checkboxes (no sub-options)
+                                if (mainCheckbox && mainCheckbox.checked && !group.querySelector('.input-wrapper')) {
+                                    const textInputSimple = group.querySelector('.conditional-text-input, .conditional-textarea');
+                                    if (textInputSimple && textInputSimple.style.display !== 'none' && textInputSimple.value.trim() !== '') {
+                                        values.push(textInputSimple.value.trim());
+                                    } else {
+                                        values.push('有');
+                                    }
+                                }
 
                                 group.querySelectorAll('input[name$="_options"]:checked').forEach(cb => {
                                     values.push(cb.nextElementSibling.textContent.trim());
@@ -578,19 +582,7 @@
                                 if(radioChecked) {
                                     values.push(radioChecked.nextElementSibling.textContent.trim());
                                 }
-
-                                const textInput = group.querySelector('.conditional-text-input, .conditional-textarea');
-                                if (textInput && textInput.style.display !== 'none' && textInput.value.trim() !== '') {
-                                     if(values.length === 0 && mainCheckbox && mainCheckbox.checked) {
-                                        values.push(textInput.value.trim());
-                                     } else if (values.length > 0) {
-                                        let lastVal = values[values.length - 1];
-                                        values[values.length - 1] = `${lastVal}: ${textInput.value.trim()}`;
-                                     } else {
-                                        values.push(textInput.value.trim());
-                                     }
-                                }
-
+                                
                                 const wrapper = group.querySelector('.input-wrapper');
                                 if (wrapper) {
                                     wrapper.querySelectorAll('.form-group').forEach(optionGroup => {
@@ -656,8 +648,8 @@
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF();
                 
-                doc.addFileToVFS('SourceHanSans-Normal.ttf', SourceHanSansNormal);
-                doc.addFont('SourceHanSans-Normal.ttf', 'SourceHanSans', 'normal');
+                doc.addFileToVFS('SourceHanSans-normal.ttf', SourceHanSansNormal);
+                doc.addFont('SourceHanSans-normal.ttf', 'SourceHanSans', 'normal');
                 doc.setFont('SourceHanSans');
 
                 let y = 15;
@@ -711,10 +703,15 @@
                                 let values = [];
                                 
                                 const mainCheckbox = group.querySelector('input[id$="_main"]');
+                                if (mainCheckbox && !mainCheckbox.checked) return;
+
                                 if (mainCheckbox && mainCheckbox.checked && !group.querySelector('.input-wrapper')) {
-                                    values.push(label); 
-                                } else if (mainCheckbox && !mainCheckbox.checked) {
-                                    return; 
+                                    const textInputSimple = group.querySelector('.conditional-text-input, .conditional-textarea');
+                                    if (textInputSimple && textInputSimple.style.display !== 'none' && textInputSimple.value.trim() !== '') {
+                                        values.push(textInputSimple.value.trim());
+                                    } else {
+                                        values.push('有');
+                                    }
                                 }
 
                                 group.querySelectorAll('input[name$="_options"]:checked').forEach(cb => {
@@ -724,18 +721,6 @@
                                 const radioChecked = group.querySelector('input[type="radio"]:checked');
                                 if(radioChecked) {
                                     values.push(radioChecked.nextElementSibling.textContent.trim());
-                                }
-
-                                const textInput = group.querySelector('.conditional-text-input, .conditional-textarea');
-                                if (textInput && textInput.style.display !== 'none' && textInput.value.trim() !== '') {
-                                    if(values.length === 0 && mainCheckbox && mainCheckbox.checked) {
-                                       values.push(textInput.value.trim());
-                                    } else if (values.length > 0) {
-                                       let lastVal = values[values.length - 1];
-                                       values[values.length - 1] = `${lastVal}: ${textInput.value.trim()}`;
-                                    } else {
-                                       values.push(textInput.value.trim());
-                                    }
                                 }
 
                                 const wrapper = group.querySelector('.input-wrapper');
