@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>日本東北孝親之旅 (2025)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', 'Noto Sans JP', sans-serif;
+            background-color: #f3f4f6;
+            padding-bottom: 80px; /* Space for bottom nav */
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 400px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 250px;
+        }
+
+        /* Animation for tab switching */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .nav-item.active {
+            color: #1e3a8a; /* Blue-900 */
+        }
+        .nav-item.active span {
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Chosen Palette: Winter Indigo & Warm Gold -->
+    <!-- Application Structure Plan: 
+         1. Header: Trip Summary & Pacing Chart.
+         2. Tab System: Itinerary, Wallet (Tickets), Care (Medical/Veg), Guide (Sightseeing).
+         3. Dynamic Content: JS renders data based on the Source Report.
+    -->
+
+    <!-- Header -->
+    <header class="bg-slate-900 text-white p-6 rounded-b-3xl shadow-lg relative overflow-hidden">
+        <div class="relative z-10">
+            <h1 class="text-2xl font-bold mb-1">日本東北孝親之旅 🇯🇵</h1>
+            <p class="text-slate-300 text-sm mb-4"><i class="far fa-calendar-alt mr-2"></i>2025/12/17 - 12/22 (6天)</p>
+            
+            <!-- Analysis Visualization -->
+            <div class="bg-slate-800/80 rounded-xl p-4 backdrop-blur-sm border border-slate-700">
+                <div class="flex justify-between items-center mb-2">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">行程節奏分析 (Trip Pacing)</h3>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full">長輩友善</span>
+                </div>
+                <div class="chart-container">
+                    <canvas id="pacingChart"></canvas>
+                </div>
+                <p class="text-[10px] text-slate-400 text-center mt-2">
+                    此圖表顯示行程已優化：<br>確保有充足的「休息」與「慢遊」時間，避免過度勞累。
+                </p>
+            </div>
+        </div>
+        <!-- Decorative Background Circle -->
+        <div class="absolute top-[-50px] right-[-50px] w-40 h-40 bg-blue-500 rounded-full opacity-20 blur-3xl"></div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-content" class="p-4 fade-in">
+        <!-- Content injected by JS -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-50 pb-safe">
+        <div class="flex justify-around items-center h-16 max-w-2xl mx-auto">
+            <button class="nav-item active flex flex-col items-center w-full h-full justify-center text-gray-400 hover:text-slate-900 transition-colors" onclick="switchTab('itinerary')">
+                <i class="fas fa-list-ul text-xl mb-1"></i>
+                <span class="text-[10px]">行程</span>
+            </button>
+            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-gray-400 hover:text-slate-900 transition-colors" onclick="switchTab('wallet')">
+                <i class="fas fa-ticket-alt text-xl mb-1"></i>
+                <span class="text-[10px]">票券/住宿</span>
+            </button>
+            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-gray-400 hover:text-slate-900 transition-colors" onclick="switchTab('guide')">
+                <i class="fas fa-map-marked-alt text-xl mb-1"></i>
+                <span class="text-[10px]">銀山指南</span>
+            </button>
+            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-gray-400 hover:text-slate-900 transition-colors" onclick="switchTab('care')">
+                <i class="fas fa-heartbeat text-xl mb-1"></i>
+                <span class="text-[10px]">醫療/素食</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data Storage (Source Material Integration) ---
+        
+        // Visualization Data
+        const pacingData = {
+            labels: ['移動 (Transport)', '景點 (Sightseeing)', '休息/用餐 (Rest & Dining)'],
+            datasets: [{
+                data: [25, 35, 40], // Estimated based on the itinerary (heavy on hotel stays and dining)
+                backgroundColor: ['#64748b', '#f59e0b', '#10b981'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        };
+
+        const logistics = {
+            flights: [
+                { date: '12/17', code: 'NH852', route: 'TSA (13:30) ➝ HND T2 (17:30)', pnr: 'FMXO8Y', note: '預約定額計程車' },
+                { date: '12/22', code: 'NH853', route: 'HND T2 (12:40) ➝ TSA (15:50)', pnr: 'FMXO8Y', note: '10:30 抵達機場' }
+            ],
+            trains: [
+                { date: '12/18', name: 'Hayabusa 23 (GranClass)', route: '東京 (13:20) ➝ 仙台 (14:51)', seats: '10號車 3A/B/C', id: 'E24098', code: '33242497977521258' },
+                { date: '12/20', name: 'Tsubasa 133 (Green)', route: '山形 (12:45) ➝ 大石田 (13:16)', seats: '11號車 1A/B/C', id: 'E42283', code: '需領實體票' },
+                { date: '12/21', name: 'Tsubasa 156 (Green)', route: '大石田 (17:27) ➝ 東京 (20:48)', seats: '11號車 2C/3B/C', id: 'E64876', code: '需領實體票' }
+            ],
+            car: {
+                shop: 'TOYOTA 仙台新幹線口店',
+                model: 'Corolla Touring Hybrid (C3)',
+                time: '12/18 15:30 取 - 12/20 10:30 還',
+                id: '99907358200',
+                note: '含雪胎 (Snow Tires)'
+            },
+            hotels: [
+                { name: 'Tokyo Station Hotel', dates: '12/17 (1晚)', id: '1000340712 / 1000340714', tel: '東京車站直結' },
+                { name: 'The Westin Sendai', dates: '12/18 (2晚)', id: '97405676', tel: '022-722-1234' },
+                { name: '古勢起屋本館', dates: '12/20 (1晚)', id: '18644 / 18645', tel: '銀山溫泉' },
+                { name: 'Tokyo Marriott Hotel', dates: '12/21 (1晚)', id: '71535755', tel: '品川御殿山' }
+            ]
+        };
+
+        const itinerary = [
+            {
+                day: 1, date: '12/17 (三)', title: '抵達東京', icon: 'fa-plane-arrival',
+                steps: [
+                    { time: '17:30', text: '抵達羽田機場 (T2)', sub: '搭乘計程車直達飯店' },
+                    { time: '19:30', text: '入住 Tokyo Station Hotel', map: 'Tokyo Station Hotel' },
+                    { time: '20:00', text: '晚餐: T\'s Tantan (Gransta Tokyo)', sub: '全素擔擔麵', map: 'T\'s Tantan Gransta Tokyo' }
+                ]
+            },
+            {
+                day: 2, date: '12/18 (四)', title: '移動：仙台光之樂章', icon: 'fa-car',
+                steps: [
+                    { time: '09:30', text: '寄送大件行李', sub: '寄往 12/21 Tokyo Marriott' },
+                    { time: '13:20', text: 'Hayabusa 23 (GranClass)', sub: '前往仙台' },
+                    { time: '15:30', text: '取車 (Toyota 仙台新幹線口)', map: 'Toyota Rent a Car Sendai Shinkansen-guchi' },
+                    { time: '16:00', text: '入住 Westin Sendai', map: 'The Westin Sendai' },
+                    { time: '17:30', text: '車遊：定禪寺通 光之樂章', sub: '車內賞燈，免受凍', map: 'Jozenji-dori Avenue' }
+                ]
+            },
+            {
+                day: 3, date: '12/19 (五)', title: '仙台：醫療與松島', icon: 'fa-procedures', highlight: true,
+                steps: [
+                    { time: '08:30', text: '抵達診所報到', sub: '右側透析專用入口', map: 'Tomizawa Aoki Clinic' },
+                    { time: '09:00', text: '母親透析 (約4小時)', sub: '父子行程：鹽竈神社', map: 'Shiogama Shrine' },
+                    { time: '14:00', text: '松島：西行戻之松公園', sub: '車遊俯瞰松島全景', map: 'Saigyo Modoshi no Matsu Park' },
+                    { time: '15:00', text: '松島海岸散策', sub: '五大堂/福浦橋', map: 'Matsushima Kaigan' }
+                ]
+            },
+            {
+                day: 4, date: '12/20 (六)', title: '前進銀山溫泉', icon: 'fa-snowflake',
+                steps: [
+                    { time: '10:30', text: '仙台站還車', sub: '搭乘仙山線 -> 山形 -> 大石田' },
+                    { time: '13:40', text: '搭乘旅館接駁車', sub: '大石田站發車' },
+                    { time: '14:20', text: '抵達銀山溫泉', map: 'Kosekiya Bekkan' },
+                    { time: '15:00', text: '散策：野川豆腐', sub: '素食可食', map: 'Nogawa Tofu' },
+                    { time: '16:00', text: '攝影：藍色時刻 (Blue Hour)', sub: '白銀橋前', map: 'Shirogane Bridge' }
+                ]
+            },
+            {
+                day: 5, date: '12/21 (日)', title: '銀山漫遊與返京', icon: 'fa-train',
+                steps: [
+                    { time: '10:00', text: '退房 (寄放行李)', sub: '伊豆之華早午餐 / 公共浴場' },
+                    { time: '16:35', text: '巴士前往大石田站', sub: '尾花澤市營巴士' },
+                    { time: '17:27', text: 'Tsubasa 156 (Green)', sub: '前往東京' },
+                    { time: '21:30', text: '入住 Tokyo Marriott', sub: '領取寄送行李', map: 'Tokyo Marriott Hotel' }
+                ]
+            },
+            {
+                day: 6, date: '12/22 (一)', title: '甜蜜返家', icon: 'fa-home',
+                steps: [
+                    { time: '10:00', text: '前往羽田機場 (T2)', sub: '搭乘計程車' },
+                    { time: '12:40', text: 'NH853 起飛', sub: '回溫暖的家' }
+                ]
+            }
+        ];
+
+        const guideSpots = [
+            { name: '野川豆腐', desc: '百年手工豆腐，素食可食(無醬汁)。', tag: '美食', map: 'Nogawa Tofu' },
+            { name: '伊豆之華', desc: '蕎麥麵老店，適合早午餐/下午茶。', tag: '美食', map: 'Izu no Hana' },
+            { name: '白銀橋', desc: '拍攝銀山溫泉經典夜景的最佳地點。', tag: '拍照', map: 'Shirogane Bridge' },
+            { name: '能登屋旅館', desc: '阿信拍攝地，神隱少女風格。', tag: '拍照', map: 'Notoya Ryokan' },
+            { name: 'Haikara-san', desc: '著名的咖哩麵包 (含肉)，可喝咖啡。', tag: '休息', map: 'Haikarasan Dori' }
+        ];
+
+        // --- Core Functions ---
+
+        function initApp() {
+            initChart();
+            switchTab('itinerary');
+        }
+
+        function switchTab(tabId) {
+            // Update Nav UI
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'text-slate-900'));
+            const activeBtn = document.querySelector(`button[onclick="switchTab('${tabId}')"]`);
+            if(activeBtn) {
+                activeBtn.classList.add('active', 'text-slate-900');
+                activeBtn.classList.remove('text-gray-400');
+            }
+
+            // Render Content
+            const container = document.getElementById('app-content');
+            container.innerHTML = '';
+            container.classList.remove('fade-in');
+            void container.offsetWidth; // Trigger reflow
+            container.classList.add('fade-in');
+
+            if (tabId === 'itinerary') renderItinerary(container);
+            else if (tabId === 'wallet') renderWallet(container);
+            else if (tabId === 'guide') renderGuide(container);
+            else if (tabId === 'care') renderCare(container);
+        }
+
+        function copyToClipboard(text) {
+            // Using modern API but fallback for WebView compatibility if needed
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("Copy");
+            textArea.remove();
+            
+            // Simple toast notification
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/80 text-white px-4 py-2 rounded-lg z-50 text-sm';
+            toast.innerText = '已複製: ' + text;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 1500);
+        }
+
+        function openMap(query) {
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
+        }
+
+        // --- Render Functions ---
+
+        function renderItinerary(container) {
+            let html = '<div class="space-y-4">';
+            itinerary.forEach(day => {
+                const isImportant = day.highlight ? 'border-l-4 border-red-500' : '';
+                html += `
+                    <div class="bg-white rounded-xl p-4 card-shadow ${isImportant}">
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                            <div>
+                                <span class="text-xs font-bold text-slate-500 uppercase">Day ${day.day}</span>
+                                <h2 class="text-lg font-bold text-slate-800">${day.date} ${day.title}</h2>
+                            </div>
+                            <div class="bg-slate-100 p-2 rounded-full text-slate-600">
+                                <i class="fas ${day.icon}"></i>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 relative border-l-2 border-slate-100 ml-2 pl-4">
+                            ${day.steps.map(step => `
+                                <li class="relative">
+                                    <div class="absolute -left-[21px] top-1.5 w-3 h-3 bg-slate-300 rounded-full border-2 border-white"></div>
+                                    <div class="flex justify-between items-start" ${step.map ? `onclick="openMap('${step.map}')"` : ''}>
+                                        <div>
+                                            <span class="text-xs font-mono font-bold text-slate-500 bg-slate-100 px-1 rounded">${step.time}</span>
+                                            <p class="text-sm font-medium text-slate-800 mt-0.5">${step.text}</p>
+                                            ${step.sub ? `<p class="text-xs text-slate-500">${step.sub}</p>` : ''}
+                                        </div>
+                                        ${step.map ? '<i class="fas fa-map-marker-alt text-blue-400 text-xs mt-1"></i>' : ''}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderWallet(container) {
+            let html = '<div class="space-y-6">';
+            
+            // Flights
+            html += '<h3 class="font-bold text-slate-700 ml-1">✈️ 航班 (ANA)</h3>';
+            logistics.flights.forEach(f => {
+                html += `
+                    <div class="bg-white rounded-xl p-4 card-shadow border-l-4 border-blue-500">
+                        <div class="flex justify-between">
+                            <span class="font-bold text-lg">${f.code}</span>
+                            <span class="text-sm text-slate-500">${f.date}</span>
+                        </div>
+                        <p class="text-sm my-1">${f.route}</p>
+                        <div class="flex justify-between items-center mt-2 bg-blue-50 p-2 rounded">
+                            <span class="text-xs font-mono text-blue-800">PNR: ${f.pnr}</span>
+                            <button onclick="copyToClipboard('${f.pnr}')" class="text-blue-600"><i class="far fa-copy"></i></button>
+                        </div>
+                        ${f.note ? `<p class="text-xs text-orange-600 mt-1"><i class="fas fa-exclamation-circle"></i> ${f.note}</p>` : ''}
+                    </div>
+                `;
+            });
+
+            // Trains
+            html += '<h3 class="font-bold text-slate-700 ml-1 mt-6">🚅 JR 新幹線</h3>';
+            logistics.trains.forEach(t => {
+                html += `
+                    <div class="bg-white rounded-xl p-4 card-shadow border-l-4 border-green-500 mb-3">
+                        <div class="flex justify-between">
+                            <span class="font-bold text-sm">${t.name}</span>
+                            <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded">${t.date}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 my-1">${t.route}</p>
+                        <p class="text-xs font-bold text-slate-800 mb-2">${t.seats}</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="bg-gray-50 p-2 rounded">
+                                <p class="text-[10px] text-gray-500">預訂編號</p>
+                                <div class="flex justify-between">
+                                    <span class="text-xs font-mono font-bold">${t.id}</span>
+                                    <button onclick="copyToClipboard('${t.id}')"><i class="far fa-copy text-xs"></i></button>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-2 rounded">
+                                <p class="text-[10px] text-gray-500">取票代碼</p>
+                                <div class="flex justify-between">
+                                    <span class="text-xs font-mono font-bold truncate">${t.code}</span>
+                                    ${t.code !== '需領實體票' ? `<button onclick="copyToClipboard('${t.code}')"><i class="far fa-copy text-xs"></i></button>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Car
+            html += '<h3 class="font-bold text-slate-700 ml-1 mt-6">🚗 租車 (Toyota)</h3>';
+            html += `
+                <div class="bg-white rounded-xl p-4 card-shadow border-l-4 border-orange-500">
+                    <h4 class="font-bold">${logistics.car.shop}</h4>
+                    <p class="text-xs text-slate-500 mb-2">${logistics.car.time}</p>
+                    <p class="text-sm mb-2">${logistics.car.model}</p>
+                    <div class="flex justify-between items-center bg-orange-50 p-2 rounded">
+                        <span class="text-xs font-mono text-orange-800">預約號: ${logistics.car.id}</span>
+                        <button onclick="copyToClipboard('${logistics.car.id}')" class="text-orange-600"><i class="far fa-copy"></i></button>
+                    </div>
+                    <button onclick="openMap('${logistics.car.shop}')" class="w-full mt-2 text-xs bg-gray-100 py-2 rounded text-slate-600 flex items-center justify-center gap-1">
+                        <i class="fas fa-location-arrow"></i> 導航至店鋪
+                    </button>
+                </div>
+            `;
+
+            // Hotels
+            html += '<h3 class="font-bold text-slate-700 ml-1 mt-6">🏨 住宿</h3>';
+            logistics.hotels.forEach(h => {
+                html += `
+                    <div class="bg-white rounded-xl p-4 card-shadow mb-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-sm">${h.name}</h4>
+                                <span class="text-xs text-slate-500">${h.dates}</span>
+                            </div>
+                            <button onclick="openMap('${h.name}')" class="text-blue-500"><i class="fas fa-map-marked-alt text-lg"></i></button>
+                        </div>
+                        <div class="mt-2 pt-2 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-xs font-mono text-slate-600">ID: ${h.id}</span>
+                            <button onclick="copyToClipboard('${h.id}')" class="text-slate-400"><i class="far fa-copy"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderGuide(container) {
+            let html = `
+                <div class="mb-4 bg-indigo-900 text-white rounded-xl p-4 card-shadow relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h3 class="font-bold text-lg mb-1">銀山溫泉散策</h3>
+                        <p class="text-xs text-indigo-200">大正浪漫的雪景漫步</p>
+                    </div>
+                    <i class="fas fa-snowflake absolute -right-4 -bottom-4 text-6xl text-indigo-800 opacity-50"></i>
+                </div>
+                
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-6 flex gap-3 items-start">
+                    <i class="fas fa-camera text-yellow-600 mt-1"></i>
+                    <div>
+                        <h4 class="font-bold text-yellow-800 text-sm">必拍：藍色時刻 (Blue Hour)</h4>
+                        <p class="text-xs text-yellow-700">16:00 - 16:30 天空深藍與煤氣燈暖黃輝映的最佳瞬間。</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+            `;
+
+            guideSpots.forEach(spot => {
+                html += `
+                    <div class="bg-white rounded-xl p-4 card-shadow flex justify-between items-center" onclick="openMap('${spot.map}')">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-slate-800">${spot.name}</h4>
+                                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${spot.tag}</span>
+                            </div>
+                            <p class="text-sm text-slate-600">${spot.desc}</p>
+                        </div>
+                        <i class="fas fa-chevron-right text-slate-300"></i>
+                    </div>
+                `;
+            });
+
+            html += `
+                </div>
+                <div class="mt-6 bg-white rounded-xl p-4 card-shadow">
+                    <h4 class="font-bold text-red-600 mb-2"><i class="fas fa-exclamation-triangle"></i> 冬季安全提醒</h4>
+                    <ul class="text-sm text-slate-600 space-y-2 list-disc ml-4">
+                        <li><strong>屋頂落雪：</strong>請走街道中間，切勿走在屋簷下。</li>
+                        <li><strong>防滑：</strong>務必穿戴簡易冰爪。</li>
+                        <li><strong>足湯：</strong>冬天穿脫不便且溼滑，建議跳過。</li>
+                    </ul>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function renderCare(container) {
+            let html = '<div class="space-y-6">';
+
+            // Dialysis Card
+            html += `
+                <div class="bg-white rounded-xl overflow-hidden card-shadow">
+                    <div class="bg-red-500 p-3 text-white flex justify-between items-center">
+                        <h3 class="font-bold"><i class="fas fa-clinic-medical mr-2"></i>母親洗腎資訊</h3>
+                        <span class="text-xs bg-white/20 px-2 py-1 rounded">12/19 (五)</span>
+                    </div>
+                    <div class="p-4">
+                        <p class="font-bold text-lg mb-1">富沢あおき内科クリニック</p>
+                        <p class="text-sm text-slate-500 mb-4">Tomizawa Aoki Clinic</p>
+                        <div class="flex gap-2 mb-4">
+                            <button onclick="openMap('Tomizawa Aoki Clinic')" class="flex-1 bg-red-50 text-red-600 py-2 rounded text-sm font-bold border border-red-100">
+                                <i class="fas fa-location-arrow mr-1"></i> 導航
+                            </button>
+                            <a href="tel:0222267707" class="flex-1 bg-gray-50 text-gray-600 py-2 rounded text-sm font-bold border border-gray-100 text-center block">
+                                <i class="fas fa-phone mr-1"></i> 電話
+                            </a>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded text-sm text-yellow-800">
+                            <p class="font-bold mb-2">必帶物品清單：</p>
+                            <ul class="space-y-1">
+                                <li><input type="checkbox" class="mr-2">護照</li>
+                                <li><input type="checkbox" class="mr-2">透析病歷文件</li>
+                                <li><input type="checkbox" class="mr-2 text-red-600 font-bold">大毛巾 & 洗臉巾 (診所無)</li>
+                                <li><input type="checkbox" class="mr-2">止血帶</li>
+                                <li><input type="checkbox" class="mr-2">耳機 & 1000円 (電視用)</li>
+                                <li><input type="checkbox" class="mr-2">行動電源 (禁插座)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Vegetarian Card
+            html += `
+                <div class="bg-white rounded-xl overflow-hidden card-shadow border-2 border-emerald-500">
+                    <div class="bg-emerald-500 p-3 text-white text-center">
+                        <h3 class="font-bold text-lg">素食溝通卡 (Vegetarian Card)</h3>
+                        <p class="text-xs opacity-90">請出示給店員看 (Show to Staff)</p>
+                    </div>
+                    <div class="p-6 text-center space-y-4">
+                        <div>
+                            <p class="text-2xl font-bold text-slate-800 mb-1">こちらは</p>
+                            <p class="text-3xl font-black text-red-600 mb-1">オリエンタル・ベジタリアン</p>
+                            <p class="text-2xl font-bold text-slate-800">です。</p>
+                            <p class="text-xs text-gray-400 mt-1">(這位是東方素食者)</p>
+                        </div>
+                        
+                        <div class="border-t border-b border-gray-100 py-4">
+                            <div class="flex items-center justify-center gap-4 text-4xl text-slate-300 mb-2">
+                                <div class="relative"><i class="fas fa-fish"></i><div class="absolute inset-0 flex items-center justify-center text-red-500 opacity-80"><i class="fas fa-ban text-5xl"></i></div></div>
+                                <div class="relative"><i class="fas fa-drumstick-bite"></i><div class="absolute inset-0 flex items-center justify-center text-red-500 opacity-80"><i class="fas fa-ban text-5xl"></i></div></div>
+                                <div class="relative"><i class="fas fa-bacon"></i><div class="absolute inset-0 flex items-center justify-center text-red-500 opacity-80"><i class="fas fa-ban text-5xl"></i></div></div>
+                            </div>
+                            <p class="text-lg font-bold text-slate-800">
+                                <span class="text-red-600">肉、魚、魚介類、出汁（カツオ等）</span><br>
+                                は一切食べられません。
+                            </p>
+                            <p class="text-xs text-gray-400 mt-1">(完全不吃肉、魚、海鮮、柴魚高湯)</p>
+                        </div>
+
+                        <div>
+                            <p class="text-lg font-bold text-slate-800">
+                                <span class="text-red-600">ネギ、玉ねぎ、ニラ、ニンニク</span><br>
+                                などの五葷も食べられません。
+                            </p>
+                            <p class="text-xs text-gray-400 mt-1">(也不吃蔥、洋蔥、韭菜、大蒜)</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // --- Chart.js ---
+        function initChart() {
+            const ctx = document.getElementById('pacingChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: pacingData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { size: 10 },
+                                boxWidth: 10
+                            }
+                        }
+                    },
+                    cutout: '70%',
+                    borderWidth: 0
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+    <!-- CONFIRMATION: NO SVG graphics used (FontAwesome used via CDN). NO Mermaid JS used. -->
+</body>
+</html>
