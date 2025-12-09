@@ -1,0 +1,599 @@
+import React, { useState } from 'react';
+import { 
+  Plane, 
+  Train, 
+  Car, 
+  MapPin, 
+  Calendar, 
+  Info, 
+  Coffee, 
+  Utensils, 
+  Moon, 
+  Sun,
+  Activity,
+  Copy,
+  ExternalLink,
+  Phone,
+  Home
+} from 'lucide-react';
+
+// --- Data Structures ---
+
+const transportData = [
+  {
+    type: 'flight',
+    icon: <Plane className="w-5 h-5" />,
+    title: '去程航班 (ANA)',
+    date: '12/17 (三)',
+    detail: 'NH852 | TSA 13:30 -> HND 17:30 (T2)',
+    note: '訂位代號: FMXO8Y',
+    seats: ''
+  },
+  {
+    type: 'flight',
+    icon: <Plane className="w-5 h-5" />,
+    title: '回程航班 (ANA)',
+    date: '12/22 (一)',
+    detail: 'NH853 | HND 12:40 (T2) -> TSA 15:50',
+    note: '建議 10:30 前抵達機場',
+    seats: ''
+  },
+  {
+    type: 'train',
+    icon: <Train className="w-5 h-5" />,
+    title: '東京 -> 仙台 (GranClass)',
+    date: '12/18 (四)',
+    detail: 'Hayabusa 23 | 13:20 -> 14:51',
+    note: '預訂編號: E24098',
+    seats: '10號車 3A, 3B, 3C'
+  },
+  {
+    type: 'car',
+    icon: <Car className="w-5 h-5" />,
+    title: '仙台租車 (Toyota)',
+    date: '12/18 15:30 - 12/20 10:30',
+    detail: '仙台新幹線口店 | Corolla Touring Hybrid',
+    note: '預約號碼: 99907358200 (含雪胎)',
+    seats: ''
+  },
+  {
+    type: 'train',
+    icon: <Train className="w-5 h-5" />,
+    title: '山形 -> 大石田 (Green)',
+    date: '12/20 (六)',
+    detail: 'Tsubasa 133 | 12:45 -> 13:16',
+    note: '預訂編號: E42283',
+    seats: '11號車 1A, 1B, 1C'
+  },
+  {
+    type: 'train',
+    icon: <Train className="w-5 h-5" />,
+    title: '大石田 -> 東京 (Green)',
+    date: '12/21 (日)',
+    detail: 'Tsubasa 156 | 17:27 -> 20:48',
+    note: '預訂編號: E64876',
+    seats: '11號車 2C, 3B, 3C'
+  }
+];
+
+const hotelsData = [
+  {
+    name: 'Tokyo Station Hotel',
+    date: '12/17 - 12/18',
+    address: '千代田区丸の内1-9-1',
+    resId: '1000340712, 1000340714',
+    note: '直結東京車站丸之內南口'
+  },
+  {
+    name: 'The Westin Sendai',
+    date: '12/18 - 12/20',
+    address: '仙台市青葉区一番町1-9-1',
+    resId: '97405676',
+    note: '地下停車場 (B1)'
+  },
+  {
+    name: '古勢起屋本館',
+    date: '12/20 - 12/21',
+    address: '山形県尾花沢市銀山新畑417',
+    resId: '18644, 18645',
+    note: '接駁車: 12/20 13:40 @ 大石田站'
+  },
+  {
+    name: 'Tokyo Marriott Hotel',
+    date: '12/21 - 12/22',
+    address: '品川区北品川4-7-36',
+    resId: '71535755',
+    note: '行李寄送目的地'
+  }
+];
+
+const itineraryData = [
+  {
+    day: 1,
+    date: '12/17 (三)',
+    title: '抵達東京',
+    highlights: ['TSA -> HND (T2)', '定額計程車直達飯店', '東京車站素食晚餐'],
+    details: [
+      { time: '13:30', activity: 'TSA 起飛 (NH852)', type: 'flight' },
+      { time: '17:30', activity: '抵達 HND T2', type: 'flight' },
+      { time: '18:30', activity: '搭計程車前往東京車站', type: 'transport' },
+      { time: '19:30', activity: 'Check-in: Tokyo Station Hotel', type: 'hotel', location: 'Tokyo Station Hotel' },
+      { time: '20:00', activity: '晚餐: T\'s Tantan (素食擔擔麵)', type: 'food', location: 'T\'s Tantan Gransta Tokyo' }
+    ]
+  },
+  {
+    day: 2,
+    date: '12/18 (四)',
+    title: '移動日：東京 -> 仙台',
+    highlights: ['寄送大件行李', 'GranClass 新幹線體驗', '仙台取車', '光之樂章車遊'],
+    details: [
+      { time: '09:30', activity: '將大件行李寄往 Tokyo Marriott (12/21入住)', type: 'info' },
+      { time: '11:00', activity: '午餐: 駅弁屋 祭 (買素食便當)', type: 'food', location: 'Ekibenya Matsuri' },
+      { time: '13:20', activity: '新幹線 Hayabusa 23 (GranClass) 發車', type: 'train' },
+      { time: '14:51', activity: '抵達仙台站', type: 'train' },
+      { time: '15:30', activity: '取車: Toyota 仙台新幹線口店', type: 'car', location: 'Toyota Rent a Car Sendai Shinkansen-guchi' },
+      { time: '16:00', activity: 'Check-in: Westin Sendai', type: 'hotel', location: 'The Westin Sendai' },
+      { time: '17:30', activity: '車遊: 定禪寺通 光之樂章', type: 'sight', location: 'Jozenji-dori Avenue' },
+      { time: '18:30', activity: '晚餐 (市區素食或外帶)', type: 'food' }
+    ]
+  },
+  {
+    day: 3,
+    date: '12/19 (五)',
+    title: '仙台：醫療與松島',
+    highlights: ['母親洗腎 (09:00)', '鹽竈神社 (免爬樓梯)', '松島海岸車遊'],
+    isImportant: true,
+    details: [
+      { time: '08:00', activity: '飯店出發 (自駕)', type: 'car' },
+      { time: '08:30', activity: '抵達診所報到 (右側專用入口)', type: 'medical', location: 'Tomizawa Aoki Clinic' },
+      { time: '09:00', activity: '母親透析 (請備妥隨身包)', type: 'medical' },
+      { time: '09:30', activity: '空檔行程: 鹽竈神社 (停第一停車場)', type: 'sight', location: 'Shiogama Shrine' },
+      { time: '13:30', activity: '接母親', type: 'medical' },
+      { time: '14:00', activity: '松島: 西行戻之松公園 (車遊全景)', type: 'sight', location: 'Saigyo Modoshi no Matsu Park' },
+      { time: '15:00', activity: '松島海岸散步 (視體力)', type: 'sight', location: 'Matsushima Kaigan' }
+    ]
+  },
+  {
+    day: 4,
+    date: '12/20 (六)',
+    title: '前進銀山溫泉',
+    highlights: ['仙台還車', '轉乘新幹線', '銀山溫泉接駁', '藍色時刻'],
+    details: [
+      { time: '10:30', activity: '還車 (Toyota 仙台新幹線口店)', type: 'car' },
+      { time: '11:18', activity: 'JR 仙山線 (往山形)', type: 'train' },
+      { time: '12:35', activity: '抵達山形，站內轉乘', type: 'info' },
+      { time: '12:45', activity: 'Tsubasa 133 (Green) 發車', type: 'train' },
+      { time: '13:16', activity: '抵達大石田站', type: 'train' },
+      { time: '13:40', activity: '旅館接駁車', type: 'bus' },
+      { time: '14:20', activity: '抵達銀山溫泉', type: 'hotel', location: 'Kosekiya Bekkan' },
+      { time: '15:00', activity: '點心: 野川豆腐 (素食OK)', type: 'food', location: 'Nogawa Tofu' },
+      { time: '16:00', activity: '拍照: 藍色時刻 (白銀橋)', type: 'sight', location: 'Shirogane Bridge' },
+      { time: '18:30', activity: '晚餐: 旅館內用', type: 'food' }
+    ]
+  },
+  {
+    day: 5,
+    date: '12/21 (日)',
+    title: '銀山漫遊 -> 東京',
+    highlights: ['溫泉街漫遊', '尾花澤市營巴士', 'Tsubasa 新幹線', '入住萬豪'],
+    details: [
+      { time: '10:00', activity: '退房 (寄放行李)', type: 'info' },
+      { time: '10:30', activity: '早午餐: 伊豆之華', type: 'food', location: 'Izu no Hana' },
+      { time: '12:30', activity: '休息: Haikara-san (咖哩麵包)', type: 'coffee', location: 'Haikarasan Dori' },
+      { time: '16:35', activity: '巴士: 尾花澤市營巴士 (銀山線)', type: 'bus' },
+      { time: '17:27', activity: 'Tsubasa 156 (Green) 發車', type: 'train' },
+      { time: '20:48', activity: '抵達東京站 -> 計程車', type: 'car' },
+      { time: '21:30', activity: 'Check-in: Tokyo Marriott', type: 'hotel', location: 'Tokyo Marriott Hotel' }
+    ]
+  },
+  {
+    day: 6,
+    date: '12/22 (一)',
+    title: '返程',
+    highlights: ['前往羽田 T2', '返台'],
+    details: [
+      { time: '10:00', activity: '退房 -> 計程車前往羽田 T2', type: 'car' },
+      { time: '10:30', activity: '抵達機場報到', type: 'flight' },
+      { time: '12:40', activity: 'HND T2 起飛 (NH853)', type: 'flight' },
+      { time: '15:50', activity: '抵達台北松山', type: 'home' }
+    ]
+  }
+];
+
+const spotsData = [
+  {
+    region: '銀山溫泉',
+    spots: [
+      { name: '野川豆腐', desc: '百年手工豆腐，素食可食(無醬汁)。', location: 'Nogawa Tofu', tags: ['美食', '素食推薦'] },
+      { name: '伊豆之華', desc: '蕎麥麵老店，適合吃早午餐或下午茶。', location: 'Izu no Hana', tags: ['美食', '休息'] },
+      { name: '白銀橋', desc: '拍攝銀山溫泉經典夜景的最佳地點。', location: 'Shirogane Bridge', tags: ['景點', '拍照'] },
+      { name: '能登屋旅館', desc: '神隱少女湯屋原型之一，必拍紅橋。', location: 'Notoya Ryokan', tags: ['景點', '拍照'] },
+    ]
+  },
+  {
+    region: '仙台/松島',
+    spots: [
+      { name: '富沢あおき内科', desc: '母親洗腎診所，右側專用入口。', location: 'Tomizawa Aoki Clinic', tags: ['醫療'] },
+      { name: '鹽竈神社', desc: '有車可以直接開到山上，免爬202階梯。', location: 'Shiogama Shrine', tags: ['景點', '好停車'] },
+      { name: '西行戻之松公園', desc: '俯瞰松島灣全景的最佳地點，車可直達。', location: 'Saigyo Modoshi no Matsu Park', tags: ['景點', '好停車'] },
+      { name: 'T\'s Tantan 仙台', desc: '位於 S-PAL 地下一樓的素食擔擔麵。', location: 'T\'s Tantan Sendai', tags: ['美食', '全素'] },
+    ]
+  },
+  {
+    region: '東京',
+    spots: [
+      { name: 'T\'s Tantan 東京', desc: '東京車站內 Keiyo Street/Gransta。', location: 'T\'s Tantan Tokyo Station', tags: ['美食', '全素'] },
+      { name: 'Tokyo Station Hotel', desc: '直結東京車站丸之內南口。', location: 'Tokyo Station Hotel', tags: ['住宿'] },
+      { name: 'Tokyo Marriott', desc: '位於品川御殿山。', location: 'Tokyo Marriott Hotel', tags: ['住宿'] },
+    ]
+  }
+];
+
+// --- Components ---
+
+const Navigation = ({ activeTab, setActiveTab }) => (
+  <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg pb-safe z-50">
+    <div className="flex justify-around items-center h-16">
+      <button 
+        onClick={() => setActiveTab('itinerary')}
+        className={`flex flex-col items-center p-2 ${activeTab === 'itinerary' ? 'text-blue-600' : 'text-gray-500'}`}
+      >
+        <Calendar size={24} />
+        <span className="text-xs mt-1">行程</span>
+      </button>
+      <button 
+        onClick={() => setActiveTab('transport')}
+        className={`flex flex-col items-center p-2 ${activeTab === 'transport' ? 'text-blue-600' : 'text-gray-500'}`}
+      >
+        <Train size={24} />
+        <span className="text-xs mt-1">交通</span>
+      </button>
+      <button 
+        onClick={() => setActiveTab('spots')}
+        className={`flex flex-col items-center p-2 ${activeTab === 'spots' ? 'text-blue-600' : 'text-gray-500'}`}
+      >
+        <MapPin size={24} />
+        <span className="text-xs mt-1">景點</span>
+      </button>
+      <button 
+        onClick={() => setActiveTab('info')}
+        className={`flex flex-col items-center p-2 ${activeTab === 'info' ? 'text-blue-600' : 'text-gray-500'}`}
+      >
+        <Info size={24} />
+        <span className="text-xs mt-1">資訊</span>
+      </button>
+    </div>
+  </div>
+);
+
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white rounded-xl shadow-sm border border-gray-100 p-4 ${className}`}>
+    {children}
+  </div>
+);
+
+const openMap = (location) => {
+  const query = encodeURIComponent(location);
+  window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+};
+
+const copyToClipboard = (text) => {
+  navigator.clipboard.writeText(text);
+  alert(`已複製: ${text}`);
+};
+
+const ItineraryView = () => {
+  const [expandedDay, setExpandedDay] = useState(null);
+
+  return (
+    <div className="space-y-4 pb-20">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">每日行程</h2>
+      {itineraryData.map((item) => (
+        <div key={item.day} className="transition-all duration-300">
+          <div 
+            onClick={() => setExpandedDay(expandedDay === item.day ? null : item.day)}
+            className={`cursor-pointer rounded-xl overflow-hidden border ${
+              item.isImportant ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-white'
+            }`}
+          >
+            <div className="p-4 flex justify-between items-center">
+              <div>
+                <div className="text-sm font-semibold text-gray-500 mb-1">{item.date}</div>
+                <div className="text-lg font-bold text-gray-800">{item.title}</div>
+                <div className="text-xs text-gray-600 mt-2 flex flex-wrap gap-1">
+                  {item.highlights.map((h, i) => (
+                    <span key={i} className="bg-gray-200/50 px-2 py-0.5 rounded text-gray-700">{h}</span>
+                  ))}
+                </div>
+              </div>
+              <div className="text-gray-400">
+                {expandedDay === item.day ? '▲' : '▼'}
+              </div>
+            </div>
+
+            {expandedDay === item.day && (
+              <div className="border-t border-gray-200 bg-gray-50 p-4 space-y-4">
+                {item.details.map((detail, idx) => (
+                  <div key={idx} className="flex gap-3">
+                    <div className="w-12 text-sm font-mono font-semibold text-gray-500 pt-0.5 shrink-0">
+                      {detail.time}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start gap-2">
+                        <div className="mt-0.5 text-gray-400 shrink-0">
+                          {detail.type === 'flight' && <Plane size={14} />}
+                          {detail.type === 'train' && <Train size={14} />}
+                          {detail.type === 'car' && <Car size={14} />}
+                          {detail.type === 'hotel' && <Moon size={14} />}
+                          {detail.type === 'food' && <Utensils size={14} />}
+                          {detail.type === 'medical' && <Activity size={14} className="text-red-500" />}
+                          {detail.type === 'sight' && <Sun size={14} />}
+                          {detail.type === 'info' && <Info size={14} />}
+                          {detail.type === 'bus' && <BusIcon size={14} />}
+                        </div>
+                        <div className="text-gray-800 text-sm">{detail.activity}</div>
+                      </div>
+                      {detail.location && (
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); openMap(detail.location); }}
+                          className="mt-1 flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                        >
+                          <MapPin size={10} /> 導航
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const BusIcon = ({ size, className }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M8 6v6" /><path d="M15 6v6" /><path d="M2 12h19.6" />
+    <path d="M18 18h3s.5-1.7.8-2.8c.1-.4.2-.8.2-1.2 0-.4-.1-.8-.2-1.2l-1.4-5C20.1 6.8 19.1 6 18 6H4a2 2 0 0 0-2 2v10h3" />
+    <circle cx="7" cy="18" r="2" /><path d="M9 18h5" /><circle cx="16" cy="18" r="2" />
+  </svg>
+);
+
+const TransportView = () => (
+  <div className="space-y-6 pb-20">
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">交通資訊</h2>
+      <div className="space-y-3">
+        {transportData.map((item, index) => (
+          <Card key={index} className="flex gap-4">
+            <div className="p-2 bg-blue-50 rounded-lg h-fit text-blue-600">
+              {item.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-start">
+                <h3 className="font-bold text-gray-800 truncate">{item.title}</h3>
+                <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600 whitespace-nowrap">{item.date}</span>
+              </div>
+              <p className="text-sm text-gray-600 mt-1">{item.detail}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {item.note && (
+                  <span className="inline-flex items-center gap-1 text-xs bg-orange-50 text-orange-700 px-2 py-1 rounded border border-orange-100">
+                    <Info size={10} /> {item.note}
+                  </span>
+                )}
+                {item.seats && (
+                  <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-100">
+                    <Utensils size={10} /> {item.seats}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+
+    <div>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">住宿資訊</h2>
+      <div className="space-y-3">
+        {hotelsData.map((hotel, index) => (
+          <Card key={index} className="flex flex-col gap-2">
+            <div className="flex justify-between items-start">
+              <h3 className="font-bold text-gray-800">{hotel.name}</h3>
+              <span className="text-xs text-gray-500">{hotel.date}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <MapPin size={14} className="shrink-0" />
+              <span className="truncate">{hotel.address}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span className="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">ID: {hotel.resId}</span>
+              <button onClick={() => copyToClipboard(hotel.resId)} className="text-gray-400 hover:text-blue-500">
+                <Copy size={12} />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mt-1">
+              <button 
+                onClick={() => openMap(hotel.name)}
+                className="flex items-center justify-center gap-1 py-1.5 bg-blue-50 text-blue-600 rounded text-sm font-medium"
+              >
+                <MapPin size={14} /> 導航
+              </button>
+              <button 
+                 onClick={() => copyToClipboard(hotel.address)}
+                 className="flex items-center justify-center gap-1 py-1.5 bg-gray-50 text-gray-600 rounded text-sm font-medium"
+              >
+                <Copy size={14} /> 複製地址
+              </button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const SpotsView = () => {
+  const [selectedSpot, setSelectedSpot] = useState(null);
+
+  return (
+    <div className="space-y-6 pb-20">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">景點導覽</h2>
+      {spotsData.map((region, rIdx) => (
+        <div key={rIdx}>
+          <h3 className="text-lg font-bold text-gray-600 mb-3 px-2 sticky top-0 bg-gray-50 py-2 z-10">{region.region}</h3>
+          <div className="space-y-3">
+            {region.spots.map((spot, sIdx) => (
+              <Card key={sIdx} className="transition-all">
+                <div 
+                  className="flex justify-between items-start cursor-pointer"
+                  onClick={() => setSelectedSpot(selectedSpot === spot.name ? null : spot.name)}
+                >
+                  <div className="flex gap-3">
+                    <div className="mt-1 text-blue-500">
+                      <MapPin size={20} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800">{spot.name}</h4>
+                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">{spot.desc}</p>
+                      <div className="flex gap-1 mt-2">
+                        {spot.tags.map(tag => (
+                          <span key={tag} className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-gray-400 mt-1">
+                    {selectedSpot === spot.name ? '▲' : '▼'}
+                  </div>
+                </div>
+                
+                {selectedSpot === spot.name && (
+                  <div className="mt-4 pt-4 border-t border-gray-100 animate-fadeIn">
+                    <p className="text-gray-700 text-sm mb-4">{spot.desc}</p>
+                    <button 
+                      onClick={() => openMap(spot.location)}
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors"
+                    >
+                      <ExternalLink size={16} /> 開啟 Google Maps 導航
+                    </button>
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+const InfoView = () => (
+  <div className="space-y-6 pb-20">
+    <h2 className="text-2xl font-bold text-gray-800 mb-4 px-2">重要資訊</h2>
+    
+    <Card className="border-l-4 border-red-500">
+      <div className="flex items-center gap-2 mb-3">
+        <Activity className="text-red-500" />
+        <h3 className="font-bold text-lg">母親透析資訊</h3>
+      </div>
+      <div className="space-y-2 text-sm text-gray-700">
+        <p><span className="font-bold">診所：</span>富沢あおき内科クリニック</p>
+        <p><span className="font-bold">時間：</span>12/19 (五) 09:00 (08:30報到)</p>
+        <p><span className="font-bold">電話：</span>022-226-7707</p>
+        <div className="bg-red-50 p-3 rounded mt-2">
+          <p className="font-bold mb-1">攜帶物品：</p>
+          <ul className="list-disc list-inside space-y-1 text-gray-600">
+            <li>護照</li>
+            <li>透析病歷摘要</li>
+            <li><span className="text-red-600 font-bold">大毛巾與洗臉巾 (診所無提供)</span></li>
+            <li>止血帶、耳機、1000円鈔票</li>
+            <li>行動電源 (禁止用插座)</li>
+          </ul>
+        </div>
+        <button 
+          onClick={() => openMap('Tomizawa Aoki Clinic')}
+          className="w-full mt-3 bg-red-100 text-red-700 py-2 rounded flex items-center justify-center gap-2 font-bold"
+        >
+          <MapPin size={16} /> 診所導航
+        </button>
+      </div>
+    </Card>
+
+    <Card className="border-l-4 border-green-500">
+      <div className="flex items-center gap-2 mb-3">
+        <Utensils className="text-green-600" />
+        <h3 className="font-bold text-lg">父親素食需求</h3>
+      </div>
+      <div className="p-4 bg-gray-50 rounded text-sm space-y-3">
+        <p className="font-bold text-center border-b pb-2">給店員看的溝通卡</p>
+        <p className="text-lg leading-relaxed font-japanese">
+          「こちらは<span className="text-red-600 font-bold">オリエンタル・ベジタリアン</span>です。」
+        </p>
+        <p className="text-gray-600">這位是東方素食者。</p>
+        
+        <p className="text-lg leading-relaxed font-japanese mt-2">
+          「<span className="font-bold">肉、魚、魚介類、出汁（カツオだし等）</span>は一切食べられません。」
+        </p>
+        <p className="text-gray-600">完全不吃肉、魚、海鮮、高湯(柴魚等)。</p>
+
+        <p className="text-lg leading-relaxed font-japanese mt-2">
+          「<span className="font-bold">ネギ、玉ねぎ、ニラ、ニンニク</span>などの五葷も食べられません。」
+        </p>
+        <p className="text-gray-600">也不吃蔥、洋蔥、韭菜、大蒜等五辛。</p>
+      </div>
+    </Card>
+
+    <Card>
+      <div className="flex items-center gap-2 mb-3">
+        <Phone className="text-blue-500" />
+        <h3 className="font-bold text-lg">緊急聯絡</h3>
+      </div>
+      <div className="grid grid-cols-1 gap-3">
+         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+            <span>警察局</span>
+            <span className="font-mono font-bold text-lg">110</span>
+         </div>
+         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+            <span>火警/救護車</span>
+            <span className="font-mono font-bold text-lg">119</span>
+         </div>
+         <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+            <span>外交部旅外救助</span>
+            <span className="font-mono text-sm">0800-085-095</span>
+         </div>
+      </div>
+    </Card>
+  </div>
+);
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('itinerary');
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
+      {/* Header */}
+      <div className="bg-white sticky top-0 z-40 border-b border-gray-200 px-4 py-3 shadow-sm flex items-center justify-center">
+        <h1 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+          <Plane className="text-blue-500" /> 
+          日本東北孝親之旅
+        </h1>
+      </div>
+
+      {/* Main Content */}
+      <div className="p-4 max-w-md mx-auto">
+        {activeTab === 'itinerary' && <ItineraryView />}
+        {activeTab === 'transport' && <TransportView />}
+        {activeTab === 'spots' && <SpotsView />}
+        {activeTab === 'info' && <InfoView />}
+      </div>
+
+      {/* Navigation */}
+      <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  );
+}
