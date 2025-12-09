@@ -98,7 +98,7 @@
             100% { transform: scale(1); }
         }
 
-        /* Modal for Phrase expansion */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -107,17 +107,26 @@
             top: 0;
             width: 100%;
             height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            overflow: hidden;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-active {
+            display: flex !important;
+            animation: fadeIn 0.2s ease-out;
         }
         .modal-content {
-            margin: 40% auto;
-            padding: 20px;
+            background-color: #fff;
             width: 90%;
             max-width: 400px;
-            text-align: center;
-            color: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
         }
     </style>
 </head>
@@ -187,17 +196,184 @@
         </div>
     </nav>
 
-    <!-- Full Screen Phrase Modal -->
-    <div id="phraseModal" class="modal" onclick="closeModal()">
-        <div class="modal-content">
-            <p id="modalJP" class="text-3xl font-bold mb-4 leading-relaxed"></p>
-            <p id="modalCN" class="text-lg text-gray-300"></p>
-            <p class="text-sm text-gray-500 mt-8">(點擊任意處關閉)</p>
+    <!-- SPOT DETAIL MODAL -->
+    <div id="spotModal" class="modal" onclick="closeSpotModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div id="modalHeader" class="h-32 bg-slate-200 relative overflow-hidden">
+                <!-- Icon Background -->
+                <div class="absolute inset-0 flex items-center justify-center text-slate-300">
+                    <i id="modalIconBg" class="fas fa-map-marker-alt text-6xl opacity-50"></i>
+                </div>
+                <button onclick="closeSpotModal()" class="absolute top-3 right-3 bg-black/50 text-white w-8 h-8 rounded-full flex items-center justify-center z-20">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto">
+                <div class="flex items-center gap-2 mb-1">
+                    <span id="modalTag" class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">Tag</span>
+                </div>
+                <h2 id="modalTitle" class="text-2xl font-bold text-slate-800 mb-2">Spot Name</h2>
+                <p id="modalDesc" class="text-sm text-slate-600 leading-relaxed mb-4">Description...</p>
+                
+                <div id="modalNoteBox" class="bg-amber-50 border border-amber-100 rounded-lg p-3 mb-4 hidden">
+                    <p class="text-xs text-amber-800 font-bold mb-1"><i class="fas fa-lightbulb mr-1"></i>小貼士</p>
+                    <p id="modalNote" class="text-xs text-amber-700">Note content...</p>
+                </div>
+
+                <button id="modalMapBtn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-200 active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i class="fas fa-location-arrow"></i> 開啟 Google Maps 導航
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PHRASE MODAL -->
+    <div id="phraseModal" class="modal" onclick="closePhraseModal()">
+        <div class="modal-content !bg-slate-800 !text-white text-center p-8">
+            <p id="phraseJP" class="text-2xl font-bold mb-6 leading-relaxed"></p>
+            <p id="phraseCN" class="text-lg text-slate-400"></p>
+            <p class="text-xs text-slate-500 mt-8">(點擊任意處關閉)</p>
         </div>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
+        // --- Enhanced Data with Details ---
+        
+        // Spot Details Database
+        const spotDetails = {
+            "ts_tantan_tokyo": {
+                name: "T's Tantan 東京駅 (Keiyo Street)",
+                desc: "位於東京車站改札內（站內），靠近「京葉線」方向的『Keiyo Street』美食區。這家店的擔擔麵完全不使用肉類、魚類、蛋奶，卻擁有濃郁的湯頭，是素食者的天堂。",
+                note: "位置有點難找。請在站內尋找往「京葉線 (Keiyo Line)」的紅色指標，店舖就在通往京葉線的手扶梯附近。",
+                tag: "素食推薦",
+                icon: "fa-utensils",
+                query: "T's Tantan Tokyo Station Keiyo Street" // Optimized Query
+            },
+            "tokyo_station_hotel": {
+                name: "Tokyo Station Hotel",
+                desc: "與東京車站丸之內站舍直結的經典飯店，擁有超過百年的歷史，被指定為國家重要文化財。歐式古典風格的裝潢與現代化的設施完美融合。",
+                tag: "住宿",
+                icon: "fa-hotel",
+                query: "The Tokyo Station Hotel"
+            },
+            "westin_sendai": {
+                name: "The Westin Sendai",
+                desc: "位於東北最高的大樓「仙台 Trust Tower」內，客房位於高樓層，可俯瞰仙台市景甚至太平洋。客房寬敞，服務一流，是帶長輩入住的最佳選擇。",
+                note: "飯店地下有停車場 (B1)，導航請設定電話 022-722-1234。",
+                tag: "住宿",
+                icon: "fa-hotel",
+                query: "The Westin Sendai"
+            },
+            "jozenji_dori": {
+                name: "定禪寺通 (光之樂章)",
+                desc: "仙台市的象徵性街道，成排的櫸木林蔭道非常壯觀。冬季舉辦「SENDAI 光之樂章」活動，數十萬顆 LED 燈將街道妝點成光之隧道。",
+                note: "我們安排「車遊」穿越此路段，讓父母在溫暖的車內欣賞燈飾，不用在寒風中步行。",
+                tag: "景點",
+                icon: "fa-star",
+                query: "Jozenji-dori Avenue Sendai"
+            },
+            "tomizawa_clinic": {
+                name: "富沢あおき内科クリニック",
+                desc: "母親預約透析的診所。位於仙台市太白區，環境乾淨專業。",
+                note: "請務必走建築物「右側」的透析專用入口 (Dialysis Entrance)。請提前 30 分鐘 (08:30) 抵達填寫資料。",
+                tag: "醫療",
+                icon: "fa-clinic-medical",
+                query: "Tomizawa Aoki Clinic Sendai"
+            },
+            "shiogama_shrine": {
+                name: "鹽竈神社 (Shiogama Shrine)",
+                desc: "擁有 1200 年以上歷史的古老神社，被尊為陸奧國一之宮。境內櫻花與杉木林立，莊嚴肅穆。主要祈求安產、海上安全與延年益壽。",
+                note: "一般參拜需爬 202 階表參道，但我們開車可直接停在山上的「第一駐車場」，完全免爬樓梯，對長輩非常友善。",
+                tag: "景點",
+                icon: "fa-torii-gate",
+                query: "Shiogama Shrine"
+            },
+            "saigyo_park": {
+                name: "西行戻之松公園",
+                desc: "松島著名的眺望景點。傳說平安時代的歌人西行法師曾在此遇見童子與松樹。這裡是俯瞰松島灣全景與福浦橋（紅橋）的絕佳制高點。",
+                note: "車子可以直接開到展望台旁的停車場，不需費力行走即可欣賞日本三景。",
+                tag: "景點",
+                icon: "fa-tree",
+                query: "Saigyo Modoshi no Matsu Park"
+            },
+            "matsushima_kaigan": {
+                name: "松島海岸",
+                desc: "日本三景之一，由 260 多個島嶼組成的美麗海灣。可以散步至五大堂（需走透橋），或在岸邊欣賞遊覽船進出。",
+                tag: "景點",
+                icon: "fa-water",
+                query: "Matsushima Kaigan Rest House"
+            },
+            "kosekiya_bekkan": {
+                name: "銀山溫泉 古勢起屋本館",
+                desc: "位於銀山溫泉街正中央的老舖旅館，保留了大正時代的浪漫風情。建築本身就是歷史，內部洋溢著復古的溫暖氛圍。",
+                note: "晚餐已特別備註父親的素食需求。請記得預約 13:40 在大石田站的接駁車。",
+                tag: "住宿",
+                icon: "fa-hot-tub",
+                query: "Kosekiya Bekkan"
+            },
+            "nogawa_tofu": {
+                name: "野川豆腐 (野川とうふや)",
+                desc: "銀山溫泉入口處的百年豆腐老店。每天早晨手工製作，豆腐軟嫩，豆香濃郁。通常是買了在旁邊的長椅或足湯旁站著吃。",
+                note: "這是父親可以安心享用的美食！記得跟老闆說只要醬油，不要加其他高湯醬料。",
+                tag: "美食",
+                icon: "fa-utensils",
+                query: "Nogawa Tofu Ginzan Onsen"
+            },
+            "shirogane_bridge": {
+                name: "白銀橋 (Shirogane Bridge)",
+                desc: "位於溫泉街入口的紅色欄杆小橋。這裡是拍攝銀山溫泉全景最經典的角度，尤其是日落後天空呈現深藍色時（Blue Hour）。",
+                tag: "拍照",
+                icon: "fa-camera",
+                query: "Shirogane Bridge Ginzan Onsen"
+            },
+            "notoya": {
+                name: "能登屋旅館",
+                desc: "銀山溫泉最具代表性的建築，擁有獨特的塔樓與紅橋，相傳是宮崎駿電影《神隱少女》油屋的原型之一（雖然我們不住這，但一定要在門口拍照）。",
+                tag: "拍照",
+                icon: "fa-camera",
+                query: "Notoya Ryokan"
+            },
+            "izu_no_hana": {
+                name: "伊豆之華 (伊豆の華)",
+                desc: "創業於 1952 年的古民家蕎麥麵店。位於溫泉街入口，二樓座位可以眺望溫泉街景色。招牌是炸茄子蕎麥麵，也有蕎麥冰淇淋等甜點。",
+                note: "適合退房後吃早午餐或下午茶休息。",
+                tag: "美食",
+                icon: "fa-coffee",
+                query: "Izu no Hana Ginzan Onsen"
+            },
+            "haikara_san": {
+                name: "Haikara-san (はいからさん通り)",
+                desc: "大正復古風格的咖啡廳，以「咖哩麵包」聞名。咖哩麵包外皮酥脆，內餡微辣。",
+                note: "咖哩麵包通常含肉，父親可以點咖啡或可可在此休息取暖。",
+                tag: "美食",
+                icon: "fa-bread-slice",
+                query: "Haikarasan Dori"
+            },
+            "tokyo_marriott": {
+                name: "Tokyo Marriott Hotel",
+                desc: "位於品川御殿山，擁有優美的日式庭園。飯店現代豪華，離品川站不遠（建議搭計程車出入較方便）。",
+                tag: "住宿",
+                icon: "fa-hotel",
+                query: "Tokyo Marriott Hotel"
+            },
+            "toyota_rent": {
+                name: "Toyota 租車 (仙台新幹線口)",
+                desc: "位於仙台車站東口附近。我們預約的是 Corolla Touring Hybrid 旅行車，空間足夠放行李，且已包含雪地輪胎。",
+                tag: "租車",
+                icon: "fa-car",
+                query: "Toyota Rent a Car Sendai Shinkansen-guchi"
+            },
+            "ts_tantan_sendai": {
+                name: "T's Tantan S-PAL 仙台",
+                desc: "T's Tantan 在仙台的分店，位於仙台車站連通的 S-PAL 地下美食街。同樣提供美味的全素擔擔麵，是父親用餐的安全選擇。",
+                tag: "素食",
+                icon: "fa-utensils",
+                query: "T's Tantan S-PAL Sendai"
+            }
+        };
+
         // --- Data ---
         
         const pacingData = {
@@ -227,13 +403,14 @@
                 id: '99907358200',
                 note: '含雪胎 (Snow Tires)',
                 tel: '022-291-0100',
-                price: '29,590 JPY'
+                price: '29,590 JPY',
+                key: 'toyota_rent'
             },
             hotels: [
-                { name: 'Tokyo Station Hotel', dates: '12/17 - 12/18', id: '1000340712 / 1000340714', desc: '直結東京車站丸之內南口' },
-                { name: 'The Westin Sendai', dates: '12/18 - 12/20', id: '86695102 / 86704930', desc: '地下停車場 (B1) - 兩間房' },
-                { name: '古勢起屋本館', dates: '12/20 - 12/21', id: '18644 / 18645', desc: '銀山溫泉，需預約素食' },
-                { name: 'Tokyo Marriott Hotel', dates: '12/21 - 12/22', id: '71535755 / 71537366', desc: '品川御殿山 - 兩間房' }
+                { name: 'Tokyo Station Hotel', dates: '12/17 - 12/18', id: '1000340712 / 1000340714', desc: '直結東京車站丸之內南口', key: 'tokyo_station_hotel' },
+                { name: 'The Westin Sendai', dates: '12/18 - 12/20', id: '86695102 / 86704930', desc: '地下停車場 (B1) - 兩間房', key: 'westin_sendai' },
+                { name: '古勢起屋本館', dates: '12/20 - 12/21', id: '18644 / 18645', desc: '銀山溫泉，需預約素食', key: 'kosekiya_bekkan' },
+                { name: 'Tokyo Marriott Hotel', dates: '12/21 - 12/22', id: '71535755 / 71537366', desc: '品川御殿山 - 兩間房', key: 'tokyo_marriott' }
             ]
         };
 
@@ -243,8 +420,8 @@
                 steps: [
                     { time: '17:30', text: '抵達羽田機場 T2', sub: 'NH852 降落', type: 'flight' },
                     { time: '18:30', text: '搭乘計程車', sub: '直達 Tokyo Station Hotel', type: 'car' },
-                    { time: '19:30', text: 'Check-in 飯店', sub: '東京車站丸之內南口', map: 'Tokyo Station Hotel', type: 'hotel' },
-                    { time: '20:00', text: '晚餐: T\'s Tantan', sub: '全素擔擔麵 (Gransta Tokyo)', map: 'T\'s Tantan Gransta Tokyo', type: 'utensils' }
+                    { time: '19:30', text: 'Check-in 飯店', sub: '東京車站丸之內南口', map: 'tokyo_station_hotel', type: 'hotel' },
+                    { time: '20:00', text: '晚餐: T\'s Tantan', sub: '全素擔擔麵 (Keiyo Street)', map: 'ts_tantan_tokyo', type: 'utensils' }
                 ]
             },
             {
@@ -252,39 +429,43 @@
                 steps: [
                     { time: '09:30', text: '寄送大件行李', sub: '寄往 12/21 Tokyo Marriott', type: 'info' },
                     { time: '13:20', text: 'Hayabusa 23 (GranClass)', sub: '前往仙台 (14:51抵達)', type: 'train' },
-                    { time: '15:30', text: '取車 (Toyota)', sub: '仙台新幹線口店', map: 'Toyota Rent a Car Sendai Shinkansen-guchi', type: 'car' },
-                    { time: '16:00', text: '入住 Westin Sendai', sub: '停車場位於 B1', map: 'The Westin Sendai', type: 'hotel' },
-                    { time: '17:30', text: '車遊：光之樂章', sub: '定禪寺通 (車內賞燈)', map: 'Jozenji-dori Avenue', type: 'star' }
+                    { time: '15:30', text: '取車 (Toyota)', sub: '仙台新幹線口店', map: 'toyota_rent', type: 'car' },
+                    { time: '16:00', text: '入住 Westin Sendai', sub: '停車場位於 B1', map: 'westin_sendai', type: 'hotel' },
+                    { time: '17:30', text: '車遊：光之樂章', sub: '定禪寺通 (車內賞燈)', map: 'jozenji_dori', type: 'star' },
+                    { time: '19:00', text: '晚餐: T\'s Tantan 仙台', sub: 'S-PAL 地下', map: 'ts_tantan_sendai', type: 'utensils' }
                 ]
             },
             {
                 day: 3, date: '12/19 (五)', title: '仙台：醫療與松島', icon: 'fa-user-nurse', color: 'bg-rose-500', highlight: true,
                 steps: [
                     { time: '08:00', text: '飯店出發 (自駕)', sub: '提早出發確保準時', type: 'car' },
-                    { time: '08:30', text: '診所報到', sub: '富沢あおき内科 (右側專用入口)', map: 'Tomizawa Aoki Clinic', type: 'hospital' },
+                    { time: '08:30', text: '診所報到', sub: '富沢あおき内科 (右側專用入口)', map: 'tomizawa_clinic', type: 'hospital' },
                     { time: '09:00', text: '母親透析 (約4小時)', sub: '請備妥隨身包', type: 'procedures' },
-                    { time: '09:30', text: '父子行程：鹽竈神社', sub: '車可直達山上，免爬樓梯', map: 'Shiogama Shrine', type: 'torii-gate' },
-                    { time: '14:00', text: '松島：西行戻之松公園', sub: '車遊俯瞰松島全景', map: 'Saigyo Modoshi no Matsu Park', type: 'camera' }
+                    { time: '09:30', text: '父子行程：鹽竈神社', sub: '車可直達山上，免爬樓梯', map: 'shiogama_shrine', type: 'torii-gate' },
+                    { time: '14:00', text: '松島：西行戻之松公園', sub: '車遊俯瞰松島全景', map: 'saigyo_park', type: 'camera' },
+                    { time: '15:00', text: '松島海岸散策', sub: '五大堂/福浦橋', map: 'matsushima_kaigan', type: 'water' }
                 ]
             },
             {
                 day: 4, date: '12/20 (六)', title: '前進銀山溫泉', icon: 'fa-snowflake', color: 'bg-cyan-500',
                 steps: [
-                    { time: '10:30', text: '仙台站還車', sub: 'Toyota 仙台新幹線口店', type: 'car' },
+                    { time: '10:30', text: '仙台站還車', sub: 'Toyota 仙台新幹線口店', map: 'toyota_rent', type: 'car' },
                     { time: '11:18', text: 'JR 仙山線 (往山形)', sub: '普通電車', type: 'train' },
                     { time: '12:45', text: 'Tsubasa 133 (Green)', sub: '山形發 -> 大石田 (13:16抵)', type: 'train' },
                     { time: '13:40', text: '旅館接駁車', sub: '大石田站前', type: 'bus' },
-                    { time: '14:20', text: '抵達銀山溫泉', sub: '古勢起屋本館', map: 'Kosekiya Bekkan', type: 'hotel' },
-                    { time: '16:00', text: '必拍：藍色時刻', sub: '白銀橋前', map: 'Shirogane Bridge', type: 'camera' }
+                    { time: '14:20', text: '抵達銀山溫泉', sub: '古勢起屋本館', map: 'kosekiya_bekkan', type: 'hotel' },
+                    { time: '15:00', text: '必吃：野川豆腐', sub: '溫泉街入口', map: 'nogawa_tofu', type: 'utensils' },
+                    { time: '16:00', text: '必拍：藍色時刻', sub: '白銀橋前', map: 'shirogane_bridge', type: 'camera' }
                 ]
             },
             {
                 day: 5, date: '12/21 (日)', title: '銀山漫遊 ➔ 東京', icon: 'fa-train', color: 'bg-emerald-500',
                 steps: [
-                    { time: '10:00', text: '退房 (寄放行李)', sub: '漫遊溫泉街 / 伊豆之華', type: 'walking' },
+                    { time: '10:00', text: '退房 (寄放行李)', sub: '伊豆之華早午餐', map: 'izu_no_hana', type: 'coffee' },
+                    { time: '12:30', text: 'Haikara-san 休息', sub: '咖哩麵包', map: 'haikara_san', type: 'chair' },
                     { time: '16:35', text: '搭乘尾花澤市營巴士', sub: '前往大石田站', type: 'bus' },
                     { time: '17:27', text: 'Tsubasa 156 (Green)', sub: '前往東京 (20:48抵達)', type: 'train' },
-                    { time: '21:30', text: '入住 Tokyo Marriott', sub: '領取寄送行李', map: 'Tokyo Marriott Hotel', type: 'hotel' }
+                    { time: '21:30', text: '入住 Tokyo Marriott', sub: '領取寄送行李', map: 'tokyo_marriott', type: 'hotel' }
                 ]
             },
             {
@@ -297,11 +478,11 @@
         ];
 
         const guideSpots = [
-            { name: '野川豆腐', desc: '百年手工豆腐，素食可食(無醬汁)。', tag: '美食', map: 'Nogawa Tofu', icon: 'fa-utensils' },
-            { name: '伊豆之華', desc: '蕎麥麵老店，適合早午餐/下午茶。', tag: '美食', map: 'Izu no Hana', icon: 'fa-coffee' },
-            { name: '白銀橋', desc: '拍攝銀山溫泉經典夜景的最佳地點。', tag: '拍照', map: 'Shirogane Bridge', icon: 'fa-camera' },
-            { name: '能登屋旅館', desc: '阿信拍攝地，神隱少女風格。', tag: '拍照', map: 'Notoya Ryokan', icon: 'fa-camera' },
-            { name: 'Haikara-san', desc: '著名的咖哩麵包 (含肉)，可喝咖啡。', tag: '休息', map: 'Haikarasan Dori', icon: 'fa-chair' }
+            { name: '野川豆腐', desc: '百年手工豆腐，素食可食(無醬汁)。', tag: '美食', map: 'nogawa_tofu', icon: 'fa-utensils' },
+            { name: '伊豆之華', desc: '蕎麥麵老店，適合早午餐/下午茶。', tag: '美食', map: 'izu_no_hana', icon: 'fa-coffee' },
+            { name: '白銀橋', desc: '拍攝銀山溫泉經典夜景的最佳地點。', tag: '拍照', map: 'shirogane_bridge', icon: 'fa-camera' },
+            { name: '能登屋旅館', desc: '阿信拍攝地，神隱少女風格。', tag: '拍照', map: 'notoya', icon: 'fa-camera' },
+            { name: 'Haikara-san', desc: '著名的咖哩麵包 (含肉)，可喝咖啡。', tag: '休息', map: 'haikara_san', icon: 'fa-chair' }
         ];
 
         const phrases = [
@@ -382,17 +563,56 @@
             setTimeout(() => toast.remove(), 1500);
         }
 
+        function showSpotDetail(key) {
+            const spot = spotDetails[key];
+            if (!spot) {
+                // Fallback if detail not found, just open map
+                openMap(key); 
+                return;
+            }
+
+            document.getElementById('modalTitle').innerText = spot.name;
+            document.getElementById('modalDesc').innerText = spot.desc;
+            document.getElementById('modalTag').innerText = spot.tag;
+            
+            // Icon
+            const iconClass = spot.icon ? `fas ${spot.icon}` : 'fas fa-map-marker-alt';
+            document.getElementById('modalIconBg').className = `${iconClass} text-6xl opacity-50`;
+
+            // Note
+            const noteBox = document.getElementById('modalNoteBox');
+            if (spot.note) {
+                document.getElementById('modalNote').innerText = spot.note;
+                noteBox.classList.remove('hidden');
+            } else {
+                noteBox.classList.add('hidden');
+            }
+
+            // Map Button
+            const query = spot.query || spot.name;
+            const btn = document.getElementById('modalMapBtn');
+            btn.onclick = () => openMap(query);
+
+            // Show Modal
+            document.getElementById('spotModal').classList.add('modal-active');
+        }
+
+        function closeSpotModal(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('spotModal').classList.remove('modal-active');
+        }
+
         function openMap(query) {
             window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`, '_blank');
         }
 
         function openPhraseModal(jp, cn) {
-            document.getElementById('modalJP').innerText = jp;
-            document.getElementById('modalCN').innerText = cn;
+            document.getElementById('phraseJP').innerText = jp;
+            document.getElementById('phraseCN').innerText = cn;
             document.getElementById('phraseModal').style.display = "block";
         }
 
-        function closeModal() {
+        function closePhraseModal() {
             document.getElementById('phraseModal').style.display = "none";
         }
 
@@ -416,12 +636,12 @@
                         <div class="space-y-5 relative pl-2">
                             <div class="absolute left-[7px] top-2 bottom-2 w-0.5 bg-slate-100"></div>
                             ${day.steps.map(step => `
-                                <div class="relative flex gap-4 items-start group" ${step.map ? `onclick="openMap('${step.map}')"` : ''}>
+                                <div class="relative flex gap-4 items-start group" ${step.map ? `onclick="showSpotDetail('${step.map}')"` : ''}>
                                     <div class="relative z-10 w-3 h-3 mt-1.5 rounded-full bg-white border-[3px] ${day.color.replace('bg-', 'border-')} shadow-sm group-hover:scale-110 transition-transform"></div>
                                     <div class="flex-1 ${step.map ? 'cursor-pointer' : ''}">
                                         <div class="flex justify-between items-start">
                                             <span class="text-xs font-mono font-bold text-slate-400 bg-slate-50 px-1.5 py-0.5 rounded">${step.time}</span>
-                                            ${step.map ? '<i class="fas fa-location-arrow text-slate-300 text-xs group-hover:text-blue-500 transition-colors"></i>' : ''}
+                                            ${step.map ? '<i class="fas fa-info-circle text-slate-300 text-sm group-hover:text-blue-500 transition-colors"></i>' : ''}
                                         </div>
                                         <p class="text-sm font-bold text-slate-700 mt-0.5 group-hover:text-blue-600 transition-colors">${step.text}</p>
                                         <p class="text-xs text-slate-500 mt-0.5">${step.sub}</p>
@@ -528,9 +748,14 @@
                         <span class="text-xs text-slate-500">總金額</span>
                         <span class="font-bold text-slate-800">${logistics.car.price}</span>
                     </div>
-                    <button onclick="openMap('${logistics.car.shop}')" class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-colors">
-                        <i class="fas fa-location-arrow mr-1"></i> 導航至店鋪
-                    </button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="showSpotDetail('${logistics.car.key}')" class="w-full py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors">
+                            <i class="fas fa-info-circle mr-1"></i> 詳情
+                        </button>
+                        <button onclick="openMap('${logistics.car.shop}')" class="w-full py-2 bg-slate-800 text-white rounded-lg text-xs font-bold hover:bg-slate-700 transition-colors">
+                            <i class="fas fa-location-arrow mr-1"></i> 導航
+                        </button>
+                    </div>
                 </div>
             `;
 
@@ -541,13 +766,12 @@
                     <div class="space-y-4">
                         ${logistics.hotels.map(h => `
                             <div class="flex justify-between items-start pb-3 border-b border-slate-50 last:border-0 last:pb-0">
-                                <div>
-                                    <h4 class="font-bold text-sm text-slate-800">${h.name}</h4>
+                                <div onclick="showSpotDetail('${h.key}')" class="cursor-pointer">
+                                    <h4 class="font-bold text-sm text-slate-800">${h.name} <i class="fas fa-info-circle text-slate-300 text-xs ml-1"></i></h4>
                                     <p class="text-[10px] text-slate-400 mb-1">${h.dates}</p>
                                     <p class="text-xs text-slate-500">${h.desc}</p>
                                 </div>
                                 <div class="flex flex-col items-end gap-2">
-                                    <button onclick="openMap('${h.name}')" class="text-purple-500 bg-purple-50 p-2 rounded-full hover:bg-purple-100 transition-colors"><i class="fas fa-map-marker-alt"></i></button>
                                     <div class="flex gap-1 flex-wrap justify-end">
                                         ${h.id.split(' / ').map(id => `
                                             <button onclick="copyToClipboard('${id}')" class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500 font-mono hover:bg-slate-200 transition-colors">${id}</button>
@@ -573,7 +797,7 @@
                 });
                 // Car
                 new QRCode(document.getElementById(`qr-${logistics.car.id}`), { text: logistics.car.id, width: 128, height: 128 });
-                // Flights (New)
+                // Flights
                 logistics.flights.forEach(f => {
                     new QRCode(document.getElementById(`qr-${f.ticket}`), { text: f.ticket, width: 128, height: 128 });
                 });
@@ -609,7 +833,7 @@
                     <!-- Spots Grid -->
                     <div class="grid grid-cols-1 gap-3">
                         ${guideSpots.map(spot => `
-                            <div class="bg-white rounded-xl p-4 card-shadow flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors" onclick="openMap('${spot.map}')">
+                            <div class="bg-white rounded-xl p-4 card-shadow flex items-center gap-4 cursor-pointer hover:bg-slate-50 transition-colors" onclick="showSpotDetail('${spot.map}')">
                                 <div class="bg-slate-100 text-slate-500 w-10 h-10 rounded-full flex items-center justify-center shrink-0">
                                     <i class="fas ${spot.icon}"></i>
                                 </div>
@@ -620,7 +844,7 @@
                                     </div>
                                     <p class="text-xs text-slate-500 truncate">${spot.desc}</p>
                                 </div>
-                                <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                                <i class="fas fa-info-circle text-slate-300 text-sm"></i>
                             </div>
                         `).join('')}
                     </div>
@@ -657,8 +881,8 @@
                         <p class="text-xs text-slate-500 mb-4">Tomizawa Aoki Clinic (右側專用入口)</p>
                         
                         <div class="grid grid-cols-2 gap-3 mb-5">
-                            <button onclick="openMap('Tomizawa Aoki Clinic')" class="flex items-center justify-center gap-2 bg-rose-50 text-rose-600 py-2.5 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors">
-                                <i class="fas fa-location-arrow"></i> 導航
+                            <button onclick="showSpotDetail('tomizawa_clinic')" class="flex items-center justify-center gap-2 bg-rose-50 text-rose-600 py-2.5 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors">
+                                <i class="fas fa-info-circle"></i> 詳情
                             </button>
                             <a href="tel:0222267707" class="flex items-center justify-center gap-2 bg-slate-50 text-slate-600 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-100 transition-colors">
                                 <i class="fas fa-phone"></i> 電話
