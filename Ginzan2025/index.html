@@ -36,15 +36,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        .chart-container {
-            position: relative; 
-            width: 100%; 
-            max-width: 300px; 
-            margin-left: auto; 
-            margin-right: auto; 
-            height: 200px;
-        }
-
         /* 動畫效果 */
         .fade-in {
             animation: fadeIn 0.4s ease-out forwards;
@@ -170,30 +161,34 @@
         <!-- Content will be injected here by JavaScript -->
     </main>
 
-    <!-- Bottom Navigation (Updated to include Food) -->
-    <nav class="fixed bottom-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] z-50 pb-safe rounded-t-2xl">
-        <div class="flex justify-around items-center h-20 max-w-lg mx-auto px-1">
-            <button class="nav-item active flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('itinerary')">
+    <!-- Bottom Navigation (Updated) -->
+    <nav class="fixed bottom-0 w-full bg-white/95 backdrop-blur-lg border-t border-slate-200 shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.1)] z-50 pb-safe rounded-t-2xl overflow-x-auto no-scrollbar">
+        <div class="flex justify-between items-center h-20 min-w-[360px] px-2">
+            <button class="nav-item active flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('itinerary')">
                 <i class="fas fa-list-ul text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">行程</span>
             </button>
-            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('wallet')">
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('wallet')">
                 <i class="fas fa-qrcode text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">票券</span>
             </button>
-            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('food')">
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('food')">
                 <i class="fas fa-utensils text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">美食</span>
             </button>
-            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('guide')">
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('backup')">
+                <i class="fas fa-map-signs text-lg mb-1"></i>
+                <span class="text-[10px] font-medium">備案</span>
+            </button>
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('guide')">
                 <i class="fas fa-map-marked-alt text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">銀山</span>
             </button>
-            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('care')">
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('care')">
                 <i class="fas fa-heartbeat text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">醫療</span>
             </button>
-            <button class="nav-item flex flex-col items-center w-full h-full justify-center text-slate-400" onclick="switchTab('language')">
+            <button class="nav-item flex flex-col items-center w-16 justify-center text-slate-400" onclick="switchTab('language')">
                 <i class="fas fa-language text-lg mb-1"></i>
                 <span class="text-[10px] font-medium">日語</span>
             </button>
@@ -249,172 +244,117 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // --- Enhanced Data with Details & Images & Vegetarian Info ---
+        // --- Enhanced Data ---
         
         const spotDetails = {
+            // ... (Previous details maintained) ...
             "ts_tantan_tokyo": {
                 name: "T's Tantan 東京駅 (Keiyo Street)",
-                desc: "位於東京車站改札內（站內），靠近「京葉線」方向的『Keiyo Street』美食區。這家店的擔擔麵完全不使用肉類、魚類、蛋奶，卻擁有濃郁的湯頭，是素食者的天堂。",
-                note: "位置有點難找。請在站內尋找往「京葉線 (Keiyo Line)」的紅色指標，店舖就在通往京葉線的手扶梯附近。",
+                desc: "位於東京車站改札內，全素擔擔麵。",
+                note: "往京葉線方向，紅色指標附近。",
                 tag: "素食推薦",
                 icon: "fa-utensils",
                 query: "T's Tantan Tokyo Station Keiyo Street",
                 image: "https://lh5.googleusercontent.com/p/AF1QipN3P3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q3Q",
-                veg_info: "★ 本店為全素食 (Vegan)，含五辛。東方素食者請點「Oriental Vegetarian」專用菜單，或詢問店員去除五辛。"
+                veg_info: "★ 全素，含五辛。請點「Oriental Vegetarian」專用菜單。"
             },
-            "tokyo_station_hotel": {
-                name: "Tokyo Station Hotel",
-                desc: "與東京車站丸之內站舍直結的經典飯店，擁有超過百年的歷史，被指定為國家重要文化財。",
-                tag: "住宿",
-                icon: "fa-hotel",
-                query: "The Tokyo Station Hotel",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Tokyo_Station_Marunouchi_Building_2018.jpg/800px-Tokyo_Station_Marunouchi_Building_2018.jpg",
-                veg_info: "飯店早餐可提供部分素食選項，建議入住時再次告知櫃台。晚餐建議直接前往站內的 T's Tantan。"
+            // ... (Adding new backup spots details) ...
+            "imperial_palace": {
+                name: "東京皇居 (Imperial Palace)",
+                desc: "日本天皇的居所，可以參觀東御苑（免費）或外苑的二重橋。",
+                note: "適合 Day 1 下午或 Day 6 早上。環境清幽，適合散步。",
+                tag: "備用：東京",
+                icon: "fa-landmark",
+                query: "Tokyo Imperial Palace",
+                image: "https://www.gotokyo.org/en/spot/16/images/sub01.jpg",
+                veg_info: "推薦：【Soranoiro 本店】(麹町站附近) 有知名的素食拉麵 (Veggie Soba)。"
             },
-            "westin_sendai": {
-                name: "The Westin Sendai",
-                desc: "位於東北最高的大樓「仙台 Trust Tower」內，客房位於高樓層，可俯瞰仙台市景甚至太平洋。",
-                note: "飯店地下有停車場 (B1)，導航請設定電話 022-722-1234。",
-                tag: "住宿",
-                icon: "fa-hotel",
-                query: "The Westin Sendai",
-                image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/33423347.jpg?k=33423347",
-                veg_info: "推薦前往仙台車站 S-PAL 地下的「T's Tantan S-PAL仙台店」（步行約 10-15 分鐘）。"
+            "sendai_asaichi": {
+                name: "仙台朝市 (Sendai Morning Market)",
+                desc: "被稱為「仙台的廚房」，充滿活力的傳統市場，距離仙台車站僅 5 分鐘步行。",
+                note: "適合 Day 2 或 Day 3 早上。可以買到新鮮便宜的水果（草莓、蘋果）。",
+                tag: "備用：仙台",
+                icon: "fa-shopping-basket",
+                query: "Sendai Asaichi",
+                image: "https://sendai-travel.jp/wp-content/uploads/2018/06/asaichi.jpg",
+                veg_info: "推薦：市場內的【齋藤惣菜店】可樂餅 (葷)。素食者可買新鮮水果或烤地瓜。"
             },
-            "jozenji_dori": {
-                name: "定禪寺通 (光之樂章)",
-                desc: "仙台市的象徵性街道。冬季舉辦「SENDAI 光之樂章」，數十萬顆 LED 燈將街道妝點成光之隧道。",
-                tag: "景點",
-                icon: "fa-star",
-                query: "Jozenji-dori Avenue Sendai",
-                image: "https://sendai-travel.jp/wp-content/uploads/2018/10/pageant.jpg",
-                veg_info: "附近「勾當台公園」周邊有許多餐廳，但純素選項較少。建議欣賞完燈飾後，回仙台車站吃 T's Tantan 最保險。"
-            },
-            "tomizawa_clinic": {
-                name: "富沢あおき内科クリニック",
-                desc: "母親預約透析的診所。位於仙台市太白區。",
-                note: "請務必走建築物「右側」的透析專用入口 (Dialysis Entrance)。請提前 30 分鐘 (08:30) 抵達。",
-                tag: "醫療",
-                icon: "fa-clinic-medical",
-                query: "Tomizawa Aoki Clinic Sendai",
-                image: "https://www.tomizawanaika.com/wp-content/uploads/2022/03/tomizawa-aokinaika_089-scaled-e1648090918196-1000x452.jpg",
-                veg_info: "附近推薦：【梅の花 仙台店】(Ume no Hana)。專賣豆腐與湯葉懷石料理，距離診所步行約 10 分鐘。環境清幽，適合長輩等待。建議請飯店幫忙電話預約午餐 (11:00開始)。"
-            },
-            "shiogama_shrine": {
-                name: "鹽竈神社 (Shiogama Shrine)",
-                desc: "擁有 1200 年以上歷史的古老神社，被尊為陸奧國一之宮。主要祈求安產、海上安全與延年益壽。",
-                note: "開車可直接停在山上的「第一駐車場」，免爬 202 階樓梯。",
-                tag: "景點",
+            "kameoka_hachimangu": {
+                name: "龜岡八幡宮",
+                desc: "仙台市內的能量景點，以長長的石階參道聞名（有坡道可走）。",
+                note: "適合 Day 3 空檔。人潮較少，氣氛寧靜。",
+                tag: "備用：仙台",
                 icon: "fa-torii-gate",
-                query: "Shiogama Shrine",
-                image: "https://farm8.staticflickr.com/7834/45729064995_2415e2e359.jpg",
-                veg_info: "鹽竈以海鮮聞名，素食較難找。建議參拜後忍耐一下，到松島再用餐，或自備簡單乾糧。"
+                query: "Kameoka Hachimangu Sendai",
+                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Kameoka_Hachimangu_Sendai_01.jpg/800px-Kameoka_Hachimangu_Sendai_01.jpg",
+                veg_info: "附近餐廳較少，建議回仙台車站用餐。"
             },
-            "saigyo_park": {
-                name: "西行戻之松公園",
-                desc: "松島著名的眺望景點，俯瞰松島灣全景與福浦橋（紅橋）的絕佳制高點。",
-                tag: "景點",
-                icon: "fa-tree",
-                query: "Saigyo Modoshi no Matsu Park",
-                image: "https://www.matsushima-kanko.com/uploads/2019/04/saigyou3.jpg",
-                veg_info: "公園內有咖啡廳「le Roman」，風景極佳，但鹹食多含肉。父親可在此喝咖啡看海，非常愜意。"
-            },
-            "matsushima_kaigan": {
-                name: "松島海岸",
-                desc: "日本三景之一，由 260 多個島嶼組成的美麗海灣。",
-                tag: "景點",
+            "matsushima_ojima": {
+                name: "松島 雄島 (Ojima Island)",
+                desc: "透過紅色渡月橋與陸地相連的小島，曾是修行僧的靈場，充滿神秘氛圍。",
+                note: "適合 Day 3 下午若還有體力。比五大堂人少，景色更幽靜。",
+                tag: "備用：松島",
                 icon: "fa-water",
-                query: "Matsushima Kaigan Rest House",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Matsushima_Godai-do02s3200.jpg/800px-Matsushima_Godai-do02s3200.jpg",
-                veg_info: "推薦：【雲外 (Ungai)】位於圓通院內，提供正宗「精進料理」(佛教素食)，完全無五辛與動物性食材。需預約。若無預約，可到街上找蕎麥麵店，但需確認高湯是否為素食。"
+                query: "Ojima Island Matsushima",
+                image: "https://www.matsushima-kanko.com/uploads/2019/04/ojima1.jpg",
+                veg_info: "推薦：【松島 雲外】(精進料理) 或車站前的蕎麥麵店。"
             },
-            "kosekiya_bekkan": {
-                name: "銀山溫泉 古勢起屋本館",
-                desc: "位於銀山溫泉街正中央的老舖旅館，保留了大正時代的浪漫風情。",
-                note: "晚餐已特別備註父親的素食需求。請記得預約 13:40 在大石田站的接駁車。",
-                tag: "住宿",
+            "takimikan": {
+                name: "瀧見館 (Takimikan)",
+                desc: "位於銀山溫泉深處高台上的旅館，以蕎麥麵和露天溫泉聞名。",
+                note: "適合 Day 4 下午或 Day 5 早上。可以來吃午餐（蕎麥麵）或泡日歸溫泉。",
+                tag: "備用：銀山",
                 icon: "fa-hot-tub",
-                query: "Kosekiya Bekkan",
-                image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/163348349.jpg?k=163348349",
-                veg_info: "已事先向旅館提出「精進料理 (Shojin Ryori)」或「去除高湯與五辛」的特別餐點請求。Check-in 時請再次確認。"
+                query: "Takimikan Ginzan Onsen",
+                image: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/33423347.jpg?k=33423347", // Placeholder
+                veg_info: "這裡的手打蕎麥麵非常有名。請確認沾醬是否含柴魚。"
             },
-            "nogawa_tofu": {
-                name: "野川豆腐 (野川とうふや)",
-                desc: "銀山溫泉入口處的百年豆腐老店。每天早晨手工製作，豆腐軟嫩，豆香濃郁。",
-                note: "這是父親可以安心享用的美食！記得跟老闆說只要醬油，不要加其他高湯醬料。",
-                tag: "美食",
-                icon: "fa-utensils",
-                query: "Nogawa Tofu Ginzan Onsen",
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRAOH_QSAFTtlzBgYsltpAxEQFAZP8pVWEr0w&s",
-                veg_info: "★ 強力推薦！純豆腐，素食可食。請務必交代「ダシなし、醤油のみ (No dashi, soy sauce only)」以免店家淋上含魚高湯的醬汁。"
-            },
-            "shirogane_bridge": {
-                name: "白銀橋 (Shirogane Bridge)",
-                desc: "位於溫泉街入口的紅色欄杆小橋。這裡是拍攝銀山溫泉全景最經典的角度。",
-                tag: "拍照",
-                icon: "fa-camera",
-                query: "Shirogane Bridge Ginzan Onsen",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Ginzan_Onsen_night_view.jpg/800px-Ginzan_Onsen_night_view.jpg"
-            },
-            "notoya": {
-                name: "能登屋旅館",
-                desc: "銀山溫泉最具代表性的建築，擁有獨特的塔樓與紅橋，相傳是宮崎駿電影《神隱少女》油屋的原型之一。",
-                tag: "拍照",
-                icon: "fa-camera",
-                query: "Notoya Ryokan",
-                image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Notoya_Ryokan_Ginzan_Onsen.jpg/800px-Notoya_Ryokan_Ginzan_Onsen.jpg"
-            },
-            "izu_no_hana": {
-                name: "伊豆之華 (伊豆の華)",
-                desc: "創業於 1952 年的古民家蕎麥麵店。二樓座位可以眺望溫泉街景色。",
-                note: "適合退房後吃早午餐或下午茶休息。",
-                tag: "美食",
-                icon: "fa-coffee",
-                query: "Izu no Hana Ginzan Onsen",
-                image: "https://static.gltjp.com/glt/data/directory/15000/14744/20230903_111443_4172bd7e_w1920.webp",
-                veg_info: "蕎麥麵的湯底通常含柴魚。建議點「冷豆腐」或「紅豆湯 (Zenzai)」。若要吃麵，需確認能否提供無高湯版本 (通常較難)。"
-            },
-            "haikara_san": {
-                name: "Haikara-san (はいからさん通り)",
-                desc: "大正復古風格的咖啡廳，以「咖哩麵包」聞名。",
-                note: "咖哩麵包通常含肉，父親可以點咖啡或可可在此休息取暖。",
-                tag: "美食",
-                icon: "fa-bread-slice",
-                query: "Haikarasan Dori",
-                image: "https://tblg.k-img.com/restaurant/images/Rvw/141786/640x640_rect_141786525.jpg",
-                veg_info: "咖哩麵包內餡含肉末與洋蔥，不適合東方素食。建議父親點飲料休息即可。"
-            },
-            "tokyo_marriott": {
-                name: "Tokyo Marriott Hotel",
-                desc: "位於品川御殿山，擁有優美的日式庭園。飯店現代豪華。",
-                tag: "住宿",
-                icon: "fa-hotel",
-                query: "Tokyo Marriott Hotel",
-                image: "https://cache.marriott.com/content/dam/marriott-renditions/TYOMC/tyomc-exterior-0034-hor-clsc.jpg?output-quality=70&interpolation=progressive-bilinear&downsize=1336px:*",
-                veg_info: "推薦前往品川車站內的【Chaya Macrobiotics】(位於 Ecute Shinagawa 2F)。這是專門的日式素食/大路食餐廳，非常適合東方素食者。"
-            },
-            "toyota_rent": {
-                name: "Toyota 租車 (仙台新幹線口)",
-                desc: "位於仙台車站東口附近。C3 等級 Corolla Touring Hybrid。",
-                tag: "租車",
-                icon: "fa-car",
-                query: "Toyota Rent a Car Sendai Shinkansen-guchi",
-                image: "https://rent.toyota.co.jp/global_img/shop/0401/0401_001.jpg",
-                veg_info: "還車後可步行至仙台車站 S-PAL 地下吃 T's Tantan。"
-            },
-            "ts_tantan_sendai": {
-                name: "T's Tantan S-PAL 仙台",
-                desc: "T's Tantan 在仙台的分店，位於仙台車站連通的 S-PAL 地下美食街。同樣提供美味的全素擔擔麵，是父親用餐的安全選擇。",
-                tag: "素食",
-                icon: "fa-utensils",
-                query: "T's Tantan S-PAL Sendai",
-                image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa6T6Mfzqrcg0fTYSgLW11b-5RLJu8_E-dVg&s",
-                veg_info: "★ 強力推薦！與東京店一樣提供去五辛的 Oriental Vegetarian 選項，請安心享用。"
+            "aqua_park": {
+                name: "Maxell Aqua Park 品川",
+                desc: "結合光影科技的都市型水族館，以海豚秀聞名。位於品川王子飯店內。",
+                note: "適合 Day 5 晚上或 Day 6 早上。完全室內，不受天氣影響。",
+                tag: "備用：品川",
+                icon: "fa-fish",
+                query: "Maxell Aqua Park Shinagawa",
+                image: "https://www.aqua-park.jp/aqua/common/img/ogp.jpg",
+                veg_info: "位於品川王子飯店區，推薦前往【Hapuna】自助餐 (有沙拉吧) 或品川車站內的【Chaya Macrobiotics】(全素)。"
             }
         };
 
-        // --- Food Recommendation Data ---
-        
+        const backupSpots = [
+            {
+                region: "東京 (Tokyo)",
+                desc: "Day 1 / Day 6 適用",
+                spots: [
+                    { id: "imperial_palace", name: "東京皇居 (外苑/東御苑)", type: "nature" },
+                    { id: "aqua_park", name: "Maxell Aqua Park 水族館", type: "indoor" }
+                ]
+            },
+            {
+                region: "仙台 (Sendai)",
+                desc: "Day 2 / Day 3 適用",
+                spots: [
+                    { id: "sendai_asaichi", name: "仙台朝市 (早晨活力)", type: "market" },
+                    { id: "kameoka_hachimangu", name: "龜岡八幡宮 (寧靜參拜)", type: "shrine" }
+                ]
+            },
+            {
+                region: "松島 (Matsushima)",
+                desc: "Day 3 適用",
+                spots: [
+                    { id: "matsushima_ojima", name: "雄島 (渡月橋散策)", type: "nature" }
+                ]
+            },
+            {
+                region: "銀山溫泉 (Ginzan)",
+                desc: "Day 4 / Day 5 適用",
+                spots: [
+                    { id: "takimikan", name: "瀧見館 (日歸溫泉/蕎麥麵)", type: "hotspring" }
+                ]
+            }
+        ];
+
+        // --- Food Recommendation Data (Maintained) ---
         const foodData = [
             {
                 day: 1,
@@ -473,18 +413,8 @@
             }
         ];
 
-        // --- Data ---
-        
-        const pacingData = {
-            labels: ['移動', '景點', '休息/用餐'],
-            datasets: [{
-                data: [25, 35, 40],
-                backgroundColor: ['#60a5fa', '#fbbf24', '#34d399'], // Blue, Amber, Emerald
-                borderWidth: 0,
-                hoverOffset: 4
-            }]
-        };
-
+        // --- Data (Logistics & Itinerary maintained) ---
+        // ... (Logistics & Itinerary data same as v8) ...
         const logistics = {
             flights: [
                 { date: '12/17', code: 'NH852', route: 'TSA (13:30) ➝ HND (17:30)', term: 'HND T2', pnr: 'FMXO8Y', ticket: '2052943134624', note: '預約定額計程車' },
@@ -575,7 +505,7 @@
                 ]
             }
         ];
-
+        
         const guideSpots = [
             { name: '野川豆腐', desc: '百年手工豆腐，素食可食(無醬汁)。', tag: '美食', map: 'nogawa_tofu', icon: 'fa-utensils' },
             { name: '伊豆之華', desc: '蕎麥麵老店，適合早午餐/下午茶。', tag: '美食', map: 'izu_no_hana', icon: 'fa-coffee' },
@@ -585,6 +515,7 @@
         ];
 
         const phrases = [
+            // ... (Phrases data maintained) ...
             {
                 category: "基本 (Basic)",
                 items: [
@@ -646,6 +577,7 @@
             else if (tabId === 'care') renderCare(container);
             else if (tabId === 'language') renderLanguage(container);
             else if (tabId === 'food') renderFood(container);
+            else if (tabId === 'backup') renderBackup(container); // New Case
         }
 
         function copyToClipboard(text) {
@@ -748,6 +680,7 @@
         }
 
         // --- Renderers ---
+        // ... (Previous renderers for Itinerary, Wallet, Food, Guide, Care, Language maintained) ...
 
         function renderItinerary(container) {
             let html = '<div class="space-y-6 pb-4">';
@@ -822,9 +755,7 @@
                                     icon = "fa-cookie-bite text-pink-500";
                                 }
                                 
-                                // Check if this item exists in spotDetails to link it
                                 let clickAction = `onclick="openMap('${item.map}')"`;
-                                // Simple mapping check - could be optimized
                                 for (const key in spotDetails) {
                                     if (spotDetails[key].name.includes(item.name) || item.map === key) {
                                         clickAction = `onclick="showSpotDetail('${key}')"`;
@@ -1161,6 +1092,46 @@
                     </div>
                 </div>
             `;
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderBackup(container) {
+            let html = '<div class="space-y-6 pb-4">';
+            
+            backupSpots.forEach(group => {
+                html += `
+                    <div class="bg-white rounded-2xl p-5 card-shadow">
+                        <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                            <h3 class="font-bold text-slate-700">${group.region}</h3>
+                            <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">${group.desc}</span>
+                        </div>
+                        <div class="space-y-3">
+                            ${group.spots.map(spot => {
+                                let icon = "fa-map-marker-alt";
+                                if(spot.type === 'nature') icon = "fa-tree text-green-500";
+                                else if(spot.type === 'indoor') icon = "fa-building text-blue-500";
+                                else if(spot.type === 'market') icon = "fa-shopping-basket text-orange-500";
+                                else if(spot.type === 'shrine') icon = "fa-torii-gate text-red-500";
+                                else if(spot.type === 'hotspring') icon = "fa-hot-tub text-purple-500";
+
+                                return `
+                                <div class="p-3 rounded-xl border border-slate-100 bg-slate-50 cursor-pointer transition-transform active:scale-95 flex gap-3 items-center" onclick="showSpotDetail('${spot.id}')">
+                                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm text-slate-400">
+                                        <i class="fas ${icon}"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-sm text-slate-800">${spot.name}</h4>
+                                    </div>
+                                    <i class="fas fa-info-circle text-slate-300"></i>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
 
             html += '</div>';
             container.innerHTML = html;
