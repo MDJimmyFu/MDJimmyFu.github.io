@@ -51,11 +51,19 @@
         /* 醒目提示樣式 */
         .entry-highlight {
             box-shadow: 0 0 0 2px #ef4444; /* red-500 */
-            transform: scale(1.05);
-            z-index: 10;
+            transform: scale(1.1); /* 放大比例增加 */
+            z-index: 20;
             position: relative;
             animation: pulse-border 2s infinite;
         }
+        
+        /* 非選中項目的淡化樣式 */
+        .entry-dimmed {
+            opacity: 0.2;
+            filter: grayscale(100%);
+            transition: all 0.3s;
+        }
+
         @keyframes pulse-border {
             0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
             70% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
@@ -620,25 +628,25 @@
         }
 
         function applyHighlight(cid) {
-            // 先清除所有 highlight
-            document.querySelectorAll('.company-indicator').forEach(el => {
+            // 先取得所有指標
+            const allIndicators = document.querySelectorAll('.company-indicator');
+            
+            // 重置所有樣式
+            allIndicators.forEach(el => {
                 el.classList.remove('entry-highlight');
-                // 電腦版恢復透明度
-                el.style.opacity = '1';
+                el.classList.remove('entry-dimmed');
             });
 
             if (!cid) return;
 
-            // 針對特定 cid 加上 highlight
-            const targets = document.querySelectorAll(`.company-indicator[data-cid="${cid}"]`);
-            if(targets.length > 0) {
-                targets.forEach(el => {
+            // 針對特定 cid 加上 highlight，其他的加上 dimmed
+            allIndicators.forEach(el => {
+                if(el.dataset.cid === cid) {
                     el.classList.add('entry-highlight');
-                });
-                
-                // 選項：讓非選中的淡化 (可選，這裡只做 highlight)
-                // document.querySelectorAll(`.company-indicator:not([data-cid="${cid}"])`).forEach(el => el.style.opacity = '0.3');
-            }
+                } else {
+                    el.classList.add('entry-dimmed');
+                }
+            });
         }
 
         function toggleReceived(key) {
