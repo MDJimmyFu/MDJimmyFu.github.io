@@ -260,8 +260,29 @@
             
             // 如果沒有公司資料，預設提示添加
             if(companies.length === 0) {
-                // 自動加入一個範例公司，方便使用者上手
-                companies.push({ id: generateId(), name: '範例公司', bank: '現金袋', payday: 10 });
+                // 根據使用者提供的 CSV 資料建立預設清單
+                const defaultCompanies = [
+                    { name: '康邁', bank: '國泰世華', payday: 5 },
+                    { name: '三美', bank: '第一銀行', payday: 5 },
+                    { name: '宏安', bank: '華南銀行', payday: 5 },
+                    { name: '季灃', bank: '第一銀行', payday: 5 },
+                    { name: '優實', bank: '中國信託', payday: 10 },
+                    { name: '實青', bank: '彰化銀行', payday: 10 },
+                    { name: '富爾達', bank: '第一銀行', payday: 15 },
+                    { name: '福安', bank: '兆豐銀行', payday: 20 },
+                    { name: '聖美麗', bank: '台灣銀行', payday: 25 },
+                    { name: '柏樂', bank: '中國信託', payday: 30 },
+                    { name: '盛順', bank: '第一銀行', payday: 30 },
+                    { name: '敏盛', bank: '王道銀行', payday: 30 },
+                    { name: '南門', bank: '國泰世華', payday: 15 },
+                    { name: '恆樂', bank: '合作金庫', payday: 10 },
+                    { name: '永許', bank: '華南銀行', payday: 1 }
+                ];
+
+                defaultCompanies.forEach(c => {
+                    companies.push({ id: generateId(), ...c });
+                });
+
                 saveCompaniesToStorage();
                 renderSettings();
             }
