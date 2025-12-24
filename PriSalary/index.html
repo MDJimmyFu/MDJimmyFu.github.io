@@ -463,16 +463,34 @@
                 }
             });
 
-            // 2. 顯示卡片
-            if(Object.keys(monthlyStats).length === 0) {
+            // 2. 轉換為陣列並依照銀行排序
+            const summaryList = [];
+            Object.keys(monthlyStats).forEach(cid => {
+                const comp = companies.find(c => c.id == cid);
+                if(comp) {
+                    summaryList.push({
+                        cid: cid,
+                        comp: comp,
+                        stat: monthlyStats[cid]
+                    });
+                }
+            });
+
+            if(summaryList.length === 0) {
                 container.innerHTML = '<p class="text-gray-500 text-sm col-span-full text-center py-4">本月尚無工作紀錄</p>';
                 return;
             }
 
-            Object.keys(monthlyStats).forEach(cid => {
-                const comp = companies.find(c => c.id == cid);
-                const stat = monthlyStats[cid];
-                if(!comp) return; // 公司可能被刪除了
+            // 排序邏輯：依照銀行名稱 (zh-Hant localeCompare)
+            summaryList.sort((a, b) => {
+                const bankA = a.comp.bank || '';
+                const bankB = b.comp.bank || '';
+                return bankA.localeCompare(bankB, 'zh-Hant');
+            });
+
+            // 3. 顯示卡片
+            summaryList.forEach(item => {
+                const { cid, comp, stat } = item;
 
                 // 計算入帳日：下個月 X 號
                 let nextMonth = month + 1;
