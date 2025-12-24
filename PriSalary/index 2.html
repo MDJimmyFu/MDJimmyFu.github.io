@@ -47,26 +47,6 @@
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
         }
         .modal.active { opacity: 1; pointer-events: auto; }
-
-        /* 醒目提示樣式 */
-        .entry-highlight {
-            box-shadow: 0 0 0 2px #ef4444; /* red-500 */
-            transform: scale(1.05);
-            z-index: 10;
-            position: relative;
-            animation: pulse-border 2s infinite;
-        }
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-        
-        /* 選中卡片的樣式 */
-        .card-selected {
-            ring: 2px solid #3b82f6;
-            background-color: #eff6ff !important;
-        }
     </style>
 </head>
 <body class="pb-20">
@@ -113,14 +93,7 @@
 
         <!-- 薪資預估總表 -->
         <div class="bg-white rounded-lg shadow p-6 mb-8 border-l-4 border-green-500">
-            <div class="flex flex-wrap justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-700"><i class="fa-solid fa-sack-dollar mr-2"></i>本月預估入帳總表</h3>
-                <!-- 新增：總收入顯示 -->
-                <div class="bg-green-100 text-green-800 px-4 py-2 rounded-lg font-bold shadow-sm">
-                    本月總計：<span id="grandTotalDisplay" class="text-xl">$0</span>
-                </div>
-            </div>
-            <p class="text-xs text-gray-500 mb-4"><i class="fa-solid fa-circle-info mr-1"></i>點擊下方公司卡片，可於上方月曆醒目提示該公司班表。</p>
+            <h3 class="text-lg font-bold mb-4 text-gray-700"><i class="fa-solid fa-sack-dollar mr-2"></i>本月預估入帳總表</h3>
             <div id="salarySummary" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 <!-- Summary cards generated here -->
                 <p class="text-gray-500 text-sm col-span-full">尚無資料，請點擊上方日期輸入工時。</p>
@@ -279,9 +252,6 @@
         // 新增資料結構: { '2023-10-companyId': true }
         let receivedStatus = JSON.parse(localStorage.getItem('salary_app_received_status')) || {};
 
-        // 當前選中的醒目提示公司ID
-        let currentHighlightId = null;
-
         // 初始化
         window.onload = function() {
             renderCalendar();
@@ -364,17 +334,13 @@
                         if(dayData[slot] && dayData[slot].companyId) {
                             const cName = getCompanyName(dayData[slot].companyId);
                             const money = dayData[slot].salary;
-                            
-                            // 電腦版顯示文字，增加 company-indicator 類別與 data-cid 屬性
+                            // 電腦版顯示文字
                             const tag = document.createElement('div');
-                            tag.className = `truncate rounded px-1 text-white company-indicator ${getSlotColor(slot)}`;
+                            tag.className = `truncate rounded px-1 text-white ${getSlotColor(slot)}`;
                             tag.innerHTML = `<span class="hidden md:inline">${getSlotIcon(slot)} ${cName} $${money}</span>`;
-                            tag.dataset.cid = dayData[slot].companyId; // 綁定公司ID
-
-                            // 手機版點點，增加 company-indicator 類別與 data-cid 屬性
+                            // 手機版只顯示一個點或極簡符號
                             const mobileDot = document.createElement('span');
-                            mobileDot.className = `md:hidden w-2 h-2 rounded-full inline-block mr-1 company-indicator ${getSlotColorBg(slot)}`;
-                            mobileDot.dataset.cid = dayData[slot].companyId; // 綁定公司ID
+                            mobileDot.className = `md:hidden w-2 h-2 rounded-full inline-block mr-1 ${getSlotColorBg(slot)}`;
                             
                             // 為了手機版佈局，這裡做一點特別處理
                             if(window.innerWidth < 768) {
@@ -386,6 +352,8 @@
                         }
                     });
                     
+                    // 手機版如果有點點，就不append contentDiv，或者只顯示總金額?
+                    // 簡單處理：電腦版顯示詳細，手機版點擊看詳情，只在日期旁邊打點
                     if(window.innerWidth >= 768) {
                         cell.appendChild(contentDiv);
                     } else {
@@ -403,17 +371,8 @@
                     }
                 }
 
-                cell.onclick = (e) => {
-                    // 避免點擊到排班內容時觸發 highlight（如果只想編輯）
-                    // 但這裡我們一律開啟編輯，highlight 是在下方卡片觸發
-                    openDayModal(dateStr);
-                };
+                cell.onclick = () => openDayModal(dateStr);
                 grid.appendChild(cell);
-            }
-            
-            // 重新渲染後如果有點選的公司，要重新套用 highlight
-            if(currentHighlightId) {
-                applyHighlight(currentHighlightId);
             }
         }
 
@@ -487,7 +446,6 @@
 
             // 1. 篩選本月資料
             const monthlyStats = {}; // { companyId: { totalSalary: 0, totalHours: 0 } }
-            let grandTotal = 0; // 本月總收入
 
             Object.keys(entries).forEach(dateKey => {
                 if(dateKey.startsWith(prefix)) {
@@ -498,17 +456,12 @@
                             if(!monthlyStats[sData.companyId]) {
                                 monthlyStats[sData.companyId] = { totalSalary: 0, totalHours: 0 };
                             }
-                            const salary = parseFloat(sData.salary || 0);
-                            monthlyStats[sData.companyId].totalSalary += salary;
+                            monthlyStats[sData.companyId].totalSalary += parseFloat(sData.salary || 0);
                             monthlyStats[sData.companyId].totalHours += parseFloat(sData.hours || 0);
-                            grandTotal += salary;
                         }
                     });
                 }
             });
-            
-            // 更新本月總計顯示
-            document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toLocaleString()}`;
 
             // 2. 轉換為陣列並依照銀行排序
             const summaryList = [];
@@ -556,21 +509,8 @@
                 const btnText = isReceived ? '<i class="fa-solid fa-check mr-1"></i>已入帳' : '確認入帳';
                 const textClass = isReceived ? 'text-green-800' : 'text-gray-800';
 
-                // 檢查是否為當前醒目提示的公司
-                const isHighlighted = (cid === currentHighlightId);
-                const highlightClass = isHighlighted ? 'ring-2 ring-red-400 ring-offset-2' : '';
-
                 const card = document.createElement('div');
-                card.className = `${cardClass} ${highlightClass} border rounded p-4 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:shadow-md company-card`;
-                card.dataset.cid = cid;
-                
-                // 點擊卡片本體觸發 highlight (需要排除按鈕點擊)
-                card.onclick = (e) => {
-                    // 如果點到的是按鈕或按鈕內部，不觸發 highlight
-                    if (e.target.closest('button')) return;
-                    highlightCompany(cid);
-                };
-
+                card.className = `${cardClass} border rounded p-4 flex flex-col justify-between transition-colors duration-300`;
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start">
@@ -589,7 +529,7 @@
                     </div>
                     <div class="mt-4 pt-3 border-t border-gray-200/50">
                         <div class="flex justify-between items-end">
-                            <button onclick="toggleReceived('${statusKey}')" class="text-xs px-3 py-1.5 rounded shadow-sm transition-colors ${btnClass} z-20 relative">
+                            <button onclick="toggleReceived('${statusKey}')" class="text-xs px-3 py-1.5 rounded shadow-sm transition-colors ${btnClass}">
                                 ${btnText}
                             </button>
                             <div class="text-right">
@@ -601,44 +541,6 @@
                 `;
                 container.appendChild(card);
             });
-        }
-
-        // --- 醒目提示功能 ---
-        function highlightCompany(cid) {
-            // 如果點擊同一個，則取消
-            if (currentHighlightId === cid) {
-                currentHighlightId = null;
-            } else {
-                currentHighlightId = cid;
-            }
-            
-            // 重新渲染卡片狀態 (為了更新卡片邊框)
-            updateSalarySummary();
-            
-            // 套用月曆樣式
-            applyHighlight(currentHighlightId);
-        }
-
-        function applyHighlight(cid) {
-            // 先清除所有 highlight
-            document.querySelectorAll('.company-indicator').forEach(el => {
-                el.classList.remove('entry-highlight');
-                // 電腦版恢復透明度
-                el.style.opacity = '1';
-            });
-
-            if (!cid) return;
-
-            // 針對特定 cid 加上 highlight
-            const targets = document.querySelectorAll(`.company-indicator[data-cid="${cid}"]`);
-            if(targets.length > 0) {
-                targets.forEach(el => {
-                    el.classList.add('entry-highlight');
-                });
-                
-                // 選項：讓非選中的淡化 (可選，這裡只做 highlight)
-                // document.querySelectorAll(`.company-indicator:not([data-cid="${cid}"])`).forEach(el => el.style.opacity = '0.3');
-            }
         }
 
         function toggleReceived(key) {
@@ -746,15 +648,12 @@
             currentDate.setMonth(currentDate.getMonth() + offset);
             renderCalendar();
             updateSalarySummary();
-            // 切換月份時，清除 highlight
-            currentHighlightId = null;
         }
 
         function jumpToToday() {
             currentDate = new Date();
             renderCalendar();
             updateSalarySummary();
-            currentHighlightId = null;
         }
 
         function formatDateKey(date) {
