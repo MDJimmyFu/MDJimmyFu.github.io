@@ -136,7 +136,7 @@
         </div>
 
         <!-- 公司與銀行設定區域 -->
-        <div id="settingsSection" class="bg-white rounded-lg shadow p-6 border-l-4 border-gray-500">
+        <div id="settingsSection" class="bg-white rounded-lg shadow p-6 border-l-4 border-gray-500 mb-8">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-700"><i class="fa-solid fa-building mr-2"></i>公司與銀行設定</h3>
                 <button onclick="openCompanyModal()" class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
@@ -158,6 +158,40 @@
                         <!-- Company list generated here -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <!-- 資料備份與管理區域 -->
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+            <h3 class="text-lg font-bold text-gray-700 mb-4"><i class="fa-solid fa-database mr-2"></i>資料備份與管理</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- 匯出 Excel/CSV -->
+                <div class="border rounded p-4 bg-gray-50 hover:bg-white transition">
+                    <h4 class="font-bold text-gray-800 mb-2">1. 匯出 Excel 報表</h4>
+                    <p class="text-xs text-gray-500 mb-3">匯出所有薪資明細為 CSV 格式，可使用 Excel 開啟查看與列印。</p>
+                    <button onclick="exportCSV()" class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded text-sm">
+                        <i class="fa-solid fa-file-csv mr-2"></i>下載 CSV 報表
+                    </button>
+                </div>
+
+                <!-- 備份資料 -->
+                <div class="border rounded p-4 bg-gray-50 hover:bg-white transition">
+                    <h4 class="font-bold text-gray-800 mb-2">2. 備份所有資料</h4>
+                    <p class="text-xs text-gray-500 mb-3">將所有設定與紀錄打包下載（JSON格式），用於更換裝置時還原。</p>
+                    <button onclick="backupData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded text-sm">
+                        <i class="fa-solid fa-download mr-2"></i>下載備份檔
+                    </button>
+                </div>
+
+                <!-- 還原資料 -->
+                <div class="border rounded p-4 bg-gray-50 hover:bg-white transition">
+                    <h4 class="font-bold text-gray-800 mb-2">3. 還原備份資料</h4>
+                    <p class="text-xs text-gray-500 mb-3">選取先前下載的備份檔（JSON格式），<span class="text-red-500 font-bold">注意：會覆蓋現有資料</span>。</p>
+                    <input type="file" id="restoreInput" accept=".json" class="hidden" onchange="restoreData(this)">
+                    <button onclick="document.getElementById('restoreInput').click()" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded text-sm">
+                        <i class="fa-solid fa-upload mr-2"></i>上傳並還原
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -748,6 +782,112 @@
                 sel.value = currentVal;
             });
         }
+
+        // --- 邏輯：匯出與匯入 ---
+        
+        // 1. 匯出 CSV 報表
+        function exportCSV() {
+            if(Object.keys(entries).length === 0) {
+                alert("目前沒有任何薪資紀錄可以匯出。");
+                return;
+            }
+
+            let csvContent = "\uFEFF"; // UTF-8 BOM
+            csvContent += "日期,時段,公司名稱,入帳銀行,預計入帳日(隔月),時數(hr),金額($)\n";
+
+            // 取得所有日期並排序
+            const sortedDates = Object.keys(entries).sort();
+
+            sortedDates.forEach(date => {
+                const dayData = entries[date];
+                ['am', 'pm', 'night'].forEach(slot => {
+                    if(dayData[slot] && dayData[slot].companyId) {
+                        const d = dayData[slot];
+                        const comp = companies.find(c => c.id == d.companyId) || { name: '已刪除公司', bank: '-', payday: '-' };
+                        
+                        let slotName = '上午';
+                        if(slot === 'pm') slotName = '下午';
+                        if(slot === 'night') slotName = '晚上';
+
+                        const row = [
+                            date,
+                            slotName,
+                            `"${comp.name}"`, // 防止名稱有逗號
+                            `"${comp.bank}"`,
+                            comp.payday,
+                            d.hours,
+                            d.salary
+                        ].join(",");
+                        csvContent += row + "\n";
+                    }
+                });
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            const fileName = `薪資報表_${formatDateKey(new Date())}.csv`;
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 2. 匯出備份 (JSON)
+        function backupData() {
+            const backup = {
+                timestamp: new Date().toISOString(),
+                version: "1.0",
+                companies: companies,
+                entries: entries,
+                receivedStatus: receivedStatus
+            };
+            
+            const jsonStr = JSON.stringify(backup, null, 2);
+            const blob = new Blob([jsonStr], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            const fileName = `薪水小幫手_備份_${formatDateKey(new Date())}.json`;
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 3. 還原資料 (Import JSON)
+        function restoreData(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    // 簡單驗證格式
+                    if (!data.companies || !data.entries) {
+                        throw new Error("格式錯誤：找不到必要的資料欄位");
+                    }
+
+                    if(confirm(`確定要還原此備份檔嗎？\n備份時間：${data.timestamp || '未知'}\n\n警告：這將會覆蓋您目前所有的資料！`)) {
+                        localStorage.setItem('salary_app_companies', JSON.stringify(data.companies));
+                        localStorage.setItem('salary_app_entries', JSON.stringify(data.entries));
+                        localStorage.setItem('salary_app_received_status', JSON.stringify(data.receivedStatus || {}));
+                        
+                        alert("還原成功！頁面將重新整理。");
+                        location.reload();
+                    }
+                } catch (err) {
+                    alert("還原失敗：檔案格式錯誤或損毀。\n" + err.message);
+                }
+                // 清空 input 讓同個檔案可以再選一次
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
 
         // --- 工具函式 ---
         function changeMonth(offset) {
