@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lime & Ocean Chat</title>
+    <style>
+        /* CSS Reset & 變數 */
+        :root {
+            --ocean-dark: #1A3C4D;
+            --ocean-current: #2C5F78;
+            --ocean-light: #4A7A94;
+            --frosted-lime: #D9E585;
+            --frosted-lime-dark: #C0CD72;
+            --text-white: #F0F4F8;
+            --text-dark: #1A262F;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--ocean-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 防止整個頁面捲動 */
+        }
+
+        /* 頂部導航列 */
+        header {
+            background-color: var(--ocean-current);
+            color: var(--frosted-lime);
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        /* 聊天訊息區域 */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        /* 訊息氣泡樣式 */
+        .message-wrapper {
+            display: flex;
+            flex-direction: column;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* 區分自己與他人的訊息 (透過 LocalStorage 判斷) */
+        .message-wrapper.others {
+            align-self: flex-start;
+        }
+        
+        .message-wrapper.me {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .nickname {
+            font-size: 0.75rem;
+            color: var(--ocean-light);
+            margin-bottom: 4px;
+            padding-left: 5px;
+        }
+        
+        .message-wrapper.me .nickname {
+            padding-right: 5px;
+        }
+
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .others .bubble {
+            background-color: #FFF;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+        }
+
+        .me .bubble {
+            background-color: var(--frosted-lime);
+            color: var(--ocean-dark);
+            border-bottom-right-radius: 4px;
+        }
+
+        /* 底部輸入區域 */
+        .input-area {
+            background-color: var(--ocean-current);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border-top: 1px solid var(--ocean-light);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border-radius: 20px;
+            border: none;
+            outline: none;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        #name-input {
+            width: 30%;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--ocean-dark);
+            font-weight: bold;
+            text-align: center;
+        }
+
+        #msg-input {
+            flex: 1;
+        }
+
+        button {
+            background-color: var(--frosted-lime);
+            color: var(--ocean-dark);
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        button:active {
+            background-color: var(--frosted-lime-dark);
+            transform: scale(0.95);
+        }
+
+        /* 載入動畫 */
+        .loading {
+            text-align: center;
+            color: var(--ocean-light);
+            font-size: 0.8rem;
+            padding: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 針對桌機螢幕優化，限制寬度看起來更像手機 */
+        @media (min-width: 768px) {
+            body {
+                background-color: #0d222e; /* 網頁背景更深 */
+                align-items: center;
+                justify-content: center;
+            }
+            .app-wrapper {
+                width: 100%;
+                max-width: 480px;
+                height: 100vh;
+                max-height: 900px;
+                background-color: var(--ocean-dark);
+                display: flex;
+                flex-direction: column;
+                box-shadow: 0 0 20px rgba(0,0,0,0.5);
+                border-left: 1px solid var(--ocean-current);
+                border-right: 1px solid var(--ocean-current);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 為了在桌機上模擬手機樣式，多包一層 wrapper -->
+    <div class="app-wrapper" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
+        <header>
+            <h1>LimeChat</h1>
+        </header>
+
+        <div id="chat-container">
+            <div class="loading">正在連接 Ocean Current...</div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-row">
+                <input type="text" id="name-input" placeholder="暱稱">
+                <input type="text" id="msg-input" placeholder="輸入訊息..." autocomplete="off">
+                <button id="send-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= 配置區域 =================
+        // 請將下方的 URL 替換為你的 Google Web App URL
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbw1k9bwQvHkIHq5MEodrAcPa_hrumlXMb5okcMqvlY1TE5Lvu_B5byiIjpIh-sCYfbF/exec'; 
+        // ===========================================
+
+        const chatContainer = document.getElementById('chat-container');
+        const nameInput = document.getElementById('name-input');
+        const msgInput = document.getElementById('msg-input');
+        const sendBtn = document.getElementById('send-btn');
+        let isSending = false;
+
+        // 從 LocalStorage 讀取上次使用的暱稱
+        const savedName = localStorage.getItem('chat_nickname');
+        if (savedName) nameInput.value = savedName;
+
+        // 讀取訊息
+        async function fetchMessages() {
+            try {
+                const response = await fetch(GAS_URL);
+                const data = await response.json();
+                renderMessages(data);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+
+        // 渲染畫面
+        function renderMessages(messages) {
+            // 清空目前的 Loading 或舊訊息 (實務上應該要做 diff，但為了簡單直接重繪)
+            // 為了保留滾動位置，這裡我們簡單做一個判斷：如果資料量沒變就不動
+            // 但為了即時性，我們先全部重繪。
+            
+            chatContainer.innerHTML = ''; 
+            
+            const currentName = nameInput.value.trim();
+
+            messages.forEach(msg => {
+                const wrapper = document.createElement('div');
+                // 判斷是否為自己的訊息
+                const isMe = currentName && msg.name === currentName;
+                
+                wrapper.className = `message-wrapper ${isMe ? 'me' : 'others'}`;
+                
+                const nicknameDiv = document.createElement('div');
+                nicknameDiv.className = 'nickname';
+                nicknameDiv.textContent = msg.name;
+
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'bubble';
+                bubbleDiv.textContent = msg.message;
+
+                wrapper.appendChild(nicknameDiv);
+                wrapper.appendChild(bubbleDiv);
+                chatContainer.appendChild(wrapper);
+            });
+
+            // 自動捲動到底部
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // 發送訊息
+        async function sendMessage() {
+            const name = nameInput.value.trim();
+            const msg = msgInput.value.trim();
+
+            if (!name) {
+                alert('請輸入暱稱！');
+                return;
+            }
+            if (!msg) return;
+            if (isSending) return;
+
+            // 儲存暱稱
+            localStorage.setItem('chat_nickname', name);
+
+            // UI 反饋：清除輸入框並顯示傳送中
+            msgInput.value = '';
+            isSending = true;
+            sendBtn.style.opacity = '0.5';
+
+            // 準備資料 (使用 form-urlencoded 格式以配合 GAS doPost)
+            const formData = new URLSearchParams();
+            formData.append('name', name);
+            formData.append('message', msg);
+
+            try {
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                // 發送成功後立即刷新
+                fetchMessages();
+            } catch (error) {
+                alert('發送失敗，請稍後再試');
+                console.error(error);
+            } finally {
+                isSending = false;
+                sendBtn.style.opacity = '1';
+                msgInput.focus();
+            }
+        }
+
+        // 事件監聽
+        sendBtn.addEventListener('click', sendMessage);
+        
+        msgInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // 初始載入
+        fetchMessages();
+
+        // 設定定時刷新 (每 3 秒刷新一次)
+        setInterval(fetchMessages, 3000);
+
+    </script>
+</body>
+</html>
