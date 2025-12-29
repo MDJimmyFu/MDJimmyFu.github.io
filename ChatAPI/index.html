@@ -21,6 +21,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent; /* 移除點擊時的藍色高光 */
         }
 
         body {
@@ -28,22 +29,55 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* 防止整個頁面捲動 */
+            overflow: hidden;
         }
 
         /* 頂部導航列 */
         header {
             background-color: var(--ocean-current);
             color: var(--frosted-lime);
-            padding: 15px;
-            text-align: center;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between; /* 左右對齊 */
+            align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             z-index: 10;
+            height: 60px;
         }
 
         header h1 {
             font-size: 1.2rem;
             letter-spacing: 1px;
+            margin: 0;
+        }
+
+        /* 重新整理按鈕樣式 */
+        #refresh-btn {
+            background: transparent;
+            border: none;
+            color: var(--frosted-lime);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            height: auto;
+            transition: background 0.2s;
+        }
+
+        #refresh-btn:active {
+            background-color: rgba(217, 229, 133, 0.2);
+        }
+
+        /* 旋轉動畫 class */
+        .spinning {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
         }
 
         /* 聊天訊息區域 */
@@ -65,7 +99,6 @@
             animation: fadeIn 0.3s ease;
         }
 
-        /* 區分自己與他人的訊息 (透過 LocalStorage 判斷) */
         .message-wrapper.others {
             align-self: flex-start;
         }
@@ -115,6 +148,7 @@
             flex-direction: column;
             gap: 8px;
             border-top: 1px solid var(--ocean-light);
+            padding-bottom: max(10px, env(safe-area-inset-bottom)); /* 適配 iPhone 底部橫條 */
         }
 
         .input-row {
@@ -132,8 +166,8 @@
         }
 
         #name-input {
-            width: 30%;
-            min-width: 80px;
+            width: 25%;
+            min-width: 70px;
             background: rgba(255, 255, 255, 0.7);
             color: var(--ocean-dark);
             font-weight: bold;
@@ -144,13 +178,15 @@
             flex: 1;
         }
 
-        button {
+        /* 發送按鈕 */
+        #send-btn {
             background-color: var(--frosted-lime);
             color: var(--ocean-dark);
             border: none;
             border-radius: 50%;
             width: 45px;
             height: 45px;
+            min-width: 45px; /* 防止壓縮 */
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -159,13 +195,12 @@
             transition: background 0.2s;
         }
 
-        button:active {
+        #send-btn:active {
             background-color: var(--frosted-lime-dark);
             transform: scale(0.95);
         }
 
-        /* 載入動畫 */
-        .loading {
+        .loading-text {
             text-align: center;
             color: var(--ocean-light);
             font-size: 0.8rem;
@@ -177,10 +212,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 針對桌機螢幕優化，限制寬度看起來更像手機 */
+        /* 桌機適配 */
         @media (min-width: 768px) {
             body {
-                background-color: #0d222e; /* 網頁背景更深 */
+                background-color: #0d222e;
                 align-items: center;
                 justify-content: center;
             }
@@ -201,14 +236,21 @@
 </head>
 <body>
 
-    <!-- 為了在桌機上模擬手機樣式，多包一層 wrapper -->
     <div class="app-wrapper" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
         <header>
             <h1>LimeChat</h1>
+            <!-- 新增 Refresh 按鈕 -->
+            <button id="refresh-btn" title="重新整理訊息">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                </svg>
+            </button>
         </header>
 
         <div id="chat-container">
-            <div class="loading">正在連接 Ocean Current...</div>
+            <div class="loading-text">請點擊右上角按鈕讀取訊息...</div>
         </div>
 
         <div class="input-area">
@@ -235,38 +277,53 @@
         const nameInput = document.getElementById('name-input');
         const msgInput = document.getElementById('msg-input');
         const sendBtn = document.getElementById('send-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
         let isSending = false;
+        let isRefreshing = false;
 
-        // 從 LocalStorage 讀取上次使用的暱稱
+        // 讀取 LocalStorage 暱稱
         const savedName = localStorage.getItem('chat_nickname');
         if (savedName) nameInput.value = savedName;
 
-        // 讀取訊息
+        // 核心功能：讀取訊息
         async function fetchMessages() {
+            if (isRefreshing) return; // 避免重複點擊
+            
             try {
+                // UI 狀態：開始旋轉
+                isRefreshing = true;
+                refreshBtn.classList.add('spinning');
+                
                 const response = await fetch(GAS_URL);
                 const data = await response.json();
                 renderMessages(data);
             } catch (error) {
                 console.error('Error fetching messages:', error);
+                // 可以在這裡顯示簡單的錯誤提示
+                const errDiv = document.createElement('div');
+                errDiv.className = 'loading-text';
+                errDiv.innerText = '讀取失敗，請檢查網路';
+                chatContainer.appendChild(errDiv);
+            } finally {
+                // UI 狀態：停止旋轉
+                isRefreshing = false;
+                refreshBtn.classList.remove('spinning');
             }
         }
 
         // 渲染畫面
         function renderMessages(messages) {
-            // 清空目前的 Loading 或舊訊息 (實務上應該要做 diff，但為了簡單直接重繪)
-            // 為了保留滾動位置，這裡我們簡單做一個判斷：如果資料量沒變就不動
-            // 但為了即時性，我們先全部重繪。
-            
             chatContainer.innerHTML = ''; 
-            
             const currentName = nameInput.value.trim();
+
+            if (messages.length === 0) {
+                chatContainer.innerHTML = '<div class="loading-text">目前沒有訊息</div>';
+                return;
+            }
 
             messages.forEach(msg => {
                 const wrapper = document.createElement('div');
-                // 判斷是否為自己的訊息
                 const isMe = currentName && msg.name === currentName;
-                
                 wrapper.className = `message-wrapper ${isMe ? 'me' : 'others'}`;
                 
                 const nicknameDiv = document.createElement('div');
@@ -282,11 +339,10 @@
                 chatContainer.appendChild(wrapper);
             });
 
-            // 自動捲動到底部
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        // 發送訊息
+        // 核心功能：發送訊息
         async function sendMessage() {
             const name = nameInput.value.trim();
             const msg = msgInput.value.trim();
@@ -298,26 +354,26 @@
             if (!msg) return;
             if (isSending) return;
 
-            // 儲存暱稱
             localStorage.setItem('chat_nickname', name);
 
-            // UI 反饋：清除輸入框並顯示傳送中
+            // UI 樂觀更新 (Optimistic UI)：你可以選擇先顯示訊息，但我這裡保持發送後才顯示
+            // 這裡做簡單的 Loading 狀態
             msgInput.value = '';
             isSending = true;
             sendBtn.style.opacity = '0.5';
 
-            // 準備資料 (使用 form-urlencoded 格式以配合 GAS doPost)
             const formData = new URLSearchParams();
             formData.append('name', name);
             formData.append('message', msg);
 
             try {
+                // 發送請求
                 await fetch(GAS_URL, {
                     method: 'POST',
                     body: formData
                 });
-                // 發送成功後立即刷新
-                fetchMessages();
+                // 發送成功後，自動呼叫一次刷新，讓使用者看到自己剛剛傳的訊息
+                await fetchMessages();
             } catch (error) {
                 alert('發送失敗，請稍後再試');
                 console.error(error);
@@ -329,17 +385,15 @@
         }
 
         // 事件監聽
+        refreshBtn.addEventListener('click', fetchMessages);
         sendBtn.addEventListener('click', sendMessage);
         
         msgInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // 初始載入
+        // 頁面初次載入時，自動抓取一次，避免畫面空白
         fetchMessages();
-
-        // 設定定時刷新 (每 3 秒刷新一次)
-        setInterval(fetchMessages, 3000);
 
     </script>
 </body>
