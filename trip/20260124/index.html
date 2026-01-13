@@ -81,7 +81,7 @@
                 travelers: ["Fu Chunhsien", "Chen Yingszu"]
             },
             flights: [
-                { type: "Departure", code: "BR184", date: "1/24", time: "07:55 - 12:00", route: "TPE ➝ NRT", ref: "DTHBFW", notes: "抵達後搭乘 N'EX 前往新宿" },
+                { type: "Departure", code: "BR184", date: "1/24", time: "07:55 - 12:00", route: "TPE ➝ NRT", ref: "DTHBFW", notes: "抵達後請至 B1 領取 N'EX 車票" },
                 { type: "Return", code: "BR195", date: "1/31", time: "20:40 - 23:40", route: "NRT ➝ TPE", ref: "DTHBFW", notes: "18:30 前抵達機場" }
             ],
             accommodations: [
@@ -89,19 +89,45 @@
                 { name: "秀峰閣 湖月", loc: "河口湖", dates: "1/26-1/28", address: "Shuhoukaku Kogetsu", mapQuery: "Shuhoukaku Kogetsu", notes: "絕景富士山溫泉，含早晚餐" }
             ],
             transport: [
-                { name: "富士回遊 11號", date: "1/26", time: "09:30 新宿 ➝ 11:29 河口湖", seat: "車廂1 (11C, 11D)", ref: "E42711", type: "Train" },
-                { name: "富士回遊 44號", date: "1/28", time: "16:49 河口湖 ➝ 18:45 新宿", seat: "車廂2 (6C, 6D)", ref: "E86349", type: "Train" }
+                { 
+                    name: "N'EX 東京去回車票 (2人)", 
+                    date: "1/24 (啟用)", 
+                    time: "14天內有效", 
+                    seat: "取票代碼: 22312405297521208", 
+                    qrCode: "0102020504FC05FA07182FFD1EC42D030FF011EE13EC232F27012E6F281889F6",
+                    ref: "E04005", 
+                    type: "Pass",
+                    note: "請於成田機場紅色售票機掃描上方 QR Code 領取。" 
+                },
+                { 
+                    name: "富士回遊 11號", 
+                    date: "1/26", 
+                    time: "09:30 新宿 ➝ 11:29 河口湖", 
+                    seat: "車廂1 (11C, 11D)", 
+                    ref: "E42711", 
+                    type: "Train",
+                    note: "*此為特急券，進出站請務必刷 IC 卡 (Suica) 支付基本運費" 
+                },
+                { 
+                    name: "富士回遊 44號", 
+                    date: "1/28", 
+                    time: "16:49 河口湖 ➝ 18:45 新宿", 
+                    seat: "車廂2 (6C, 6D)", 
+                    ref: "E86349", 
+                    type: "Train",
+                    note: "*此為特急券，進出站請務必刷 IC 卡 (Suica) 支付基本運費" 
+                }
             ],
             ticketGuides: [
                 {
-                    title: "機場交通：N'EX 東京去回車票",
-                    subtitle: "最划算的機場往返",
+                    title: "機場交通：N'EX 取票指南",
+                    subtitle: "已預訂 (訂單 E04005)",
                     tags: ["JR", "機場"],
                     steps: [
-                        "購買地點：成田機場 B1 的「JR 東日本旅行服務中心」或紅色售票機。",
-                        "價格：成人來回約 5,000 日圓 (比單程買便宜很多)。",
-                        "使用方式：去程劃位至新宿，回程有效期為14天內，這張票剛好適合您的8天行程。",
-                        "注意：回程需在新宿站的售票機劃位指定席。"
+                        "地點：成田機場 B1 改札口附近的「紅色售票機」。",
+                        "操作：點擊螢幕右下角「QR Code 領取」，掃描此 App 上的二維碼。",
+                        "備用：若掃描失敗，請手動輸入取票代碼 [22312405297521208]。",
+                        "劃位：領票時可同時劃位去程 (成田->新宿) 的指定席。回程票請保管好，回程當天再劃位即可。"
                     ],
                     icon: "airplane-tilt"
                 },
@@ -120,12 +146,12 @@
                 },
                 {
                     title: "JR 通票選擇建議",
-                    subtitle: "JR 東京廣域周遊券 vs 單買",
-                    tags: ["JR Pass", "評估"],
+                    subtitle: "本次不需購買廣域周遊券",
+                    tags: ["JR Pass", "省錢"],
                     steps: [
-                        "評估：雖然「JR 東京廣域周遊券 (3天 15,000日圓)」可搭富士回遊和日光號，但您的行程分開 (Day3-5 河口湖, Day7 日光)，無法連續三天使用。",
-                        "結論：直接「單買車票」或使用西瓜卡(Suica)最划算且彈性。",
-                        "日光交通：Day 7 去日光，請直接在 JR 新宿站的綠色售票機購買「特急日光/鬼怒川」車票，或刷 Suica 進站 + 買特急券。"
+                        "評估：您已購買划算的 N'EX 去回票 (10,000日圓/2人) 以及富士回遊特急券。",
+                        "日光交通：Day 7 去日光，請直接在 JR 新宿站的綠色售票機單買「特急日光/鬼怒川」車票即可。",
+                        "結論：不需要再買其他 JR Pass。"
                     ],
                     icon: "ticket"
                 },
@@ -584,10 +610,6 @@
                 {
                     day: 8, date: "1/31 (六)", title: "返台",
                     weather: "晴天 3°C~10°C",
-                    outfit: {
-                        male: "【舒適便裝】寬鬆上衣 + 彈性褲。鞋子好穿脫(安檢)。",
-                        female: "【休閒風】棉質長洋裝 + 牛仔外套。包包要大(裝戰利品)。"
-                    },
                     events: [
                         { 
                             time: "10:00", title: "新宿御苑", desc: "晨間散步 (行李寄放飯店)", icon: "leaf", map: "Shinjuku Gyoen National Garden",
@@ -954,7 +976,7 @@
                 {/* Transport */}
                 <section>
                     <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center">
-                        <Icon name="train" className="mr-2" /> 已預訂鐵路 (富士回遊)
+                        <Icon name="train" className="mr-2" /> 已預訂鐵路 (富士回遊/N'EX)
                     </h3>
                     <div className="space-y-3">
                         {tripData.transport.map((train, i) => (
@@ -967,8 +989,24 @@
                                 <div className="text-sm text-slate-800 dark:text-slate-200 font-medium bg-slate-50 dark:bg-slate-700 p-2 rounded inline-block">
                                     {train.seat}
                                 </div>
+                                
+                                {/* QR Code Display Logic */}
+                                {train.qrCode && (
+                                    <div className="mt-3 flex flex-col items-center bg-white p-3 rounded-lg border border-slate-200">
+                                        <img 
+                                            src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${train.qrCode}`} 
+                                            alt="Ticket QR Code" 
+                                            className="w-32 h-32"
+                                        />
+                                        <div className="text-[10px] text-slate-400 mt-1 break-all text-center w-full px-2">
+                                            {train.qrCode}
+                                        </div>
+                                        <div className="text-xs text-slate-600 font-bold mt-1 bg-slate-100 px-2 py-1 rounded">憑此 QR Code 領票</div>
+                                    </div>
+                                )}
+
                                 <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">
-                                    *進出站請刷 IC 卡 (Suica/Pasmo) 支付基本運費
+                                    {train.note}
                                 </div>
                             </Card>
                         ))}
