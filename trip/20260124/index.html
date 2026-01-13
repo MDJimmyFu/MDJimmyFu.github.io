@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>東京浪漫之旅 2026</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'media', // 自動依照裝置系統設定 (Light/Dark)
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#1e293b', // Custom dark shade
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            background-color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s ease;
+        }
+        /* Dark mode body background fallback */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #020617;
+            }
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        /* Custom Animations */
+        @keyframes scale-in {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- Data Source ---
+        const tripData = {
+            meta: {
+                title: "東京 & 河口湖 浪漫之旅",
+                dates: "2026/01/24 - 01/31",
+                travelers: ["Fu Chunhsien", "Chen Yingszu"]
+            },
+            flights: [
+                { type: "Departure", code: "BR184", date: "1/24", time: "07:55 - 12:00", route: "TPE ➝ NRT", ref: "DTHBFW", notes: "抵達後搭乘 N'EX 前往新宿" },
+                { type: "Return", code: "BR195", date: "1/31", time: "20:40 - 23:40", route: "NRT ➝ TPE", ref: "DTHBFW", notes: "18:30 前抵達機場" }
+            ],
+            accommodations: [
+                { name: "Hilton Tokyo", loc: "新宿", dates: "1/24-1/26 & 1/28-1/31", address: "Hilton Tokyo, Shinjuku", mapQuery: "Hilton Tokyo", notes: "大件行李可寄放" },
+                { name: "秀峰閣 湖月", loc: "河口湖", dates: "1/26-1/28", address: "Shuhoukaku Kogetsu", mapQuery: "Shuhoukaku Kogetsu", notes: "絕景富士山溫泉，含早晚餐" }
+            ],
+            transport: [
+                { name: "富士回遊 11號", date: "1/26", time: "09:30 新宿 ➝ 11:29 河口湖", seat: "車廂1 (11C, 11D)", ref: "E42711", type: "Train" },
+                { name: "富士回遊 44號", date: "1/28", time: "16:49 河口湖 ➝ 18:45 新宿", seat: "車廂2 (6C, 6D)", ref: "E86349", type: "Train" }
+            ],
+            // New Ticket Guide Data
+            ticketGuides: [
+                {
+                    title: "機場交通：N'EX 東京去回車票",
+                    subtitle: "最划算的機場往返",
+                    tags: ["JR", "機場"],
+                    steps: [
+                        "購買地點：成田機場 B1 的「JR 東日本旅行服務中心」或紅色售票機。",
+                        "價格：成人來回約 5,000 日圓 (比單程買便宜很多)。",
+                        "使用方式：去程劃位至新宿，回程有效期為14天內，這張票剛好適合您的8天行程。",
+                        "注意：回程需在新宿站的售票機劃位指定席。"
+                    ],
+                    icon: "airplane-tilt"
+                },
+                {
+                    title: "鎌倉：江之島−鎌倉周遊券",
+                    subtitle: "Day 6 必備",
+                    tags: ["小田急", "當日買"],
+                    steps: [
+                        "購買地點：新宿站西口 (West Exit) 地面層或地下層的「小田急旅遊服務中心」或藍色自動售票機。",
+                        "購買時間：當天早上購買即可 (售票機 5:00 起開放)。",
+                        "價格：約 1,640 日圓。",
+                        "包含：新宿-藤澤來回車票 + 江之電 (藤澤-鎌倉) 無限搭乘。",
+                        "注意：若要搭乘最快的「浪漫特快 (Romancecar)」，需另外加購特急券。"
+                    ],
+                    icon: "train"
+                },
+                {
+                    title: "JR 通票選擇建議",
+                    subtitle: "JR 東京廣域周遊券 vs 單買",
+                    tags: ["JR Pass", "評估"],
+                    steps: [
+                        "評估：雖然「JR 東京廣域周遊券 (3天 15,000日圓)」可搭富士回遊和日光號，但您的行程分開 (Day3-5 河口湖, Day7 日光)，無法連續三天使用。",
+                        "結論：直接「單買車票」或使用西瓜卡(Suica)最划算且彈性。",
+                        "日光交通：Day 7 去日光，請直接在 JR 新宿站的綠色售票機購買「特急日光/鬼怒川」車票，或刷 Suica 進站 + 買特急券。"
+                    ],
+                    icon: "ticket"
+                },
+                {
+                    title: "必備：交通 IC 卡",
+                    subtitle: "Suica / PASMO",
+                    tags: ["必備", "市區"],
+                    steps: [
+                        "iPhone 用戶：直接在「錢包 App」按 + 號，選擇「交通卡」>「Suica」，用 Apple Pay 儲值即可。",
+                        "實體卡：若無 iPhone，可在機場車站的售票機購買 Welcome Suica (紅色) 或 PASMO Passport。",
+                        "用途：搭地鐵、超商購物、自動販賣機皆可用。"
+                    ],
+                    icon: "cardholder"
+                }
+            ],
+            reservations: [
+                { name: "敘敘苑 東京歌劇城", date: "1/25 11:30", guests: "4人 (含朋友)", ref: "Fu Chunhsien", loc: "Tokyo Opera City 53F", mapQuery: "Jojoen Tokyo Opera City" }
+            ],
+            backups: [
+                {
+                    day: 1, loc: "新宿",
+                    items: [
+                        { type: "rain", title: "新宿高島屋 / NEWoMan", desc: "百貨逛街", details: "與新宿站直結，完全不用淋雨。高島屋樓層多，NEWoMan 質感好，且有很多咖啡廳可休息。", map: "Takashimaya Shinjuku", image: "https://images.unsplash.com/photo-1575209426372-c515a4c6cc72?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "Tokyu Kabukicho Tower", desc: "娛樂綜合大樓", details: "新宿最新地標，內部有充滿霓虹燈的『新宿歌舞伎 hall』美食街、遊樂場和電影院，完全室內。", map: "Tokyu Kabukicho Tower", image: "https://images.unsplash.com/photo-1678783098319-a99f34273024?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "Thermae-Yu (テルマー湯)", desc: "高級大眾澡堂", details: "歌舞伎町旁的高級Spa。環境非常乾淨，有露天風呂和岩盤浴，是消除搭機疲勞的最佳去處。", map: "Thermae-Yu", image: "https://images.unsplash.com/photo-1596120236172-231999844ade?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "伊勢丹百貨美食街", desc: "外帶回飯店", details: "若不想外食，去新宿伊勢丹 B1 買頂級便當或熟食，回 Hilton 房間慢慢享用。", map: "Isetan Shinjuku", image: "https://images.unsplash.com/photo-1598155523122-38423bd4d631?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 2, loc: "表參道/原宿",
+                    items: [
+                        { type: "rain", title: "根津美術館", desc: "隈研吾設計", details: "雖然有庭園，但本館建築本身就是藝術品。館內收藏豐富，在此靜靜看雨中的庭園非常有禪意。", map: "Nezu Museum", image: "https://images.unsplash.com/photo-1545620950-d46e6aefd872?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "Tokyu Plaza 表參道", desc: "萬花筒入口", details: "著名的鏡面入口必拍。頂樓有空中花園，內部也有許多時尚小店。", map: "Tokyu Plaza Omotesando Harajuku", image: "https://images.unsplash.com/photo-1627917290936-a837c7688009?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "Vino Buono 青山", desc: "景觀餐廳下午茶", details: "可以眺望青山聖格雷斯大教堂的浪漫餐廳。不用一直走路，坐著享受精緻甜點儲備演唱會體力。", map: "Vino Buono Aoyama", image: "https://images.unsplash.com/photo-1579618218290-556cb964174d?w=800&auto=format&fit=crop" },
+                         { type: "tired", title: "明治神宮 森林散步", desc: "芬多精放鬆", details: "如果只是覺得逛街吵雜，可以去旁邊的明治神宮，參道寬敞平緩，走在森林裡非常放鬆。", map: "Meiji Jingu", image: "https://images.unsplash.com/photo-1565518972879-199672da5575?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 3, loc: "河口湖",
+                    items: [
+                        { type: "rain", title: "久保田一竹美術館", desc: "和服藝術美術館", details: "米其林三星景點。展示華麗的「辻花」染色和服。建築本身充滿高第風格，室內完全不受天氣影響。", map: "Itchiku Kubota Art Museum", image: "https://images.unsplash.com/photo-1582294157585-61848c6d1d4d?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "河口湖香草館", desc: "乾燥花手作體驗", details: "可以體驗製作乾燥花環或香氛蠟燭，室內充滿香草香氣，非常療癒。", map: "Kawaguchiko Herb Hall", image: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "提早 Check-in 秀峰閣", desc: "飯店即景點", details: "既然住這麼好的飯店，不如提早進去享受。在房間泡茶看山，或是去泡湯，也是一種享受。", map: "Shuhoukaku Kogetsu", image: "https://images.unsplash.com/photo-1549463853-4cd22cb33221?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "八木崎公園", desc: "平坦湖畔公園", details: "相比大石公園人較少，地勢非常平坦，適合不想爬坡只想隨意散步的時候。", map: "Yagizaki Park", image: "https://images.unsplash.com/photo-1559861611-37e28b813470?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 4, loc: "河口湖",
+                    items: [
+                        { type: "rain", title: "富士山世界遺產中心", desc: "室內展覽館", details: "位於南館，有巨大的富士山模型和豐富的數位展示，可以深入了解富士山的歷史與文化。", map: "Fujisan World Heritage Center", image: "https://images.unsplash.com/photo-1542668571-b0c6346261c1?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "河口湖美術館", desc: "湖畔藝術", details: "常有富士山主題的攝影展或畫展。館內的咖啡廳面湖，是雨天發呆的好地方。", map: "Kawaguchiko Museum of Art", image: "https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "河口湖遊覽船", desc: "坐船遊湖", details: "搭乘「Ensoleille」號遊覽船，不用走路就能從湖中不同角度欣賞風景，非常輕鬆寫意。", map: "Lake Kawaguchi Pleasure Boat", image: "https://images.unsplash.com/photo-1624623223635-438fc7d94f29?w=800&auto=format&fit=crop" },
+                         { type: "tired", title: "富士御室淺間神社", desc: "寧靜古社", details: "河口湖最古老的神社，被森林環繞，氣氛莊嚴靜謐，遊客較少，適合靜心。", map: "Fuji Omuro Sengen Shrine", image: "https://images.unsplash.com/photo-1605626269375-b46327b7949a?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 5, loc: "麻布台之丘",
+                    items: [
+                        { type: "rain", title: "麻布台之丘 室內散策", desc: "完全室內行程", details: "這裡有大量的室內畫廊、集市和餐廳。連接神谷町站，完全不需要撐傘。", map: "Azabudai Hills", image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&auto=format&fit=crop" },
+                         { type: "rain", title: "森美術館 (六本木)", desc: "高空現代藝術", details: "位於六本木之丘 53F。看完展覽可以直接去 Tokyo City View 看夜景，都在室內。", map: "Mori Art Museum", image: "https://images.unsplash.com/photo-1565532326759-b7b203099903?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "Balcony by 6th", desc: "景觀晚餐", details: "如果累了不想上觀景台，直接這家熱門餐廳用餐，氣氛極佳，食物也非常好吃。", map: "Balcony by 6th Azabudai", image: "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 6, loc: "鎌倉/江之島",
+                    items: [
+                        { type: "rain", title: "新江之島水族館", desc: "夢幻水母展", details: "位於江之島對岸，以水母展示聞名。雨天躲在藍色的水底世界非常浪漫。", map: "Enoshima Aquarium", image: "https://images.unsplash.com/photo-1543329241-e9463567bc7c?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "鎌倉Kokoma", desc: "陶藝體驗", details: "如果下雨不方便逛街，可以預約一堂陶藝課，手作專屬的杯子或碗盤，很有紀念意義。", map: "Kamakura Kokoma", image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "小町通吃喝 & Bills", desc: "美食漫遊", details: "放棄江之島爬坡，只在鎌倉車站附近逛街，傍晚去七里濱 Bills 吃鬆餅看海就好。", map: "Komachi Dori", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "報國寺 (竹寺)", desc: "竹林與抹茶", details: "雖然稍微要走一點路，但坐在竹林前喝抹茶非常放鬆，能洗滌心靈。", map: "Hokokuji Temple", image: "https://images.unsplash.com/photo-1490256860086-13a7c6444c13?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 7, loc: "日光",
+                    items: [
+                        { type: "rain", title: "日光東照宮寶物館", desc: "室內文物展", details: "除了陽明門，旁邊的寶物館收藏了德川家康的遺物與國寶刀劍，值得細細品味。", map: "Nikko Toshogu Museum", image: "https://images.unsplash.com/photo-1594977937397-6c84c7dbb944?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "日光田母澤御用邸", desc: "皇室別墅", details: "結合了江戶與明治時代風格的建築，室內空間非常大且華麗，雨天在此欣賞庭園別有一番風味。", map: "Nikko Tamozawa Imperial Villa", image: "https://images.unsplash.com/photo-1590764254426-3d23348d2eb9?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "神橋 & 車站周邊", desc: "輕鬆散步", details: "只看神橋，不進去東照宮爬樓梯。在東武日光站前吃炸湯波饅頭，早點搭車回新宿。", map: "Shinkyo Bridge", image: "https://images.unsplash.com/photo-1605602484732-4759600980c6?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "憾滿之淵", desc: "地藏菩薩步道", details: "一條沿著溪流的平坦步道，排列著數十尊地藏菩薩像，風景清幽且不需爬坡。", map: "Kanmangafuchi Abyss", image: "https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 8, loc: "新宿/返程",
+                    items: [
+                        { type: "rain", title: "新宿御苑 溫室", desc: "大型玻璃溫室", details: "如果下雨，御苑的大溫室是個好去處，裡面種滿熱帶植物，溫暖又漂亮。", map: "Shinjuku Gyoen Greenhouse", image: "https://images.unsplash.com/photo-1557929036-9636d109d96e?w=800&auto=format&fit=crop" },
+                        { type: "rain", title: "都廳展望台", desc: "免費高空觀景", details: "不想在戶外吹風，可以去東京都廳免費展望台看最後一眼東京全景。", map: "Tokyo Metropolitan Government Building", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "機場免稅店", desc: "提早去機場", details: "如果累了，直接去成田機場。在那裡吃午餐、按摩、逛免稅店，輕鬆等待飛機。", map: "Narita Airport", image: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800&auto=format&fit=crop" },
+                        { type: "tired", title: "驚安殿堂 (唐吉訶德)", desc: "最後補貨", details: "新宿歌舞伎町店。若還有體力但不想跑遠，就在這裡把伴手禮一次買齊。", map: "Don Quijote Shinjuku Kabukicho", image: "https://images.unsplash.com/photo-1554907984-15263bf9f471?w=800&auto=format&fit=crop" }
+                    ]
+                }
+            ],
+            food: [
+                {
+                    day: 1, loc: "新宿",
+                    items: [
+                        { category: "晚餐", title: "Red Noodle (辣麻味噌)", desc: "歌舞伎町人氣拉麵", details: "喜歡吃辣必去！濃郁的味噌湯底加上獨特辣粉，非常過癮。位於黃金街附近。", map: "Red Noodle Shinjuku", image: "https://images.unsplash.com/photo-1552611052-11e04de081de?w=800&auto=format&fit=crop" },
+                        { category: "甜點", title: "Harbs Lumine EST", desc: "水果千層蛋糕", details: "東京必吃甜點。水果千層用料實在，奶油清爽不膩。Lumine EST 店就在新宿東口直結。", map: "Harbs Lumine Est", image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&auto=format&fit=crop" },
+                        { category: "宵夜", title: "岐阜屋 (Gifuya)", desc: "思出橫丁中華料理", details: "充滿昭和風情的開放式居酒屋，木耳蛋肉炒各式必點，搭配啤酒超棒。", map: "Gifuya Shinjuku", image: "https://images.unsplash.com/photo-1562967245-78d6957db22d?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 2, loc: "表參道/巨蛋",
+                    items: [
+                        { category: "甜點", title: "Ralph's Coffee", desc: "美式復古咖啡廳", details: "Ralph Lauren 開設的咖啡廳，裝潢綠色系非常復古好拍。巧克力蛋糕很濃郁。", map: "Ralph's Coffee Omotesando", image: "https://images.unsplash.com/photo-1559496417-e7f25cb247f3?w=800&auto=format&fit=crop" },
+                        { category: "點心", title: "Luke's Lobster", desc: "紐約龍蝦堡", details: "貓街上的排隊名店。滿滿的龍蝦肉塞在溫熱的麵包裡，逛街邊走邊吃最適合。", map: "Luke's Lobster Omotesando", image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?w=800&auto=format&fit=crop" },
+                        { category: "宵夜", title: "AFURI 拉麵", desc: "柚子鹽拉麵", details: "演唱會後如果不吃燒肉，推薦這家。清爽的柚子香氣湯頭，就算深夜吃也沒罪惡感。", map: "Afuri Shinjuku", image: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 3, loc: "河口湖",
+                    items: [
+                        { category: "午餐", title: "Hoto Fudo (不動茶屋)", desc: "東戀路店 (雲朵建築)", details: "這家分店的建築像一朵雲，非常特別。必吃餺飥麵（扁平烏龍麵與味噌蔬菜湯）。", map: "Hoto Fudo Higashikoiji", image: "https://images.unsplash.com/photo-1582450871972-ab5ca641643d?w=800&auto=format&fit=crop" },
+                        { category: "甜點", title: "Fujiyama Cookie", desc: "富士山餅乾", details: "就在纜車站與遊覽船附近。富士山造型的餅乾非常可愛，適合買來當伴手禮。", map: "Fujiyama Cookie", image: "https://images.unsplash.com/photo-1621236378699-8597faf6a176?w=800&auto=format&fit=crop" },
+                        { category: "點心", title: "Cheesecake Garden", desc: "起司蛋糕花園", details: "店內有多種口味的起司蛋糕，可以點一塊蛋糕配咖啡，在店內小憩。", map: "Kawaguchiko Cheesecake Garden", image: "https://images.unsplash.com/photo-1567171466295-4afa63d45416?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 4, loc: "河口湖",
+                    items: [
+                        { category: "午餐", title: "Lake Bake", desc: "湖畔麵包店", details: "位於大石公園旁，人氣極高的麵包店。戶外座位可以直接看到富士山。", map: "Lake Bake", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop" },
+                        { category: "伴手禮", title: "旅之驛 kawaguchiko base", desc: "在地農產市集", details: "新開幕的複合設施。可以買到山梨縣產的葡萄、水蜜桃加工品和在地紅酒。", map: "Tabino Eki Kawaguchiko Base", image: "https://images.unsplash.com/photo-1596541671981-d1c85375531d?w=800&auto=format&fit=crop" },
+                        { category: "下午茶", title: "HanaCafe", desc: "音樂盒之森咖啡廳", details: "在歐式庭園中享用下午茶，幸運的話還能邊聽現場演奏邊用餐。", map: "Kawaguchiko Music Forest Museum", image: "https://images.unsplash.com/photo-1514517220017-8ce97a34a7b6?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 5, loc: "麻布台之丘",
+                    items: [
+                        { category: "晚餐", title: "Pizza 4P's", desc: "人氣手工披薩", details: "來自越南的超人氣披薩店日本首店。招牌是布拉塔起司披薩，環境時尚輕鬆。", map: "Pizza 4P's Tokyo", image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format&fit=crop" },
+                        { category: "甜點", title: "% Arabica Coffee", desc: "京都網紅咖啡", details: "位於麻布台之丘 B1。極簡風格的設計，拿鐵非常順口，適合外帶去廣場喝。", map: "% Arabica Tokyo Azabudai Hills", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&auto=format&fit=crop" },
+                        { category: "點心", title: "Azabudai Market", desc: "精緻超市熟食", details: "這裡聚集了許多名店的熟食櫃位，買點生火腿、起司回飯店當宵夜也很棒。", map: "Azabudai Hills Market", image: "https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 6, loc: "鎌倉",
+                    items: [
+                        { category: "午餐", title: "Caraway (キャラウェイ)", desc: "排隊咖哩名店", details: "位於小町通巷弄內。咖哩味道濃郁，飯量驚人，是鎌倉在地老字號。", map: "Caraway Curry Kamakura", image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop" },
+                        { category: "下午茶", title: "Bills 七里濱", desc: "世界第一早餐鬆餅", details: "一定要坐戶外或窗邊位置！邊吃鬆餅邊看湘南海岸與江之島，景色無敵。", map: "Bills Shichirigahama", image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&auto=format&fit=crop" },
+                        { category: "伴手禮", title: "豐島屋", desc: "鳩三郎餅乾", details: "鎌倉最著名的伴手禮，鴿子造型的奶油餅乾，奶香濃郁，包裝也很經典。", map: "Toshimaya Honten", image: "https://images.unsplash.com/photo-1582294157585-61848c6d1d4d?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 7, loc: "日光",
+                    items: [
+                        { category: "午餐", title: "明治之館", desc: "西洋蛋包飯", details: "位於東照宮旁的洋館古蹟餐廳。招牌是淋上多蜜醬的蛋包飯和起司蛋糕。", map: "Meiji no Yakata", image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?w=800&auto=format&fit=crop" },
+                        { category: "甜點", title: "Sakaeya (さかえや)", desc: "炸湯波饅頭", details: "東武日光站前必吃！炸得酥脆的豆皮饅頭灑上粗鹽，鹹甜口感絕配。", map: "Sakaeya Nikko", image: "https://images.unsplash.com/photo-1606380628272-3e2849e75525?w=800&auto=format&fit=crop" },
+                        { category: "點心", title: "日光布丁亭", desc: "濃郁布丁", details: "使用日光霧降高原牛奶製作，口感綿密。就在神橋附近。", map: "Nikko Pudding Tei", image: "https://images.unsplash.com/photo-1517427677506-ade074eb1432?w=800&auto=format&fit=crop" }
+                    ]
+                },
+                {
+                    day: 8, loc: "新宿",
+                    items: [
+                        { category: "早午餐", title: "Sarabeth's", desc: "紐約早餐女王", details: "位於 Lumine 2。班尼迪克蛋和法式吐司非常有名，適合優雅的最後一天早晨。", map: "Sarabeth's Shinjuku", image: "https://images.unsplash.com/photo-1533089862017-a0d40808778f?w=800&auto=format&fit=crop" },
+                        { category: "午餐", title: "Katsukura (名代豬排)", desc: "京都炸豬排", details: "位於高島屋 14F。來自京都的豬排店，炸工細緻，高麗菜絲和味噌湯可續。", map: "Katsukura Shinjuku", image: "https://images.unsplash.com/photo-1595290293125-950c487ce5a4?w=800&auto=format&fit=crop" },
+                        { category: "咖啡", title: "Blue Bottle", desc: "藍瓶咖啡", details: "NEWoMan 1F。在去機場前最後喝一杯手沖咖啡，買些咖啡豆當紀念。", map: "Blue Bottle Coffee Shinjuku", image: "https://images.unsplash.com/photo-1518832553480-cd0e625ed3e6?w=800&auto=format&fit=crop" }
+                    ]
+                }
+            ],
+            // Added emergency array back
+            emergency: [
+                { title: "警察局", number: "110", icon: "siren" },
+                { title: "火警/救護車", number: "119", icon: "ambulance" },
+                { title: "駐日代表處 (東京)", number: "+81-3-3280-7811", icon: "phone" },
+                { title: "旅外國人急難救助", number: "+81-80-1009-7179", icon: "lifebuoy" }
+            ],
+            itinerary: [
+                {
+                    day: 1, date: "1/24 (六)", title: "抵達東京 & 新宿之夜",
+                    weather: "晴時多雲 3°C~9°C",
+                    events: [
+                        { 
+                            time: "07:55", title: "搭乘 BR184", desc: "前往東京成田機場", icon: "plane-takeoff", map: "Taoyuan Airport",
+                            image: "https://images.unsplash.com/photo-1542296332-2e4473faf563?w=800&auto=format&fit=crop",
+                            details: "長榮航空櫃台報到。建議提早 2 小時抵達機場，可先預訂機上免稅品。"
+                        },
+                        { 
+                            time: "12:00", title: "抵達東京 & N'EX", desc: "搭乘 N'EX 直達新宿 (約85分)", icon: "train", map: "Narita Airport",
+                            image: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&auto=format&fit=crop",
+                            details: "出關後請至 B1 JR 售票處或機台領取/購買 N'EX 車票。記得將 Suica 綁定手機。"
+                        },
+                        { 
+                            time: "15:00", title: "Hilton Tokyo Check-in", desc: "搭乘接駁車或計程車至飯店", icon: "bed", map: "Hilton Tokyo",
+                            image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop",
+                            details: "位於新宿西口。飯店有免費接駁巴士往返新宿站西口 (京王百貨前 21 號站牌)。"
+                        },
+                        { 
+                            time: "18:00", title: "歌舞伎町/思出橫丁", desc: "晚餐：體驗熱鬧居酒屋或串燒", icon: "beer-bottle", map: "Omoide Yokocho",
+                            image: "https://images.unsplash.com/photo-1516208793756-c43d904e3184?w=800&auto=format&fit=crop",
+                            details: "推薦參觀：新宿東寶大樓的『哥吉拉頭像』。思出橫丁推薦『岐阜屋』或隨意挑選充滿昭和風情的串燒小店。"
+                        }
+                    ]
+                },
+                {
+                    day: 2, date: "1/25 (日)", title: "Lady Gaga & 敘敘苑",
+                    weather: "晴天 2°C~10°C",
+                    events: [
+                        { 
+                            time: "11:30", title: "敘敘苑午餐", desc: "東京歌劇城 53F 景觀燒肉 (4位)", icon: "fork-knife", map: "Jojoen Tokyo Opera City", important: true,
+                            image: "https://images.unsplash.com/photo-1594046243098-0fceea9d451e?w=800&auto=format&fit=crop",
+                            details: "53樓高空景觀絕佳！必點：敘敘苑沙拉、厚切牛舌、午間套餐 CP 值很高。請提早 10 分鐘抵達。"
+                        },
+                        { 
+                            time: "14:00", title: "表參道/原宿", desc: "逛表參道 Hills、貓街", icon: "shopping-bag", map: "Omotesando Hills",
+                            image: "https://images.unsplash.com/photo-1573057187288-44222f98f7e6?w=800&auto=format&fit=crop",
+                            details: "參觀安藤忠雄設計的『表參道 Hills』。推薦美食：Luke's Lobster 龍蝦堡、Ralph's Coffee。"
+                        },
+                        { 
+                            time: "18:00", title: "Lady Gaga 演唱會", desc: "東京巨蛋 (預計18:00開演)", icon: "music-notes", map: "Tokyo Dome", important: true,
+                            image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&auto=format&fit=crop",
+                            details: "請務必檢查：電子票券/實體票、護照。建議提早抵達購買周邊商品或與看板合照。"
+                        },
+                        { 
+                            time: "21:30", title: "新宿宵夜", desc: "演唱會後慶祝", icon: "bowl-food", map: "Shinjuku Station",
+                            image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&auto=format&fit=crop",
+                            details: "推薦深夜拉麵：『一蘭』、『AFURI』(清爽柚子鹽味) 或 24小時營業的『磯丸水產』。"
+                        }
+                    ]
+                },
+                {
+                    day: 3, date: "1/26 (一)", title: "前往河口湖",
+                    weather: "多雲轉晴 -2°C~5°C",
+                    events: [
+                         { 
+                            time: "09:00", title: "JR新宿站 集合", desc: "建議前往 9 或 10 號月台", icon: "train", map: "Shinjuku Station",
+                            image: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&auto=format&fit=crop",
+                            details: "請預留 15-20 分鐘找月台。富士回遊號通常與『梓號 (Azusa)』連結行駛，請務必確認車廂號碼（通常是 1-3 號車廂前往河口湖）。"
+                        },
+                        { 
+                            time: "09:30", title: "富士回遊 11號 出發", desc: "座位: 車廂1 (11C, 11D)", icon: "train", map: "Shinjuku Station", important: true,
+                            image: "https://images.unsplash.com/photo-1515165592879-1849b88c43e9?w=800&auto=format&fit=crop",
+                            details: "車程約 2 小時。D 席在去程左側，若天氣好有機會看到富士山。車上無販售推車，建議先在新宿站買便當。"
+                        },
+                        { 
+                            time: "11:29", title: "抵達河口湖站", desc: "車站周邊午餐", icon: "map-pin", map: "Kawaguchiko Station",
+                            image: "https://images.unsplash.com/photo-1582450871972-ab5ca641643d?w=800&auto=format&fit=crop",
+                            details: "出站後可看見富士山。推薦午餐：車站對面的『不動茶屋 (Hoto Fudo)』站前店，品嚐名物餺飥麵。"
+                        },
+                        { 
+                            time: "13:30", title: "天上山公園纜車", desc: "搭乘纜車/遊覽船", icon: "tram", map: "Mt. Fuji Panoramic Ropeway",
+                            image: "https://images.unsplash.com/photo-1589462573216-c18608f6540c?w=800&auto=format&fit=crop",
+                            details: "從河口湖站步行約 10-15 分鐘。搭乘纜車上山可俯瞰河口湖全景與富士山。若人潮過多，可改搭『Ensoleille』遊覽船。"
+                        },
+                        { 
+                            time: "15:00", title: "秀峰閣 湖月 Check-in", desc: "搭乘旅館接駁車", icon: "house-line", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop",
+                            details: "請聯絡旅館接駁（或在 14:30 後在車站遊客中心請人幫忙聯絡）。Check-in 後享受房內無敵景觀。"
+                        },
+                        { 
+                            time: "16:30", title: "夕陽 & 逆富士攝影", desc: "飯店庭園/湖畔", icon: "camera", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1627914046777-7053e18503b2?w=800&auto=format&fit=crop",
+                            details: "日落前後的光影最美。秀峰閣的庭園就是拍攝逆富士的絕佳地點，無需跑遠。"
+                        },
+                        { 
+                            time: "18:30", title: "懷石料理晚餐", desc: "旅館內用餐 + 露天溫泉", icon: "wine", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1584650548441-96e326e5c519?w=800&auto=format&fit=crop",
+                            details: "享用精緻的日式會席料理。餐後請務必體驗露天風呂，若天氣好可以看到滿天星空下的富士山輪廓。"
+                        }
+                    ]
+                },
+                {
+                    day: 4, date: "1/27 (二)", title: "河口湖深度放鬆",
+                    weather: "晴朗 -3°C~6°C",
+                    events: [
+                        { 
+                            time: "06:30", title: "早起看逆富士", desc: "清晨湖面平靜最適合觀賞", icon: "camera", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1506606401543-2e73709ce441?w=800&auto=format&fit=crop",
+                            details: "日出前後半小時是風浪最小的時候，最容易拍到完美的倒影。就在飯店後方湖畔即可拍攝。"
+                        },
+                         { 
+                            time: "08:00", title: "飯店早餐", desc: "日式自助餐", icon: "coffee", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1576487238230-151b7e0821d3?w=800&auto=format&fit=crop",
+                            details: "一邊看著富士山一邊享用早餐。"
+                        },
+                        { 
+                            time: "10:00", title: "大石公園", desc: "散步、吃冰淇淋", icon: "tree", map: "Oishi Park",
+                            image: "https://images.unsplash.com/photo-1559861611-37e28b813470?w=800&auto=format&fit=crop",
+                            details: "位於河口湖北岸，可拍攝蘆葦與富士山的合影。必吃：藍莓冰淇淋。可從飯店步行（約 20 分）或搭巴士前往。"
+                        },
+                         { 
+                            time: "12:00", title: "午餐：Lake Bake", desc: "湖畔人氣麵包店", icon: "fork-knife", map: "Lake Bake",
+                            image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=800&auto=format&fit=crop",
+                            details: "就在大石公園旁。戶外座位可以直接面對富士山，麵包非常美味，適合簡單輕食。"
+                        },
+                        { 
+                            time: "13:30", title: "音樂盒之森美術館", desc: "歐式庭園浪漫散步", icon: "music-note", map: "Kawaguchiko Music Forest Museum",
+                            image: "https://images.unsplash.com/photo-1524185786193-272e213b38c2?w=800&auto=format&fit=crop",
+                            details: "搭乘紅線巴士前往。館內有許多珍貴的大型自動演奏樂器，定時有演奏表演，氣氛非常浪漫。"
+                        },
+                        { 
+                            time: "15:30", title: "返回飯店 / 湖畔散步", desc: "享受悠閒時光", icon: "footprints", map: "Shuhoukaku Kogetsu",
+                            image: "https://images.unsplash.com/photo-1548263594-a71e7f71791a?w=800&auto=format&fit=crop",
+                            details: "下午早點回飯店休息，再泡一次溫泉，或在房間陽台發呆，享受這趟旅程最奢華的寧靜。"
+                        }
+                    ]
+                },
+                {
+                    day: 5, date: "1/28 (三)", title: "返回東京 & 麻布台",
+                    weather: "晴時多雲 2°C~9°C",
+                    events: [
+                        { 
+                            time: "10:00", title: "Check-out", desc: "搭接駁車至河口湖站", icon: "suitcase", map: "Kawaguchiko Station",
+                            image: "https://images.unsplash.com/photo-1540321281729-1667b22572a5?w=800&auto=format&fit=crop",
+                            details: "退房後搭乘接駁車至車站。可將行李寄放在車站置物櫃或有人工寄放處。"
+                        },
+                        { 
+                            time: "11:00", title: "Cisco Coffee / 下吉田", desc: "最後的富士山巡禮", icon: "coffee", map: "Cisco Coffee",
+                            image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&auto=format&fit=crop",
+                            details: "方案A：在河口湖著名的『Cisco Coffee』喝咖啡。方案B：若體力好，可搭電車去下吉田站看『新倉山淺間公園』（忠靈塔）。"
+                        },
+                        { 
+                            time: "14:30", title: "伴手禮採買", desc: "Fujiyama Cookie", icon: "bag", map: "Fujiyama Cookie",
+                            image: "https://images.unsplash.com/photo-1621236378699-8597faf6a176?w=800&auto=format&fit=crop",
+                            details: "在車站附近購買伴手禮。推薦 Fujiyama Cookie 或起司蛋糕。也可在 7-11 買些零食車上吃。"
+                        },
+                        { 
+                            time: "16:20", title: "前往月台", desc: "準備搭車", icon: "train", map: "Kawaguchiko Station",
+                            image: "https://images.unsplash.com/photo-1515165592879-1849b88c43e9?w=800&auto=format&fit=crop",
+                            details: "河口湖站遊客眾多，建議提早進站。"
+                        },
+                        { 
+                            time: "16:49", title: "富士回遊 44號", desc: "座位: 車廂2 (6C, 6D)", icon: "train", map: "Kawaguchiko Station", important: true,
+                            image: "https://images.unsplash.com/photo-1492571350019-22de08371fd3?w=800&auto=format&fit=crop",
+                            details: "返回新宿。利用車程休息。"
+                        },
+                        { 
+                            time: "18:45", title: "抵達新宿 / Hilton", desc: "回飯店放行李", icon: "bed", map: "Hilton Tokyo",
+                            image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&auto=format&fit=crop",
+                            details: "先回 Hilton Check-in 領回寄放的大行李。"
+                        },
+                        { 
+                            time: "20:00", title: "麻布台之丘", desc: "晚餐 & 東京鐵塔夜景", icon: "buildings", map: "Azabudai Hills",
+                            image: "https://images.unsplash.com/photo-1536098561742-ca998e48cbcc?w=800&auto=format&fit=crop",
+                            details: "從新宿搭大江戶線至『六本木』或日比谷線至『神谷町』。推薦至中央廣場看夜景。晚餐可吃 Pizza 4P's 或 Balcony by 6th。"
+                        }
+                    ]
+                },
+                {
+                    day: 6, date: "1/29 (四)", title: "鎌倉 & 江之島",
+                    weather: "晴天 4°C~11°C",
+                    events: [
+                        { 
+                            time: "09:00", title: "新宿出發", desc: "搭乘小田急線", icon: "train", map: "Shinjuku Station",
+                            image: "https://images.unsplash.com/photo-1596426742546-5d9703a55306?w=800&auto=format&fit=crop",
+                            details: "購買『江之島-鎌倉周遊券』(1640日圓)。搭乘『快速急行』前往藤澤，再轉江之電，或搭乘浪漫特快（需加價）。"
+                        },
+                        { 
+                            time: "10:30", title: "鎌倉站 / 小町通", desc: "商店街吃吃喝喝", icon: "shopping-bag", map: "Komachi Dori",
+                            image: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&auto=format&fit=crop",
+                            details: "從鎌倉站東口出來即是。推薦：抹茶冰淇淋、炸肉餅。沿著街道逛向神社。"
+                        },
+                         { 
+                            time: "11:30", title: "鶴岡八幡宮", desc: "古都參拜", icon: "shrines", map: "Tsurugaoka Hachimangu",
+                            image: "https://images.unsplash.com/photo-1572972750893-559194205562?w=800&auto=format&fit=crop",
+                            details: "鎌倉最重要的神社。登上階梯後可回望整條若宮大路，視野開闊。"
+                        },
+                        { 
+                            time: "12:30", title: "午餐：Caraway / 吻仔魚", desc: "排隊名店", icon: "fork-knife", map: "Caraway Curry Kamakura",
+                            image: "https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&auto=format&fit=crop",
+                            details: "推薦『Caraway』咖哩（飯量很大！）或是在小町通吃吻仔魚丼（生/熟皆有）。"
+                        },
+                        { 
+                            time: "14:00", title: "江之電體驗 / 長谷站", desc: "高德院大佛", icon: "tram", map: "Kotoku-in",
+                            image: "https://images.unsplash.com/photo-1605218439072-0402dc54a24c?w=800&auto=format&fit=crop",
+                            details: "搭乘復古綠色電車到長谷站。參觀日本第二大銅造佛像，可進入大佛內部參觀。"
+                        },
+                        { 
+                            time: "15:30", title: "鎌倉高校前", desc: "灌籃高手平交道", icon: "camera", map: "Kamakura High School Mae Station",
+                            image: "https://images.unsplash.com/photo-1549643276-fbc2bd5f15e5?w=800&auto=format&fit=crop",
+                            details: "著名的動漫場景。在此拍下電車經過海邊的畫面。接著可去鄰近的『七里濱』Bills 吃下午茶看海。"
+                        },
+                        { 
+                            time: "17:00", title: "江之島 / 弁天橋", desc: "步行過橋", icon: "bridge", map: "Enoshima Benten Bridge",
+                            image: "https://images.unsplash.com/photo-1510672005697-a467f5756914?w=800&auto=format&fit=crop",
+                            details: "傍晚時分過橋，欣賞富士山剪影（天氣好時）。島上有手扶梯可搭乘上山。"
+                        },
+                        { 
+                            time: "17:30", title: "湘南的寶石", desc: "江之島點燈", icon: "star", map: "Enoshima Sea Candle",
+                            image: "https://images.unsplash.com/photo-1610967389814-225916960098?w=800&auto=format&fit=crop",
+                            details: "冬季限定的燈光秀，整個 Sea Candle 燈塔與花園被燈飾包圍，非常浪漫。晚餐可選擇在島上或回新宿吃。"
+                        }
+                    ]
+                },
+                {
+                    day: 7, date: "1/30 (五)", title: "日光世界遺產",
+                    weather: "多雲 (山區冷) -1°C~5°C",
+                    events: [
+                        { 
+                            time: "07:30", title: "新宿站出發", desc: "特急日光/鬼怒川號", icon: "train", map: "Shinjuku Station",
+                            image: "https://images.unsplash.com/photo-1528360983277-13d9b152c56e?w=800&auto=format&fit=crop",
+                            details: "搭乘 JR 直通運轉的特急列車（建議先劃位）。車程約 2 小時。請準備好早餐在車上吃。"
+                        },
+                        { 
+                            time: "09:30", title: "抵達東武日光站", desc: "轉乘世界遺產巡遊巴士", icon: "bus", map: "Tobu Nikko Station",
+                            image: "https://images.unsplash.com/photo-1558985250-27a406d64cb3?w=800&auto=format&fit=crop",
+                            details: "出站後購買巴士一日券（或直接刷 IC 卡）。搭乘巴士至『神橋』站下車。"
+                        },
+                         { 
+                            time: "10:00", title: "神橋 (Shinkyo)", desc: "朱紅色拱橋", icon: "camera", map: "Shinkyo Bridge",
+                            image: "https://images.unsplash.com/photo-1605602484732-4759600980c6?w=800&auto=format&fit=crop",
+                            details: "日本三大奇橋之一。朱紅色的橋身在冬天的雪景或枯木背景下非常顯眼。拍完照後步行上山。"
+                        },
+                        { 
+                            time: "10:30", title: "日光東照宮", desc: "德川家康靈廟", icon: "ticket", map: "Nikko Toshogu",
+                            image: "https://images.unsplash.com/photo-1624867675080-6927d8965f80?w=800&auto=format&fit=crop",
+                            details: "參觀順序：表門 -> 三猿（非禮勿視...） -> 陽明門（必看！） -> 眠貓 -> 奧宮（家康墓，需爬207階樓梯）。"
+                        },
+                        { 
+                            time: "13:00", title: "午餐：湯波料理", desc: "明治之館 / Asaya", icon: "bowl-food", map: "Meiji no Yakata",
+                            image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?w=800&auto=format&fit=crop",
+                            details: "推薦『明治之館』吃蛋包飯，或是在參道上的餐廳吃日光名產『湯波 (Yuba)』(豆皮) 料理。"
+                        },
+                        { 
+                            time: "14:30", title: "二荒山神社 / 輪王寺", desc: "祈求良緣", icon: "shrines", map: "Futarasan Shrine",
+                            image: "https://images.unsplash.com/photo-1594977937397-6c84c7dbb944?w=800&auto=format&fit=crop",
+                            details: "二荒山神社以祈求夫妻圓滿、良緣聞名，非常適合夫妻參拜。若時間允許，可參觀輪王寺大猷院。"
+                        },
+                        { 
+                            time: "15:30", title: "返回車站 / 炸湯波饅頭", desc: "點心時間", icon: "cookie", map: "Sakaeya Nikko",
+                            image: "https://images.unsplash.com/photo-1542385152-cb65586a1df0?w=800&auto=format&fit=crop",
+                            details: "搭巴士回東武日光站。必吃站前的『Sakaeya (さかえや)』炸湯波饅頭，灑上粗鹽鹹甜好吃。"
+                        },
+                        { 
+                            time: "16:30", title: "搭車回新宿", desc: "特急列車", icon: "train", map: "Tobu Nikko Station",
+                            image: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800&auto=format&fit=crop",
+                            details: "搭乘約 16:30-17:00 的特急列車返回新宿。晚餐在新宿解決，慶祝旅程最後一晚。"
+                        }
+                    ]
+                },
+                {
+                    day: 8, date: "1/31 (六)", title: "返台",
+                    weather: "晴天 3°C~10°C",
+                    events: [
+                        { 
+                            time: "10:00", title: "新宿御苑", desc: "晨間散步 (行李寄放飯店)", icon: "leaf", map: "Shinjuku Gyoen National Garden",
+                            image: "https://images.unsplash.com/photo-1585816287937-23588df8bd93?w=800&auto=format&fit=crop",
+                            details: "新海誠電影《言葉之庭》的場景。冬季庭園雖然蕭瑟但也別有一番寧靜美感，適合最後的散步。"
+                        },
+                        { 
+                            time: "12:30", title: "午餐 & 最後購物", desc: "新宿高島屋 / NEWoMan", icon: "bag", map: "Takashimaya Shinjuku",
+                            image: "https://images.unsplash.com/photo-1533050487297-09b450131914?w=800&auto=format&fit=crop",
+                            details: "把握最後機會在百貨公司地下街買伴手禮。推薦：New York Perfect Cheese, Press Butter Sand。"
+                        },
+                        { 
+                            time: "17:00", title: "前往成田機場", desc: "搭乘 N'EX", icon: "train", map: "Narita Airport",
+                            image: "https://images.unsplash.com/photo-1570710891163-6d3b5c47248b?w=800&auto=format&fit=crop",
+                            details: "請務必在 18:30 前抵達機場櫃台報到。長榮航空通常在第一航廈南翼。"
+                        }
+                    ]
+                }
+            ]
+        };
+
+        // --- Components ---
+
+        const Icon = ({ name, className }) => {
+            return <i className={`ph ph-${name} ${className}`}></i>;
+        };
+
+        const Card = ({ children, className = "" }) => (
+            <div className={`bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 p-4 ${className} transition-colors duration-200`}>
+                {children}
+            </div>
+        );
+
+        const Modal = ({ isOpen, onClose, event }) => {
+            if (!isOpen || !event) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose}></div>
+                    <div className="relative bg-white dark:bg-slate-900 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-[scale-in_0.2s_ease-out] flex flex-col max-h-[90vh]">
+                        
+                        {/* Image Header */}
+                        {event.image && (
+                            <div className="relative h-48 sm:h-56 bg-slate-200 dark:bg-slate-800">
+                                <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                                <button onClick={onClose} className="absolute top-4 right-4 bg-black/30 text-white rounded-full p-1 hover:bg-black/50 backdrop-blur-md transition">
+                                    <Icon name="x" className="text-2xl" />
+                                </button>
+                                <div className="absolute bottom-4 left-6 text-white">
+                                    <h3 className="text-2xl font-bold shadow-black drop-shadow-md">{event.title}</h3>
+                                    {event.time && (
+                                        <div className="flex items-center text-sm font-medium opacity-90">
+                                            <Icon name="clock" className="mr-1.5" />
+                                            {event.time}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                        
+                        {/* Content Body */}
+                        <div className="p-6 overflow-y-auto">
+                            {!event.image && (
+                                <div className="flex justify-between items-start mb-4">
+                                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">{event.title}</h3>
+                                    <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                                        <Icon name="x" className="text-2xl" />
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            <p className="text-slate-600 dark:text-slate-300 text-lg mb-6 leading-relaxed">{event.desc}</p>
+                            
+                            {/* Recommendations / Details */}
+                            {event.details && (
+                                <div className="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-xl border border-blue-100 dark:border-blue-800/50 mb-6">
+                                    <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center text-sm uppercase tracking-wide">
+                                        <Icon name="thumbs-up" className="mr-2 text-lg" weight="fill" />
+                                        推薦重點 & Tips
+                                    </h4>
+                                    <p className="text-blue-900 dark:text-blue-200 text-sm leading-relaxed whitespace-pre-line">
+                                        {event.details}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Action Buttons */}
+                            <div className="space-y-3 mt-auto">
+                                {event.map && (
+                                    <a 
+                                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.map)}`}
+                                        target="_blank"
+                                        className="flex items-center justify-center w-full py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-200 dark:shadow-none hover:-translate-y-0.5 transition-all"
+                                    >
+                                        <Icon name="map-pin" className="mr-2 text-xl" weight="fill" />
+                                        Google Maps 導航
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TabBar = ({ activeTab, onTabChange }) => {
+            const tabs = [
+                { id: 'itinerary', icon: 'calendar-check', label: '行程' },
+                { id: 'backup', icon: 'umbrella', label: '備案' },
+                { id: 'food', icon: 'coffee', label: '美食' },
+                { id: 'booking', icon: 'ticket', label: '預訂' },
+                { id: 'info', icon: 'info', label: '資訊' },
+            ];
+
+            return (
+                <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pb-safe pt-2 px-2 flex justify-around items-center z-40 h-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] transition-colors duration-300">
+                    {tabs.map(tab => (
+                        <button 
+                            key={tab.id}
+                            onClick={() => onTabChange(tab.id)}
+                            className={`flex flex-col items-center space-y-1 min-w-[60px] transition-colors ${activeTab === tab.id ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}
+                        >
+                            <Icon name={tab.icon} className={`text-2xl ${activeTab === tab.id ? 'weight-fill' : ''}`} />
+                            <span className="text-[10px] font-bold">{tab.label}</span>
+                        </button>
+                    ))}
+                </div>
+            );
+        };
+
+        const ItineraryView = ({ onSelectEvent }) => {
+            const [activeDay, setActiveDay] = useState(1);
+            
+            return (
+                <div className="pb-24">
+                    {/* Day Selector */}
+                    <div className="flex overflow-x-auto hide-scrollbar space-x-3 p-4 sticky top-16 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur z-30 border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+                        {tripData.itinerary.map(day => (
+                            <button 
+                                key={day.day}
+                                onClick={() => setActiveDay(day.day)}
+                                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                    activeDay === day.day 
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200 dark:shadow-none' 
+                                    : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700'
+                                }`}
+                            >
+                                Day {day.day}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-4 space-y-4">
+                        {tripData.itinerary.filter(d => d.day === activeDay).map(day => (
+                            <div key={day.day} className="animate-[fade-in_0.3s_ease-out]">
+                                <div className="mb-4">
+                                    <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{day.date}</h2>
+                                    <div className="flex items-center text-slate-500 dark:text-slate-400 mt-1">
+                                        <Icon name="sun-dim" className="mr-1.5" />
+                                        <span>{day.weather}</span>
+                                    </div>
+                                    <div className="text-lg font-medium text-blue-600 dark:text-blue-400 mt-1">{day.title}</div>
+                                </div>
+
+                                <div className="space-y-4 relative before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+                                    {day.events.map((evt, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            onClick={() => onSelectEvent(evt)}
+                                            className="relative flex items-start pl-12 group cursor-pointer active:scale-[0.98] transition-transform"
+                                        >
+                                            <div className={`absolute left-0 top-0 w-10 h-10 rounded-full flex items-center justify-center border-2 z-10 bg-white dark:bg-slate-900 ${
+                                                evt.important ? 'border-amber-400 text-amber-500 shadow-sm' : 'border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500'
+                                            }`}>
+                                                <Icon name={evt.icon} className="text-xl" />
+                                            </div>
+                                            <div className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md transition-all">
+                                                <div className="flex justify-between items-start">
+                                                    <span className="font-bold text-slate-800 dark:text-slate-100 text-lg">{evt.title}</span>
+                                                    <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 px-2 py-1 rounded">{evt.time}</span>
+                                                </div>
+                                                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{evt.desc}</p>
+                                                {evt.important && (
+                                                    <div className="mt-2 flex items-center text-xs font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded w-fit">
+                                                        <Icon name="star" className="mr-1" weight="fill"/>
+                                                        重點行程
+                                                    </div>
+                                                )}
+                                                {/* Mini Thumbnail Preview */}
+                                                {evt.image && (
+                                                    <div className="mt-3 rounded-lg overflow-hidden h-24 w-full relative">
+                                                        <img src={evt.image} alt={evt.title} className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition" />
+                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const BackupView = ({ onSelectEvent }) => (
+            <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1 mb-2">備用方案</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm px-1 mb-4">點擊卡片查看詳細資訊。</p>
+                
+                <div className="space-y-6">
+                    {tripData.backups.map((item, i) => (
+                        <div key={i} className="space-y-3">
+                             <div className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-lg text-sm font-bold inline-block">
+                                Day {item.day} - {item.loc}
+                            </div>
+                            <div className="grid grid-cols-1 gap-3">
+                                {item.items.map((opt, idx) => (
+                                    <div 
+                                        key={idx}
+                                        onClick={() => onSelectEvent(opt)}
+                                        className={`bg-white dark:bg-slate-800 p-4 rounded-xl border shadow-sm cursor-pointer active:scale-[0.98] transition hover:shadow-md flex items-center ${
+                                            opt.type === 'rain' ? 'border-blue-100 dark:border-blue-900/50' : 'border-amber-100 dark:border-amber-900/50'
+                                        }`}
+                                    >
+                                        <div className={`p-3 rounded-xl mr-4 flex-shrink-0 ${
+                                            opt.type === 'rain' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400'
+                                        }`}>
+                                            <Icon name={opt.type === 'rain' ? 'cloud-rain' : 'battery-low'} className="text-2xl" weight="fill"/>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className={`text-xs font-bold uppercase tracking-wider mb-1 ${
+                                                opt.type === 'rain' ? 'text-blue-500 dark:text-blue-400' : 'text-amber-500 dark:text-amber-400'
+                                            }`}>
+                                                {opt.type === 'rain' ? '雨天備案' : '輕鬆模式'}
+                                            </div>
+                                            <div className="font-bold text-slate-800 dark:text-slate-100 text-base">{opt.title}</div>
+                                            <div className="text-slate-500 dark:text-slate-400 text-sm">{opt.desc}</div>
+                                        </div>
+                                        <Icon name="caret-right" className="text-slate-300 dark:text-slate-600" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const FoodView = ({ onSelectEvent }) => (
+            <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1 mb-2">在地美食推薦</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm px-1 mb-4">點擊卡片查看詳細資訊。</p>
+                
+                <div className="space-y-8">
+                    {tripData.food.map((item, i) => (
+                        <div key={i}>
+                            <div className="flex items-center mb-3 px-1">
+                                <span className="bg-slate-800 dark:bg-slate-700 text-white text-xs font-bold px-2 py-1 rounded mr-2">Day {item.day}</span>
+                                <span className="font-bold text-lg text-slate-800 dark:text-slate-200">{item.loc}</span>
+                            </div>
+                            
+                            <div className="grid gap-3">
+                                {item.items.map((foodItem, idx) => (
+                                    <div 
+                                        key={idx}
+                                        onClick={() => onSelectEvent(foodItem)}
+                                        className="bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center cursor-pointer active:scale-[0.98] transition hover:border-blue-200 dark:hover:border-blue-800"
+                                    >
+                                        <div className="w-16 h-16 rounded-lg bg-slate-100 dark:bg-slate-700 mr-4 overflow-hidden flex-shrink-0">
+                                            <img src={foodItem.image} className="w-full h-full object-cover" alt={foodItem.title} />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center mb-0.5">
+                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded mr-2 ${
+                                                    foodItem.category.includes('餐') ? 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-300' :
+                                                    foodItem.category.includes('甜') || foodItem.category.includes('點') ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-300' :
+                                                    'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                                                }`}>
+                                                    {foodItem.category}
+                                                </span>
+                                            </div>
+                                            <div className="font-bold text-slate-800 dark:text-slate-100 text-sm line-clamp-1">{foodItem.title}</div>
+                                            <div className="text-slate-500 dark:text-slate-400 text-xs line-clamp-1">{foodItem.desc}</div>
+                                        </div>
+                                        <div className="pl-2">
+                                            <Icon name="info" className="text-blue-500 dark:text-blue-400 text-lg" />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+
+        const BookingView = () => (
+            <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1">預訂資訊</h2>
+                
+                {/* Ticket Guide Section */}
+                <section className="mb-6">
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center">
+                        <Icon name="book-open-text" className="mr-2" /> 交通票券攻略
+                    </h3>
+                    <div className="space-y-4">
+                        {tripData.ticketGuides.map((guide, i) => (
+                            <Card key={i} className="border-l-4 border-l-blue-500 dark:border-l-blue-400">
+                                <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                        <div className="font-bold text-slate-800 dark:text-white text-lg">{guide.title}</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">{guide.subtitle}</div>
+                                    </div>
+                                    <Icon name={guide.icon} className="text-2xl text-blue-200 dark:text-blue-900" />
+                                </div>
+                                <div className="flex flex-wrap gap-2 mb-3">
+                                    {guide.tags.map((tag, idx) => (
+                                        <span key={idx} className="bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 text-[10px] font-bold px-2 py-1 rounded-full">
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                                <ul className="space-y-2">
+                                    {guide.steps.map((step, idx) => (
+                                        <li key={idx} className="text-sm text-slate-600 dark:text-slate-300 flex items-start">
+                                            <span className="mr-2 text-blue-400 mt-1">•</span>
+                                            <span>{step}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Transport */}
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center">
+                        <Icon name="train" className="mr-2" /> 已預訂鐵路 (富士回遊)
+                    </h3>
+                    <div className="space-y-3">
+                        {tripData.transport.map((train, i) => (
+                            <Card key={i} className="border-l-4 border-l-green-500 dark:border-l-green-400">
+                                <div className="flex justify-between items-start mb-1">
+                                    <div className="font-bold text-slate-800 dark:text-white">{train.name}</div>
+                                    <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 text-xs font-bold px-2 py-1 rounded">{train.ref}</span>
+                                </div>
+                                <div className="text-sm text-slate-600 dark:text-slate-300 mb-1">{train.date} | {train.time}</div>
+                                <div className="text-sm text-slate-800 dark:text-slate-200 font-medium bg-slate-50 dark:bg-slate-700 p-2 rounded inline-block">
+                                    {train.seat}
+                                </div>
+                                <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">
+                                    *進出站請刷 IC 卡 (Suica/Pasmo) 支付基本運費
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+
+                {/* Flights */}
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center">
+                        <Icon name="airplane-tilt" className="mr-2" /> 機票 (長榮航空)
+                    </h3>
+                    <div className="space-y-3">
+                        {tripData.flights.map((flight, i) => (
+                            <Card key={i} className="relative overflow-hidden">
+                                <div className="absolute top-0 right-0 p-2 bg-blue-50 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-xs font-bold rounded-bl-lg">
+                                    {flight.ref}
+                                </div>
+                                <div className="flex items-center mb-2">
+                                    <div className="font-bold text-lg mr-2 text-slate-800 dark:text-white">{flight.code}</div>
+                                    <div className="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded">{flight.date}</div>
+                                </div>
+                                <div className="flex items-center justify-between text-slate-700 dark:text-slate-200 font-medium mb-1">
+                                    <span>{flight.time.split(' - ')[0]}</span>
+                                    <Icon name="arrow-right" className="text-slate-300 dark:text-slate-600"/>
+                                    <span>{flight.time.split(' - ')[1]}</span>
+                                </div>
+                                <div className="text-sm text-slate-500 dark:text-slate-400 mb-2">{flight.route}</div>
+                                <div className="text-xs text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-100 dark:border-slate-700">{flight.notes}</div>
+                            </Card>
+                        ))}
+                         <div className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-600 dark:text-slate-300 flex items-start">
+                            <Icon name="user" className="mr-2 mt-0.5" />
+                            <div>
+                                旅客：{tripData.meta.travelers.join(", ")}<br/>
+                                會員編號: 410688755 (FU)
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Restaurants */}
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3 flex items-center">
+                        <Icon name="fork-knife" className="mr-2" /> 餐廳預約
+                    </h3>
+                    {tripData.reservations.map((res, i) => (
+                        <Card key={i} className="border-l-4 border-l-amber-500 dark:border-l-amber-400">
+                             <div className="flex justify-between items-start mb-1">
+                                <div className="font-bold text-slate-800 dark:text-white">{res.name}</div>
+                                <span className="text-sm text-amber-600 dark:text-amber-400 font-medium">{res.date}</span>
+                            </div>
+                             <div className="text-sm text-slate-600 dark:text-slate-300">{res.loc}</div>
+                             <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">人數: {res.guests}</div>
+                             <div className="mt-2 text-xs text-slate-400 dark:text-slate-500">訂位人: {res.ref}</div>
+                        </Card>
+                    ))}
+                </section>
+            </div>
+        );
+
+        const InfoView = () => (
+            <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
+                <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1">實用資訊</h2>
+
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">住宿</h3>
+                    <div className="space-y-3">
+                        {tripData.accommodations.map((hotel, i) => (
+                            <Card key={i}>
+                                <div className="flex items-start">
+                                    <div className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-300 p-2 rounded-lg mr-3">
+                                        <Icon name="bed" className="text-xl" />
+                                    </div>
+                                    <div>
+                                        <div className="font-bold text-slate-800 dark:text-white">{hotel.name}</div>
+                                        <div className="text-sm text-slate-500 dark:text-slate-400">{hotel.loc} | {hotel.dates}</div>
+                                        <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">{hotel.notes}</div>
+                                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(hotel.mapQuery)}`} target="_blank" className="text-blue-600 dark:text-blue-400 text-sm font-medium mt-2 inline-flex items-center">
+                                            <Icon name="map-pin" className="mr-1"/> 導航
+                                        </a>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                </section>
+
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">緊急聯絡</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                        {tripData.emergency.map((em, i) => (
+                            <a href={`tel:${em.number}`} key={i} className="bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 border border-red-100 dark:border-red-900/50 p-4 rounded-xl flex flex-col items-center justify-center text-center transition">
+                                <Icon name={em.icon} className="text-3xl text-red-500 dark:text-red-400 mb-2" />
+                                <div className="font-bold text-red-900 dark:text-red-200 text-sm">{em.title}</div>
+                                <div className="text-red-700 dark:text-red-300 text-xs mt-1">{em.number}</div>
+                            </a>
+                        ))}
+                    </div>
+                </section>
+
+                <section>
+                    <h3 className="text-sm font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-3">連結</h3>
+                    <div className="space-y-2">
+                        <a href="https://www.jma.go.jp/bosai/forecast/" target="_blank" className="block p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
+                            <span className="flex items-center text-slate-700 dark:text-slate-200 font-medium"><Icon name="cloud-sun" className="mr-3 text-xl"/> 日本氣象廳 (JMA)</span>
+                            <Icon name="arrow-square-out" className="text-slate-400 dark:text-slate-500"/>
+                        </a>
+                        <a href="https://www.google.com/maps" target="_blank" className="block p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between">
+                            <span className="flex items-center text-slate-700 dark:text-slate-200 font-medium"><Icon name="map-trifold" className="mr-3 text-xl"/> Google Maps</span>
+                            <Icon name="arrow-square-out" className="text-slate-400 dark:text-slate-500"/>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        );
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('itinerary');
+            const [selectedEvent, setSelectedEvent] = useState(null);
+
+            return (
+                <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-950 shadow-2xl overflow-hidden relative transition-colors duration-300">
+                    {/* Header */}
+                    <div className="bg-white dark:bg-slate-900 px-6 pt-12 pb-4 sticky top-0 z-20 shadow-sm transition-colors duration-300">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">東京浪漫之旅</h1>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">{tripData.meta.dates} | {tripData.meta.travelers[0]} & Wife</p>
+                            </div>
+                            <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 p-2 rounded-full">
+                                <Icon name="mountains" className="text-2xl" weight="fill"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <main>
+                        {activeTab === 'itinerary' && <ItineraryView onSelectEvent={setSelectedEvent} />}
+                        {activeTab === 'backup' && <BackupView onSelectEvent={setSelectedEvent} />}
+                        {activeTab === 'food' && <FoodView onSelectEvent={setSelectedEvent} />}
+                        {activeTab === 'booking' && <BookingView />}
+                        {activeTab === 'info' && <InfoView />}
+                    </main>
+
+                    {/* Modals */}
+                    <Modal 
+                        isOpen={!!selectedEvent} 
+                        onClose={() => setSelectedEvent(null)}
+                        event={selectedEvent}
+                    />
+
+                    {/* Navigation */}
+                    <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
