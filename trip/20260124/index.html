@@ -168,7 +168,24 @@
                 }
             ],
             reservations: [
-                { name: "敘敘苑 東京歌劇城", date: "1/25 11:30", guests: "4人 (含朋友)", ref: "Fu Chunhsien", loc: "Tokyo Opera City 53F", mapQuery: "Jojoen Tokyo Opera City" }
+                { 
+                    name: "六本木田舎家 (東店)", 
+                    date: "1/24 18:00", 
+                    guests: "2人 (FU)", 
+                    ref: "已預約", 
+                    loc: "Inakaya East, Roppongi", 
+                    mapQuery: "Inakaya East Roppongi",
+                    note: "電話: +81 3-3408-5040。請準時出席。" 
+                },
+                { 
+                    name: "敘敘苑 東京歌劇城", 
+                    date: "1/25 11:30", 
+                    guests: "4人 (含朋友)", 
+                    ref: "Fu Chunhsien", 
+                    loc: "Tokyo Opera City 53F", 
+                    mapQuery: "Jojoen Tokyo Opera City",
+                    note: "預約包含朋友聚餐"
+                }
             ],
             backups: [
                 {
@@ -341,9 +358,9 @@
                             details: "位於新宿西口。飯店有免費接駁巴士往返新宿站西口 (京王百貨前 21 號站牌)。"
                         },
                         { 
-                            time: "18:00", title: "歌舞伎町/思出橫丁", desc: "晚餐：體驗熱鬧居酒屋或串燒", icon: "beer-bottle", map: "Omoide Yokocho",
-                            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRT7Pu0k-goYY24qpjwSsE0A4d3soh1V0HGxQ&s",
-                            details: "推薦參觀：新宿東寶大樓的『哥吉拉頭像』。思出橫丁推薦『岐阜屋』或隨意挑選充滿昭和風情的串燒小店。"
+                            time: "18:00", title: "六本木田舎家 (爐端燒)", desc: "已預約：東店 (Inakaya East)", icon: "fork-knife", map: "Inakaya East Roppongi", important: true,
+                            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKOfnlSJUN07gHKJmraqsHVU5xawwHl1Y_-g&s",
+                            details: "經典的日式爐端燒名店，氣氛非常熱鬧。預約人: FU (2位)。請準時抵達。" 
                         }
                     ]
                 },
@@ -1061,6 +1078,7 @@
                              <div className="text-sm text-slate-600 dark:text-slate-300">{res.loc}</div>
                              <div className="text-sm text-slate-600 dark:text-slate-300 mt-1">人數: {res.guests}</div>
                              <div className="mt-2 text-xs text-slate-400 dark:text-slate-500">訂位人: {res.ref}</div>
+                             {res.note && <div className="mt-1 text-xs text-slate-500 dark:text-slate-400 italic">{res.note}</div>}
                         </Card>
                     ))}
                 </section>
