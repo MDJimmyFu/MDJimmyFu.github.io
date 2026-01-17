@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Stable Brain Monitor Simulator</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --sedline-blue: #00aaff;
+            --sedline-yellow: #ffcc00;
+            --text-white: #ffffff;
+        }
+
+        body {
+            margin: 0; padding: 0;
+            background-color: #000;
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- 工具列 --- */
+        #toolbar {
+            height: 40px; background: #222; border-bottom: 1px solid #444;
+            display: flex; align-items: center; gap: 10px; padding: 0 10px; flex-shrink: 0;
+        }
+        .btn {
+            background: #444; border: none; color: #aaa;
+            padding: 5px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;
+        }
+        .btn.active-sed { background: #0055aa; color: white; }
+        .btn.active-bis { background: #d4ac0d; color: black; }
+
+        /* --- 主畫面 Grid 容器 --- */
+        #monitor-screen {
+            flex: 1;
+            background: black;
+            display: grid;
+            padding: 2px;
+            gap: 2px;
+            overflow: hidden;
+            /* 預設為 Sedline 佈局 */
+        }
+
+        /* 通用面板樣式 */
+        .panel {
+            background: #080808; border: 1px solid #333;
+            position: relative; overflow: hidden;
+        }
+        .panel-label {
+            position: absolute; top: 2px; left: 4px;
+            font-size: 10px; color: #666; pointer-events: none; z-index: 5;
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+        .hidden { display: none !important; }
+
+        /* ============================
+           CSS Grid 魔法區 (核心修正)
+           ============================ */
+
+        /* 定義每個區塊的名字 */
+        #panel-eeg { grid-area: eeg; }
+        #panel-dsa { grid-area: dsa; }
+        
+        /* Sedline 專用區塊 */
+        #group-sedline-mid { grid-area: mid; display: flex; }
+        
+        /* BIS 專用區塊 */
+        #group-bis-num { grid-area: num; display: flex; }
+        #panel-bis-trend { grid-area: trend; }
+
+        /* --- 模式 1: Sedline 佈局定義 --- */
+        .layout-sedline {
+            grid-template-columns: 1fr;
+            grid-template-rows: 25% 35% 40%; /* EEG | Mid | DSA */
+            grid-template-areas: 
+                "eeg"
+                "mid"
+                "dsa";
+        }
+
+        /* --- 模式 2: BIS 佈局定義 --- */
+        .layout-bis {
+            grid-template-columns: 35% 65%; /* 左窄 右寬 */
+            grid-template-rows: 30% 50% 20%; /* Top | DSA | Trend */
+            grid-template-areas: 
+                "num eeg"
+                "dsa dsa"
+                "trend trend";
+        }
+
+        /* ============================
+           個別元件樣式
+           ============================ */
+
+        /* Sedline 中段 (Trend + Number) */
+        #group-sedline-mid .sub-trend { flex: 2; border-right: 1px solid #333; position: relative; }
+        #group-sedline-mid .sub-num { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #000; }
+        
+        .sed-psi-val { font-size: 80px; color: var(--sedline-yellow); font-weight: bold; line-height: 1; }
+        .sed-label { font-size: 18px; color: var(--sedline-blue); font-weight: bold; }
+
+        /* BIS 數字區 (Num + EMG) */
+        #group-bis-num { background: #111; border: 2px solid #555; border-radius: 4px; }
+        .bis-num-inner { flex: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+        .bis-val { font-size: 90px; color: white; font-weight: bold; line-height: 1; }
+        .bis-tag { position: absolute; top: 5px; left: 5px; font-size: 16px; font-weight: bold; background: #000; padding: 0 4px; }
+        
+        .bis-emg-col { flex: 1; border-left: 1px solid #555; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 5px; }
+        .emg-bar-bg { width: 10px; height: 80%; background: #333; position: relative; }
+        .emg-bar-fill { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, #0f0, #ff0, #f00); transition: height 0.1s; }
+
+        /* --- 控制面板 --- */
+        #controls {
+            height: 140px; background: #1a1a1a; border-top: 1px solid #333;
+            padding: 10px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; flex-shrink: 0; overflow-y: auto;
+        }
+        .ctrl-row { margin-bottom: 5px; }
+        .ctrl-head { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 3px; }
+        input[type=range] { width: 100%; height: 4px; background: #444; -webkit-appearance: none; border-radius: 2px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #ddd; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+<div id="toolbar">
+    <button class="btn active-sed" id="btn-sed" onclick="switchMode('sedline')">Masimo Sedline</button>
+    <button class="btn" id="btn-bis" onclick="switchMode('bis')">Medtronic BIS</button>
+    <div style="margin-left:auto; font-size:12px; color:#666;">Stable V2</div>
+</div>
+
+<!-- Grid 容器: 所有元件都在這裡，只是根據 CSS 決定位置或隱藏 -->
+<div id="monitor-screen" class="layout-sedline">
+
+    <!-- 1. EEG 區 (兩家都有，位置不同) -->
+    <div class="panel" id="panel-eeg">
+        <div class="panel-label" id="lbl-eeg">EEG (4-Channel)</div>
+        <canvas id="cvsEEG"></canvas>
+    </div>
+
+    <!-- 2. Sedline 中段組合 (僅 Sedline 顯示) -->
+    <div class="panel" id="group-sedline-mid">
+        <div class="sub-trend">
+            <div class="panel-label">Trend</div>
+            <canvas id="cvsTrendSed"></canvas>
+        </div>
+        <div class="sub-num">
+            <div class="sed-label">PSI</div>
+            <div class="sed-psi-val" id="valPSI">--</div>
+            <div style="font-size:12px; color:#888; margin-top:5px;">SR 0 | EMG <span id="txtEmgSed">5</span></div>
+        </div>
+    </div>
+
+    <!-- 3. BIS 數字組合 (僅 BIS 顯示) -->
+    <div class="hidden" id="group-bis-num">
+        <div class="bis-num-inner">
+            <div class="bis-tag">BIS</div>
+            <div class="bis-val" id="valBIS">--</div>
+            <div style="font-size:12px; color:#aaa;">SQI 99</div>
+        </div>
+        <div class="bis-emg-col">
+            <div class="emg-bar-bg"><div class="emg-bar-fill" id="barEMG"></div></div>
+            <div style="font-size:10px; margin-top:5px;">EMG</div>
+        </div>
+    </div>
+
+    <!-- 4. DSA 區 (兩家都有，大小位置不同) -->
+    <div class="panel" id="panel-dsa">
+        <div class="panel-label">DSA Spectrogram</div>
+        <canvas id="cvsDSA"></canvas>
+    </div>
+
+    <!-- 5. BIS Trend (僅 BIS 顯示) -->
+    <div class="panel hidden" id="panel-bis-trend">
+        <div class="panel-label">Trend</div>
+        <canvas id="cvsTrendBis"></canvas>
+    </div>
+
+</div>
+
+<!-- 控制項 -->
+<div id="controls">
+    <div class="ctrl-row">
+        <div class="ctrl-head"><span>Delta (Deep)</span><span id="tDelta">20%</span></div>
+        <input type="range" id="slDelta" min="0" max="100" value="20">
+    </div>
+    <div class="ctrl-row">
+        <div class="ctrl-head"><span>Alpha (Sedation)</span><span id="tAlpha">0%</span></div>
+        <input type="range" id="slAlpha" min="0" max="100" value="0">
+    </div>
+    <div class="ctrl-row">
+        <div class="ctrl-head"><span>Beta (Awake)</span><span id="tBeta">50%</span></div>
+        <input type="range" id="slBeta" min="0" max="100" value="50">
+    </div>
+    <div class="ctrl-row">
+        <div class="ctrl-head"><span>Noise (EMG)</span><span id="tNoise">5%</span></div>
+        <input type="range" id="slNoise" min="0" max="60" value="5">
+    </div>
+</div>
+
+<script>
+    // --- 系統變數 ---
+    let mode = 'sedline'; 
+    let params = { delta: 0.2, alpha: 0.0, beta: 0.5, noise: 0.05 };
+    let frame = 0;
+
+    // --- DOM 快取 ---
+    const container = document.getElementById('monitor-screen');
+    const groupSed = document.getElementById('group-sedline-mid');
+    const groupBisNum = document.getElementById('group-bis-num');
+    const panelBisTrend = document.getElementById('panel-bis-trend');
+    const btnSed = document.getElementById('btn-sed');
+    const btnBis = document.getElementById('btn-bis');
+    const lblEEG = document.getElementById('lbl-eeg');
+
+    // Canvas Contexts
+    const ctxEEG = document.getElementById('cvsEEG').getContext('2d');
+    const ctxDSA = document.getElementById('cvsDSA').getContext('2d', {willReadFrequently:true});
+    const ctxTS = document.getElementById('cvsTrendSed').getContext('2d');
+    const ctxTB = document.getElementById('cvsTrendBis').getContext('2d');
+
+    // 資料
+    const traceLen = 512;
+    let traceData = new Array(traceLen).fill(0);
+
+    // --- 初始化 ---
+    function init() {
+        resizeAll();
+        window.addEventListener('resize', resizeAll);
+        
+        ['slDelta', 'slAlpha', 'slBeta', 'slNoise'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateParams);
+        });
+        
+        updateParams();
+        requestAnimationFrame(loop);
+    }
+
+    function switchMode(m) {
+        mode = m;
+        
+        // 1. 切換 CSS Grid Class
+        if (m === 'sedline') {
+            container.className = 'layout-sedline';
+            
+            // 2. 切換元件可見性
+            groupSed.classList.remove('hidden');
+            groupBisNum.classList.add('hidden');
+            panelBisTrend.classList.add('hidden');
+            
+            // 3. 更新按鈕與標籤
+            btnSed.className = 'btn active-sed';
+            btnBis.className = 'btn';
+            lblEEG.innerText = "EEG (L1/L2/R1/R2)";
+            
+        } else {
+            container.className = 'layout-bis';
+            
+            groupSed.classList.add('hidden');
+            groupBisNum.classList.remove('hidden');
+            panelBisTrend.classList.remove('hidden');
+            
+            btnSed.className = 'btn';
+            btnBis.className = 'btn active-bis';
+            lblEEG.innerText = "EEG (Channel 1)";
+        }
+        
+        // 4. 強制重新計算 Canvas 大小 (關鍵修復點)
+        // 使用 setTimeout 確保 DOM layout 完成後才 resize
+        setTimeout(resizeAll, 10);
+    }
+
+    function resizeAll() {
+        fit(ctxEEG.canvas);
+        fit(ctxDSA.canvas);
+        fit(ctxTS.canvas);
+        fit(ctxTB.canvas);
+        
+        // 填滿背景
+        fill(ctxDSA, '#000');
+        fill(ctxTS, '#000');
+        fill(ctxTB, '#000');
+    }
+    
+    function fit(cvs) {
+        // 防止 resize 時寬高為 0 導致錯誤
+        if (cvs.clientWidth === 0 || cvs.clientHeight === 0) return;
+        cvs.width = cvs.clientWidth;
+        cvs.height = cvs.clientHeight;
+    }
+    
+    function fill(ctx, color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(0,0, ctx.canvas.width, ctx.canvas.height);
+    }
+
+    function updateParams() {
+        const d = +document.getElementById('slDelta').value;
+        const a = +document.getElementById('slAlpha').value;
+        const b = +document.getElementById('slBeta').value;
+        const n = +document.getElementById('slNoise').value;
+
+        params.delta = d / 20;
+        params.alpha = a / 20;
+        params.beta = b / 20;
+        params.noise = n / 100;
+
+        document.getElementById('tDelta').innerText = d + '%';
+        document.getElementById('tAlpha').innerText = a + '%';
+        document.getElementById('tBeta').innerText = b + '%';
+        document.getElementById('tNoise').innerText = n + '%';
+        
+        document.getElementById('barEMG').style.height = Math.min(100, n*1.6) + '%';
+        document.getElementById('txtEmgSed').innerText = n;
+    }
+
+    // --- 主迴圈 ---
+    function loop() {
+        // 1. 生成訊號
+        let t = frame * 0.2;
+        let val = (Math.sin(t) * params.delta * 2) + 
+                  (Math.sin(t*8) * params.alpha * 1.5) +
+                  (Math.sin(t*20) * params.beta * 0.5) +
+                  ((Math.random()-0.5) * params.noise * 10);
+        
+        traceData.shift();
+        traceData.push(val);
+        
+        // 2. 畫 EEG (每幀都畫)
+        drawEEG();
+
+        // 3. 畫 DSA 與 Trend (降速更新)
+        if (frame % 2 === 0) {
+            let score = calcScore();
+            updateNums(score);
+            drawDSA(score);
+            drawTrend(score);
+        }
+        
+        frame++;
+        requestAnimationFrame(loop);
+    }
+    
+    function calcScore() {
+        let s = 95;
+        s -= params.delta * 18;
+        s -= params.alpha * 5;
+        s += params.beta * 5;
+        s = Math.max(0, Math.min(100, s));
+        // Noise 假性干擾
+        s += params.noise * 30;
+        return Math.floor(Math.min(100, s));
+    }
+    
+    function updateNums(s) {
+        document.getElementById('valPSI').innerText = s;
+        document.getElementById('valBIS').innerText = s;
+    }
+
+    // --- 繪圖邏輯 ---
+    function drawEEG() {
+        const w = ctxEEG.canvas.width;
+        const h = ctxEEG.canvas.height;
+        ctxEEG.clearRect(0,0,w,h);
+        ctxEEG.lineWidth = 1.5;
+        
+        if (mode === 'sedline') {
+            const colors = ['#ffcc00', '#ffcc00', '#00aaff', '#00aaff']; // L1,L2,R1,R2
+            const yOff = [0.15, 0.4, 0.65, 0.9];
+            for(let ch=0; ch<4; ch++) {
+                ctxEEG.beginPath();
+                ctxEEG.strokeStyle = colors[ch];
+                for(let i=0; i<w; i+=2) {
+                    let idx = Math.floor((i/w)*traceLen);
+                    // 模擬不同導程相位差
+                    let mod = Math.sin(i*0.02+ch) + traceData[idx];
+                    let y = h*yOff[ch] - (mod * (h/15));
+                    if(i===0) ctxEEG.moveTo(i,y); else ctxEEG.lineTo(i,y);
+                }
+                ctxEEG.stroke();
+            }
+        } else {
+            // BIS 單導程
+            ctxEEG.beginPath();
+            ctxEEG.strokeStyle = '#fff';
+            let mid = h/2;
+            for(let i=0; i<w; i+=2) {
+                let idx = Math.floor((i/w)*traceLen);
+                let y = mid - (traceData[idx] * (h/10));
+                if(i===0) ctxEEG.moveTo(i,y); else ctxEEG.lineTo(i,y);
+            }
+            ctxEEG.stroke();
+        }
+    }
+
+    function drawDSA(score) {
+        const cvs = ctxDSA.canvas;
+        const w = cvs.width;
+        const h = cvs.height;
+        if(w===0 || h===0) return;
+
+        // 左移
+        ctxDSA.drawImage(cvs, -2, 0);
+        
+        // 畫新的一行
+        let powerCol = [];
+        for(let y=0; y<h; y+=1) {
+            let freq = (1 - y/h) * 30; // 0-30Hz
+            let p = 0;
+            // 模擬 FFT 能量
+            if(freq < 4) p += params.delta * (2 - freq/3);
+            if(freq > 8 && freq < 12) {
+                let dist = Math.abs(freq-10);
+                if(dist<2) p += params.alpha * 2.5 * (1-dist/2);
+            }
+            if(freq > 13) p += params.beta * 0.4;
+            p += params.noise * 0.3 + 0.05;
+
+            powerCol.push(p);
+            ctxDSA.fillStyle = colorMap(p);
+            ctxDSA.fillRect(w-2, y, 2, 1);
+        }
+        
+        // 畫 SEF (白線)
+        let total = powerCol.reduce((a,b)=>a+b,0);
+        let acc = 0;
+        let sefY = 0;
+        // 從下(低頻)往上找 95%
+        for(let i=powerCol.length-1; i>=0; i--) {
+            acc += powerCol[i];
+            if(acc > total*0.95) { sefY = i; break; }
+        }
+        ctxDSA.fillStyle = '#fff';
+        ctxDSA.fillRect(w-2, sefY, 2, 2);
+    }
+
+    function drawTrend(score) {
+        // 選對的 canvas
+        const ctx = mode==='sedline' ? ctxTS : ctxTB;
+        const cvs = ctx.canvas;
+        if(cvs.width===0) return;
+
+        ctx.drawImage(cvs, -1, 0);
+        
+        // 清除右側
+        ctx.fillStyle = '#000';
+        ctx.fillRect(cvs.width-1, 0, 1, cvs.height);
+        
+        // 畫點
+        let y = cvs.height * (1 - score/100);
+        ctx.fillStyle = mode==='sedline' ? '#ffcc00' : '#fff';
+        ctx.fillRect(cvs.width-1, y, 1, 2);
+        
+        // 畫 EMG 陰影
+        let eh = params.noise * 1.5 * cvs.height;
+        if(eh>0) {
+            ctx.fillStyle = 'rgba(255,0,0,0.3)';
+            ctx.fillRect(cvs.width-1, cvs.height-eh, 1, eh);
+        }
+    }
+
+    function colorMap(v) {
+        v = v/2.0;
+        if(v<0)v=0; if(v>1)v=1;
+        
+        if(mode === 'sedline') {
+            // Inferno
+            if(v<0.3) return `rgb(0,0,${v*3.3*255})`;
+            if(v<0.6) return `rgb(${(v-0.3)*3.3*255},0,255)`;
+            if(v<0.8) return `rgb(255,${(v-0.6)*5*255},0)`;
+            return `rgb(255,255,${(v-0.8)*5*255})`;
+        } else {
+            // Jet (Blue-Green-Red)
+            let h = 240 - (v*240);
+            return `hsl(${h}, 100%, 50%)`;
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>
