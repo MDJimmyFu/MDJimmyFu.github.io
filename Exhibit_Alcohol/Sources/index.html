@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒、文化、與健康—資料來源呈現</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; scroll-behavior: smooth; }
+        .serif-title { font-family: 'Noto Serif TC', serif; }
+        .reference-block { background-color: #f9fafb; border-left: 3px solid #e5e7eb; padding: 1rem; margin-top: 1rem; }
+        .reference-item { font-size: 0.85rem; color: #4b5563; margin-bottom: 0.5rem; line-height: 1.4; }
+        .reference-label { font-weight: bold; color: #991b1b; display: block; margin-bottom: 0.25rem; font-size: 0.75rem; text-transform: uppercase; }
+        .poem-container { background-color: #fff5f5; border-radius: 1rem; padding: 1.5rem; border: 1px inset #fee2e2; }
+        .bg-alcohol {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&q=80&w=2000');
+            background-size: cover; background-position: center; background-attachment: fixed;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900">
+
+    <!-- Hero -->
+    <header class="bg-alcohol h-80 flex flex-col items-center justify-center text-white text-center px-4">
+        <h1 class="serif-title text-3xl md:text-5xl mb-2">酒、文化、與健康</h1>
+        <p class="text-xl md:text-2xl opacity-80 font-light">這杯酒、身體買單！資料來源詳實紀錄</p>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white shadow-sm border-b overflow-x-auto whitespace-nowrap">
+        <div class="max-w-6xl mx-auto px-4 flex space-x-8 py-4">
+            <a href="#wall1" class="text-red-900 font-bold">第一面牆</a>
+            <a href="#wall2" class="text-red-900 font-bold">第二面牆</a>
+            <a href="#wall3" class="text-red-900 font-bold">第三面牆</a>
+            <a href="#wall4" class="text-red-900 font-bold">第四面牆</a>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-16 space-y-32">
+
+        <!-- Wall 1 -->
+        <section id="wall1">
+            <div class="border-l-8 border-red-800 pl-6 mb-12">
+                <h2 class="serif-title text-3xl font-bold">第一面牆：生活中的酒</h2>
+                <p class="text-gray-500 italic">From Occasional to Routine: Alcohol Around Us</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">從神話到人間：酒的多文化起源</h3>
+                        <div class="reference-block">
+                            <span class="reference-label">學術引用與參考網址</span>
+                            <div class="reference-item">P.E. McGovern, et al. Fermented beverages of pre- and proto-historic China, Proc. Natl. Acad. Sci. U.S.A. 101 (51) 17593-17598.</div>
+                            <div class="reference-item">〈Total alcohol consumption per capita〉. Our World in Data. <a href="https://reurl.cc/xKXQbV" class="text-blue-600 underline">https://reurl.cc/xKXQbV</a></div>
+                            <div class="reference-item">〈Millet Wine with the Aborigines of Taiwan〉. Roads & Kingdoms. <a href="https://reurl.cc/dq9Nay" class="text-blue-600 underline">https://reurl.cc/dq9Nay</a></div>
+                            <div class="reference-item">〈The Earliest Alcoholic Beverage in the World〉. The Penn Museum. <a href="https://reurl.cc/bNqQmo" class="text-blue-600 underline">https://reurl.cc/bNqQmo</a></div>
+                        </div>
+                    </div>
+
+                    <div class="poem-container">
+                        <h4 class="font-bold text-red-900 mb-4 border-b border-red-200 pb-2">「將進酒之大家來喝酒團」對話詩詞來源</h4>
+                        <div class="grid grid-cols-1 gap-4 text-sm leading-relaxed text-gray-700">
+                            <p>「抽刀斷水水更流，舉杯消愁愁更愁。」— 李白</p>
+                            <p>「葡萄美酒夜光杯，欲飲琵琶馬上催。」— 王翰</p>
+                            <p>「勸君更盡一杯酒，西出陽關無故人。」— 王維</p>
+                            <p>「人生得意須盡歡，莫使金樽空對月。」— 李白</p>
+                            <p>「孤燈社酒人散後，獨自挑燈愁思多。」— 白居易</p>
+                            <p>「酒債尋常行處有，人生七十古來稀。」— 杜甫</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-4">酒精之化學、生理代謝與立即毒性</h3>
+                    <div class="reference-block">
+                        <span class="reference-label">參考來源</span>
+                        <div class="reference-item">〈聰明酒杯記得「量」！不喝更好最健康 衛福部聯袂各大醫院、協會團體啟動酒癮防治新藍圖〉. 衛生福利部心理健康司. <a href="https://reurl.cc/Vm7AyZ" class="text-blue-600 underline">https://reurl.cc/Vm7AyZ</a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wall 2 -->
+        <section id="wall2">
+            <div class="border-l-8 border-red-800 pl-6 mb-12">
+                <h2 class="serif-title text-3xl font-bold">第二面牆：不只為了享受：現代人喝酒的理由</h2>
+                <p class="text-gray-500 italic">Beyond Enjoyment: The Reasons Behind Modern Drinking</p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- Drinking Motives -->
+                <div class="bg-white border rounded-xl p-8 shadow-sm">
+                    <h3 class="text-xl font-bold mb-6 text-red-900 border-b pb-2 italic">Drinking Motives & Peer Pressure</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="reference-item italic">Rupprecht J, et al. Alcohol use and drinking motives across five countries: a post-COVID-19 pandemic update. Am J Drug Alcohol Abuse. 2025 Jan 2.</div>
+                        <div class="reference-item italic">Motta-Ochoa R, et al. Motives for alcohol use, risky drinking patterns and harm reduction practices among people who experience homelessness... Montreal. Harm Reduct J. 2023.</div>
+                        <div class="reference-item italic">Abbey A, et al. The relationship between reasons for drinking alcohol and alcohol consumption: an interactional approach. Addict Behav. 1993.</div>
+                        <div class="reference-item italic">Benedek M, et al. Creativity on tap? Effects of alcohol intoxication on creative cognition. Conscious Cogn. 2017.</div>
+                        <div class="reference-item">〈Study finds 30% of adults feel peer pressured to drink while socializing nationwide〉. <a href="https://reurl.cc/YkG270" class="text-blue-600 underline">https://reurl.cc/YkG270</a></div>
+                        <div class="reference-item">〈超過1成4大專生飲酒過量！...健康好心情〉. 衛生福利部國民健康署. <a href="https://reurl.cc/GGQ8zy" class="text-blue-600 underline">https://reurl.cc/GGQ8zy</a></div>
+                    </div>
+                </div>
+
+                <!-- Systems & Brain -->
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 p-6 rounded-xl">
+                        <h4 class="font-bold mb-4 text-red-900">酒精對於腦部之影響 Influence on the Brain</h4>
+                        <div class="space-y-3">
+                            <div class="reference-item italic">Sahu P, et al. Alcohol and alcoholism associated neurological disorders. World J Exp Med. 2025.</div>
+                            <div class="reference-item italic">Olsen RW, et al. Role of GABAA receptors in alcohol use disorders... CIE rodent model. Mol Brain. 2017.</div>
+                            <div class="reference-item italic">Hedayati-Moghadam M, et al. Ethanol's impact on the brain... memory impairment. Mol Biol Rep. 2024.</div>
+                            <div class="reference-item italic">Koob GF, et al. Alcohol use disorder and sleep disturbances. Neuropsychopharmacology. 2020.</div>
+                            <div class="reference-item">〈Alcohol-Induced Blackout: How Does Alcohol Impact Memory?〉. <a href="https://reurl.cc/EbW3na" class="text-blue-600 underline">https://reurl.cc/EbW3na</a></div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-xl">
+                        <h4 class="font-bold mb-4 text-red-900">酒精對於肝臟之影響 Influence on the Liver</h4>
+                        <div class="space-y-3">
+                            <div class="reference-item italic">Desalegn H, et al. Impact of alcohol use on liver disease outcomes. Clin Liver Dis. 2024.</div>
+                            <div class="reference-item italic">Kuo CH, et al. Compositional and Metabolomic Shifts of the Gut Microbiome in Alcohol-Related Liver Disease. J Gastroenterol Hepatol. 2025.</div>
+                            <div class="reference-item italic">Chen YT et al. Long-term Risks of Cirrhosis and Hepatocellular Carcinoma. Am J Gastroenterol. 2024.</div>
+                            <div class="reference-item italic">Gao B, et al. Alcoholic liver disease: pathogenesis and new therapeutic targets. Gastroenterology. 2011.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DUI -->
+                <div class="bg-red-900 text-white p-8 rounded-xl">
+                    <h3 class="text-xl font-bold mb-4">酒駕—社會最沉重的酒精代價</h3>
+                    <p class="text-sm opacity-80 mb-6">（特別感謝臺灣酒駕防制社會關懷協會審稿）</p>
+                    <div class="grid md:grid-cols-2 gap-x-12 gap-y-2 text-xs opacity-90">
+                        <p>Fell JC, et al. The effectiveness of alcohol monitoring... Traffic Inj Prev. 2021.</p>
+                        <p>Nochajski TH, et al. Relapse to driving under the influence (DUI). Clin Psychol Rev. 2006.</p>
+                        <p>蔡中志，〈酒後駕駛對交通安全之影響 〉，《數位典藏與數位學習聯合目錄》，2000年。</p>
+                        <p>蔡中志，〈國人酒精濃度與代謝率及對行為影響之實驗研究〉，《警光雜誌》，2001年。</p>
+                        <p>林書慶，〈酒後駕車影響因子之研究〉，中央警察大學犯罪防治研究所博士論文，2020年。</p>
+                        <p>陳存雄，〈酒後駕車駕駛行為的反應與防制酒後駕車策略之探討〉，2011年。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wall 3 -->
+        <section id="wall3">
+            <div class="border-l-8 border-red-800 pl-6 mb-12">
+                <h2 class="serif-title text-3xl font-bold">第三面牆：我有飲酒問題嗎？</h2>
+                <p class="text-gray-500 italic">Screening for Alcohol Use Disorder</p>
+            </div>
+
+            <div class="space-y-8">
+                <div class="reference-block bg-white border">
+                    <h3 class="font-bold text-red-900 mb-2 underline">核心研究參考資料</h3>
+                    <div class="reference-item italic">Kranzler HR. Overview of Alcohol Use Disorder. Am J Psychiatry. 2023.</div>
+                    <div class="reference-item italic">Volkow ND, et al. Neurobiologic Advances from the Brain Disease Model of Addiction. N Engl J Med. 2016.</div>
+                    <div class="reference-item">〈The Interaction of Alcohol with Brain Reward Circuitry (II)〉. Neurotorium. <a href="https://reurl.cc/7bngk1" class="text-blue-600 underline">https://reurl.cc/7bngk1</a></div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="poem-container">
+                        <h4 class="font-bold text-red-900 mb-4 border-b border-red-200 pb-2">「將進酒之我要來戒酒團」詩詞來源</h4>
+                        <div class="text-sm space-y-3 text-gray-700">
+                            <p>「微疴坐杯酌，止酒則瘳矣。」— 蘇軾〈和陶止酒〉</p>
+                            <p>「自言衰病根，恐在酒杯裏。」— 蘇轍〈次韻子瞻和陶公止酒〉</p>
+                            <p>「多病願止酒，不止病不已。」— 梅堯臣〈擬陶潛止酒〉</p>
+                            <p>「政使江變酒，誓不涉其涘。」— 陳與義〈諸公和淵明止酒詩〉</p>
+                            <p>「已於萬事都無念，只向三杯亦有魔。」— 王大受〈以疾止酒〉</p>
+                            <p>「止酒正似塞決河，厚積薪芻傅砂礫。」— 張耒〈止酒贈郡守楊環寶〉</p>
+                            <p>「徒知止不樂，未知止利己。」— 陶淵明〈止酒〉</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-bold">戒酒的旅程：六個階段</h4>
+                        <div class="reference-block">
+                            <div class="reference-item italic">Raihan N, et al. Stages of Change Theory. StatPearls Publishing. 2025.</div>
+                            <div class="reference-item italic">Sliedrecht W, et al. Alcohol use disorder relapse factors: A systematic review. Psychiatry Res. 2019.</div>
+                            <div class="reference-item">〈The Stages of Change Model of Overcoming Addiction〉. Verywell Mind. <a href="https://reurl.cc/jmazZ1" class="text-blue-600 underline">https://reurl.cc/jmazZ1</a></div>
+                            <div class="reference-item italic">簡婉曦，〈【成癮腦學】酒癮治療的不同階段〉. 醫療心空間. <a href="https://vocus.cc/article/66deadd3fd897800017b763b" class="text-blue-600 underline">網址</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Wall 4 -->
+        <section id="wall4">
+            <div class="border-l-8 border-red-800 pl-6 mb-12">
+                <h2 class="serif-title text-3xl font-bold">第四面牆：康復之路與最新研究</h2>
+                <p class="text-gray-500 italic">Recovery Journey and Recent Global Research</p>
+            </div>
+
+            <div class="space-y-12">
+                <div class="bg-gray-100 p-8 rounded-2xl">
+                    <h3 class="text-xl font-bold mb-4 text-red-900 italic">Treatment & Support</h3>
+                    <div class="grid md:grid-cols-2 gap-4 text-xs">
+                        <div class="reference-item italic">McPheeters M, et al. Pharmacotherapy for Alcohol Use Disorder. JAMA. 2023.</div>
+                        <div class="reference-item italic">Ray LA, et al. Combined Pharmacotherapy and Cognitive Behavioral Therapy... JAMA Netw Open. 2020.</div>
+                        <div class="reference-item">〈114年度「酒癮治療費用補助方案」說明書〉. 衛福部心理健康司. <a href="https://reurl.cc/gnxOlN" class="text-blue-600 underline">網址</a></div>
+                        <div class="reference-item italic">葉春吟，〈戒酒之認知行為治療〉. 成功大學醫學院附設醫院精神部. <a href="https://reurl.cc/KOqm4p" class="text-blue-600 underline">網址</a></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <span class="bg-red-800 text-white px-3 py-1 rounded-md mr-4">最新研究成果</span>
+                        <span class="text-sm font-normal text-gray-500 uppercase tracking-widest">Recent Research 2022-2025</span>
+                    </h3>
+                    <div class="grid md:grid-cols-1 gap-4">
+                        <div class="reference-item border-b pb-2">Hong CM, et al. Clinical Outcomes of Alcohol-Associated Liver Disease in a Taiwan Medical Center. <strong>AASLD Liver Meeting 2024.</strong></div>
+                        <div class="reference-item border-b pb-2">Huang YC, et al. Men's decrease and women's increase in harmful alcohol use... 2014-2018 Taiwan. <strong>Int J Drug Policy. 2022.</strong></div>
+                        <div class="reference-item border-b pb-2">Chung AN, et al. Sex-specific incidences and risk profiles of suicide mortality in people with alcohol dependence in Taiwan. <strong>Addiction. 2022.</strong></div>
+                        <div class="reference-item border-b pb-2">Ting PS, et al. Exclusive liquor and cocktail consumption is associated with at-risk fibrosis among nonheavy alcohol users... <strong>Alcohol Clin Exp Res. 2024.</strong></div>
+                        <div class="reference-item border-b pb-2">Chen PH, et al. Patient reflections, challenges, and supports related to early liver transplant... <strong>Liver Transplantation. 2023.</strong></div>
+                        <div class="reference-item border-b pb-2">Huang MC, et al. Increase in plasma CCL11 (Eotaxin-1) in patients with alcohol dependence and changes during detoxification. <strong>Brain Behav Immun. 2022.</strong></div>
+                        <div class="reference-item border-b pb-2">Llorente C, et al. mAChR4 suppresses liver disease via GAP-induced antimicrobial immunity. <strong>Nature. 2025.</strong></div>
+                        <div class="reference-item border-b pb-2">Chen PH, et al. Impact of Longitudinal Patterns of Alcohol Use on Mortality in People Who Inject Drugs. <strong>J Addict Med. 2025.</strong></div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                    <h4 class="font-bold text-blue-900 mb-2">公共議題與防制法規</h4>
+                    <p class="text-xs text-blue-800 mb-4 italic">（特別感謝臺灣酒駕防制社會關懷協會審稿）</p>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p>〈WHA今年(2010)決議通過酒害防制策略 臺灣支持推動酒害防制〉. <a href="https://reurl.cc/MM9aDp" class="text-blue-600 underline">https://reurl.cc/MM9aDp</a></p>
+                        <p>〈健康局研擬酒害防制法初稿，全案尚在討論階段及廣徵意見〉. <a href="https://reurl.cc/EbW3a0" class="text-blue-600 underline">https://reurl.cc/EbW3a0</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 px-4 text-xs">
+        <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+            <div>
+                <h2 class="serif-title text-xl text-white mb-4">策展論文資料庫</h2>
+                <p>本網頁詳實呈現「酒、文化、與健康」展覽之所有文獻引用與資料來源。內容涵蓋 1990 年代至 2025 年之最新全球酒精研究報告、台灣本土流行病學數據以及古典文學引用。</p>
+            </div>
+            <div class="md:text-right">
+                <p class="mb-2">資料更新日期：2025年最新版次</p>
+                <p>數據來源：衛生福利部、GBD Study、Lancet、Nature、Addiction 等學術期刊</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
