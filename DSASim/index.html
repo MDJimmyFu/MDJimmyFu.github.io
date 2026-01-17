@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brain Monitor V19: Smooth DSA (Clinical Grade)</title>
+    <title>Brain Monitor V20: Time-Scale Control</title>
     <style>
         :root {
             --bg-color: #000000;
@@ -36,8 +36,11 @@
         .btn.active-sed { background: #004488; color: white; border-color: #0088ff; }
         .btn.active-bis { background: #aa8800; color: black; border-color: #ffcc00; }
         
-        .right-group { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-        .drug-selector { font-size: 12px; color: #aaa; display: flex; align-items: center; gap: 5px; }
+        .right-group { margin-left: auto; display: flex; align-items: center; gap: 15px; }
+        
+        .control-block { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #aaa; border-right: 1px solid #333; padding-right: 15px; }
+        .control-block:last-child { border-right: none; padding-right: 0; }
+        
         select { background: #333; color: white; border: 1px solid #444; padding: 2px 5px; border-radius: 3px; }
         
         input[type="file"] { display: none; }
@@ -149,7 +152,19 @@
             <input type="file" id="fileInput" accept=".edf">
         </label>
         
-        <div class="drug-selector">
+        <div class="control-block">
+            Step: 
+            <select id="dsaIntervalSel" onchange="updateDSAInterval()">
+                <option value="0">Realtime</option>
+                <option value="1">1s</option>
+                <option value="3">3s</option>
+                <option value="5">5s</option>
+                <option value="10">10s</option>
+                <option value="15">15s</option>
+            </select>
+        </div>
+
+        <div class="control-block">
             Sig: 
             <select id="drugSel" onchange="applyDrug()">
                 <option value="manual">Manual/File</option>
@@ -266,8 +281,11 @@
     let fileTotalSamples = 0;
     let frame = 0;
     
-    // Smoothing Buffers (The Key to V19)
-    // Stores the spectral power of the PREVIOUS frame to average with current
+    // V20: Time Control
+    let dsaInterval = 0; // 0 = Realtime, else seconds
+    let dsaAccumulator = 0;
+    
+    // Smoothing Buffers
     let spectrumSmoothL = new Float32Array(31).fill(0);
     let spectrumSmoothR = new Float32Array(31).fill(0);
     
@@ -307,26 +325,26 @@
         }
         parse() {
             this.offset = 0;
-            this.readString(8); // version
-            this.readString(80); // pat
-            this.readString(80); // rec
-            this.readString(8); // date
-            this.readString(8); // time
+            this.readString(8); 
+            this.readString(80); 
+            this.readString(80); 
+            this.readString(8); 
+            this.readString(8); 
             this.headerBytes = parseInt(this.readString(8));
-            this.readString(44); // reserved
+            this.readString(44); 
             this.numRecs = parseInt(this.readString(8));
             this.durRec = parseFloat(this.readString(8));
             this.ns = parseInt(this.readString(4));
             const labels = []; for(let i=0;i<this.ns;i++) labels.push(this.readString(16));
-            this.offset += this.ns * 80; // trans
-            this.offset += this.ns * 8;  // dim
+            this.offset += this.ns * 80; 
+            this.offset += this.ns * 8;  
             const physMin = []; for(let i=0;i<this.ns;i++) physMin.push(parseFloat(this.readString(8)));
             const physMax = []; for(let i=0;i<this.ns;i++) physMax.push(parseFloat(this.readString(8)));
             const digMin = []; for(let i=0;i<this.ns;i++) digMin.push(parseInt(this.readString(8)));
             const digMax = []; for(let i=0;i<this.ns;i++) digMax.push(parseInt(this.readString(8)));
-            this.offset += this.ns * 80; // prefilt
+            this.offset += this.ns * 80; 
             const nsamp = []; for(let i=0;i<this.ns;i++) nsamp.push(parseInt(this.readString(8)));
-            this.offset += this.ns * 32; // reserved
+            this.offset += this.ns * 32; 
             const loadCh = Math.min(this.ns, 4);
             const signals = [];
             for(let i=0; i<loadCh; i++) signals.push(new Float32Array(this.numRecs * nsamp[i]));
@@ -349,15 +367,12 @@
         }
     }
 
-    // --- V19: FFT with Temporal Smoothing ---
+    // --- Utils ---
     function computeSpectrum(signal, fs) {
         const N = signal.length;
         const rawSpectrum = new Float32Array(31); 
         const windowed = new Float32Array(N);
-        // Hanning Window
         for(let i=0; i<N; i++) windowed[i] = signal[i] * (0.5 * (1 - Math.cos(2*Math.PI*i/(N-1))));
-        
-        // Simple DFT for 0-30Hz
         for (let freq = 0; freq <= 30; freq++) {
             let real = 0; let imag = 0;
             const k = freq * N / fs;
@@ -371,8 +386,6 @@
         return rawSpectrum;
     }
 
-    // --- V19: The Smoothing Function ---
-    // alpha: 0.0 (keep old) to 1.0 (replace with new). 0.1 means slow smoothing.
     function smoothSpectrum(prevSpec, newSpec, alpha) {
         for(let i=0; i<31; i++) {
             prevSpec[i] = (prevSpec[i] * (1 - alpha)) + (newSpec[i] * alpha);
@@ -395,6 +408,7 @@
 
         document.getElementById('fileInput').addEventListener('change', handleFileUpload);
         updateParams();
+        updateDSAInterval();
         requestAnimationFrame(loop);
     }
 
@@ -430,8 +444,8 @@
         document.getElementById('btn-playpause').innerText = "⏸";
         document.getElementById('sel-speed').value = "1";
         document.getElementById('drugSel').value = 'manual';
-        // Reset smoothers
         spectrumSmoothL.fill(0); spectrumSmoothR.fill(0);
+        dsaAccumulator = 0;
         updateTimeDisplay();
     }
 
@@ -448,13 +462,19 @@
     }
 
     function changeSpeed() { playbackSpeed = parseInt(document.getElementById('sel-speed').value); }
+    
+    // V20: New Interval Logic
+    function updateDSAInterval() {
+        dsaInterval = parseInt(document.getElementById('dsaIntervalSel').value);
+        dsaAccumulator = 0; // Reset
+    }
 
     function seek(val) {
         if(!isPlayingFile || !fileTotalSamples) return;
         playbackIdx = Math.floor((val / 100) * fileTotalSamples);
         updateTimeDisplay();
-        // Reset smoothers on seek to avoid trails
         spectrumSmoothL.fill(0); spectrumSmoothR.fill(0);
+        dsaAccumulator = 0;
     }
 
     function updateTimeDisplay() {
@@ -540,53 +560,41 @@
         document.getElementById('barBisEMG').style.height = Math.min(100, get('slN')*1.6)+'%';
     }
 
-    // --- Organic Signal Generator (Stateful) ---
-    // V19 Change: Make noise stateful to reduce "static"
+    // --- Organic Signal Generator ---
     let bandStates = {};
     for(let ch=0; ch<4; ch++) bandStates[ch] = { delta:0, theta:0, alpha:0, beta:0 };
-    
-    function bandNoise(val, target, speed) {
-        return val + (target - val) * speed + (Math.random()-0.5)*0.5;
-    }
+    function bandNoise(val, target, speed) { return val + (target - val) * speed + (Math.random()-0.5)*0.5; }
 
     function generateSimulatedSignal(ch, t) {
         if (isSuppressed) return (Math.random()-0.5) * 0.05 + (Math.random()-0.5)*params.noise*2;
-        
         let st = bandStates[ch];
-        
-        // Pink Noise Baseline
         let pink = (Math.random()-0.5) * 0.15;
-
-        // Delta (Wanders slowly)
         st.delta = bandNoise(st.delta, Math.sin(t*3 + ch)*2.0, 0.05);
         let delta = st.delta * params.delta;
-
-        // Theta
         st.theta = bandNoise(st.theta, Math.sin(t*5 + ch)*1.5, 0.08);
         let theta = st.theta * params.theta;
-
-        // Alpha (Propofol Spindles - Bursting)
-        // Alpha isn't constant; it waxes and wanes
         let alphaEnv = (Math.sin(t * 1.5) + 1.2) / 2.0; 
         st.alpha = Math.sin(t*20*3.14 + ch) * alphaEnv;
         let alpha = st.alpha * params.alpha * 2.0;
-
-        // Beta (Fast jitter)
         let beta = (Math.random()-0.5) * params.beta * 0.8;
-
-        // EMG
         let emg = (Math.random()-0.5) * params.noise * 5.0;
-
         return delta + theta + alpha + beta + pink + emg;
     }
 
     // --- Loop ---
     function loop() {
-        let currentSignalPower = [spectrumSmoothL, spectrumSmoothR]; // Use the smoothed buffers
+        let currentSignalPower = [spectrumSmoothL, spectrumSmoothR]; 
         
+        let dt = 0; // Delta time for this frame (in signal time)
+
         if (isPlayingFile) {
             if (!isPaused) {
+                // Calculate how much signal time passes in one frame
+                // 60Hz loop approx.
+                // samplesPerFrame = (Fs / 60) * Speed
                 const samplesPerFrame = Math.max(1, Math.floor((fileFs / 60) * playbackSpeed));
+                dt = samplesPerFrame / fileFs; // Seconds of signal passed
+
                 for(let i=0; i<samplesPerFrame; i++) {
                     if (playbackIdx >= fileSignals[0].length) playbackIdx = 0; 
                     for(let ch=0; ch<4; ch++) {
@@ -600,21 +608,17 @@
             }
             updateTimeDisplay();
             
-            // Calculate Raw
             const rawL = computeSpectrum(eegBuffers[0].slice(-256), fileFs);
             const rawR = computeSpectrum(eegBuffers[1].slice(-256), fileFs);
-            
-            // V19: Apply Temporal Smoothing
-            // 0.1 means "take 10% new data, keep 90% old data" -> Very smooth
             const alpha = 0.15; 
             smoothSpectrum(spectrumSmoothL, rawL, alpha);
             smoothSpectrum(spectrumSmoothR, rawR, alpha);
-            
-            // Re-assign for drawing
             currentSignalPower = [spectrumSmoothL, spectrumSmoothR];
 
         } else {
             // Simulation
+            dt = 1/60; // Approx real time
+
             suppressTimer--;
             if(suppressTimer <= 0) {
                 if(params.sr===0) { isSuppressed=false; suppressTimer=100; }
@@ -625,46 +629,40 @@
                     suppressTimer = isSuppressed ? 60 * (tgt/(1-tgt+0.1)) : 60;
                 }
             }
-            
-            let t = frame * (1/60.0);
+            let t = frame * dt;
             for(let ch=0; ch<4; ch++) {
                 let sig = generateSimulatedSignal(ch, t);
                 eegBuffers[ch].shift(); eegBuffers[ch].push(sig);
             }
-            
-            // For sim, we calculate power from params directly for cleaner look,
-            // but applying smoothing helps transitions
-            // (Sim logic handles drawing directly in drawDSA usually, 
-            // but let's unify it if possible, or keep separate for cleanliness)
             currentSignalPower = "SIM"; 
         }
 
-        if(frame%10===0) {
-            let displaySR = 0;
-            if(isPlayingFile) {
-                sefVal = 12 + Math.random()*2; 
-            } else {
-                srHistory.shift(); srHistory.push(isSuppressed?1:0);
-                curSR = Math.floor((srHistory.reduce((a,b)=>a+b,0)/60)*100);
-                displaySR = curSR;
-                if(isSuppressed) sefVal = 0;
-                else {
-                    if(params.beta > 1.0) sefVal = 25;
-                    else if(params.alpha > 1.0) sefVal = 13;
-                    else sefVal = 4 + Math.random();
-                }
+        // --- DSA Update Logic V20 ---
+        dsaAccumulator += dt;
+        
+        let shouldDraw = false;
+        
+        if (dsaInterval === 0) {
+            // Realtime: Draw roughly every 2 frames (30fps visual limit)
+            if (frame % 2 === 0) shouldDraw = true;
+        } else {
+            // Stepped: Draw only when accumulated time > interval
+            if (dsaAccumulator >= dsaInterval) {
+                shouldDraw = true;
+                dsaAccumulator = 0; // Reset accumulator
             }
-            document.getElementById('valSR').innerText = displaySR;
-            document.getElementById('valSEFL').innerText = sefVal.toFixed(1);
-            document.getElementById('valSEFR').innerText = (sefVal + (Math.random()-0.5)).toFixed(1);
         }
 
-        drawEEG();
-        
-        if (!isPaused && frame%2===0) {
+        if(frame%10===0) { // UI stats update (fast)
+            updateStats();
+        }
+
+        drawEEG(); // EEG always runs smooth
+
+        if (shouldDraw) {
             let score = 50; 
             if(!isPlayingFile) score = calcScoreSim();
-            else score = 40 + Math.random()*5; 
+            else score = 40 + Math.random()*5; // In file mode, mock score or calc
             
             document.getElementById('valPSI').innerText = Math.floor(score);
             document.getElementById('valBIS').innerText = Math.floor(score);
@@ -676,6 +674,26 @@
         requestAnimationFrame(loop);
     }
     
+    function updateStats() {
+        let displaySR = 0;
+        if(isPlayingFile) {
+            sefVal = 12 + Math.random()*2; 
+        } else {
+            srHistory.shift(); srHistory.push(isSuppressed?1:0);
+            curSR = Math.floor((srHistory.reduce((a,b)=>a+b,0)/60)*100);
+            displaySR = curSR;
+            if(isSuppressed) sefVal = 0;
+            else {
+                if(params.beta > 1.0) sefVal = 25;
+                else if(params.alpha > 1.0) sefVal = 13;
+                else sefVal = 4 + Math.random();
+            }
+        }
+        document.getElementById('valSR').innerText = displaySR;
+        document.getElementById('valSEFL').innerText = sefVal.toFixed(1);
+        document.getElementById('valSEFR').innerText = (sefVal + (Math.random()-0.5)).toFixed(1);
+    }
+
     function calcScoreSim() {
         if(isSuppressed) return 0;
         let s = 95;
@@ -694,7 +712,7 @@
         ctxEEG.clearRect(0,0,w,h); ctxEEG.lineWidth = 1;
         const colors = ['#eebb00', '#00aaff', '#eebb00', '#00aaff']; 
         const scale = isPlayingFile ? 0.3 : 1.0;
-
+        // EEG drawing logic unchanged
         if(mode==='sedline') {
             const yOff = [0.15, 0.4, 0.65, 0.9];
             for(let ch=0; ch<4; ch++) {
@@ -721,9 +739,12 @@
         }
     }
 
+    // In V20, DSA and Trend draw shift by 1 pixel to keep sync at long intervals
     function drawTrend(score) {
         const ctx = mode==='sedline' ? ctxTS : ctxTB;
         const cvs = ctx.canvas; if(!cvs.width) return;
+        
+        // Shift by 1 pixel
         ctx.drawImage(cvs, -1, 0); 
         
         if(mode==='sedline') {
@@ -746,17 +767,18 @@
 
     function drawDSA(powerInput) {
         const w = cvsDSA.width, h = cvsDSA.height; if(!w) return;
-        if(!isPaused) ctxDSA.drawImage(cvsDSA, -2, 0);
+        // Shift by 1 pixel (Standardized for V20)
+        // Note: Using -1 instead of -2 allows for denser data on screen
+        if(!isPaused) ctxDSA.drawImage(cvsDSA, -1, 0);
         else return;
 
         if(mode === 'sedline') {
             const hHalf = h/2;
-            ctxDSA.fillStyle = '#222'; ctxDSA.fillRect(w-2, hHalf-1, 2, 2);
+            ctxDSA.fillStyle = '#222'; ctxDSA.fillRect(w-1, hHalf-1, 1, 2);
             if(!isPlayingFile && isSuppressed) {
-                ctxDSA.fillStyle = '#000'; ctxDSA.fillRect(w-2, 0, 2, h); return;
+                ctxDSA.fillStyle = '#000'; ctxDSA.fillRect(w-1, 0, 1, h); return;
             }
             if(isPlayingFile) {
-                // Pass the SMOOTHED arrays
                 drawSpectrumBlock(0, hHalf, powerInput[0], false);
                 drawSpectrumBlock(hHalf, h, powerInput[1], true);
             } else {
@@ -764,7 +786,7 @@
                 drawSimBlock(hHalf, h, 1.1, true);
             }
         } else {
-            if(!isPlayingFile && isSuppressed) { ctxDSA.fillStyle='#000'; ctxDSA.fillRect(w-2,0,2,h); return; }
+            if(!isPlayingFile && isSuppressed) { ctxDSA.fillStyle='#000'; ctxDSA.fillRect(w-1,0,1,h); return; }
             if(isPlayingFile) drawSpectrumBlock(0, h, powerInput[0], false);
             else drawSimBlock(0, h, 1.0, false);
         }
@@ -776,15 +798,11 @@
             let nY = (y - yStart) / height;
             let freq = isMirrored ? nY * 30 : (1 - nY) * 30;
             let bin = Math.floor(freq); if(bin<0) bin=0; if(bin>30) bin=30;
-            
-            // V19: Frequency Blurring (Simulate Multitaper)
-            // Average adjacent bins to reduce "stripes"
             let val = spectrum[bin];
             if(bin>0 && bin<30) val = val*0.5 + spectrum[bin-1]*0.25 + spectrum[bin+1]*0.25;
-            
             val = val / 50; 
             ctxDSA.fillStyle = colorMap(val);
-            ctxDSA.fillRect(cvsDSA.width-2, y, 2, 2);
+            ctxDSA.fillRect(cvsDSA.width-1, y, 1, 2);
         }
         drawSEFLine(yStart, yEnd, height, isMirrored);
     }
@@ -795,9 +813,9 @@
             let nY = (y - yStart) / height;
             let freq = isMirrored ? nY * 30 : (1 - nY) * 30;
             let p = getSimPower(freq);
-            p *= (1 + (Math.random()-0.5)*0.1*varFact); // Reduced jitter for smoothing
+            p *= (1 + (Math.random()-0.5)*0.1*varFact); 
             ctxDSA.fillStyle = colorMap(p);
-            ctxDSA.fillRect(cvsDSA.width-2, y, 2, 2);
+            ctxDSA.fillRect(cvsDSA.width-1, y, 1, 2);
         }
         drawSEFLine(yStart, yEnd, height, isMirrored);
     }
@@ -807,7 +825,7 @@
         if (isMirrored) sefPix = yStart + (sefVal/30) * height;
         else sefPix = yStart + (1 - (sefVal/30)) * height;
         if(sefPix<yStart) sefPix=yStart; if(sefPix>yEnd) sefPix=yEnd;
-        ctxDSA.fillStyle = '#fff'; ctxDSA.fillRect(cvsDSA.width-2, sefPix, 2, 2);
+        ctxDSA.fillStyle = '#fff'; ctxDSA.fillRect(cvsDSA.width-1, sefPix, 1, 2);
     }
 
     function getSimPower(freq) {
