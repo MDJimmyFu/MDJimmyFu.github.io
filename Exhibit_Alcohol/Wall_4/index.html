@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>近年酒癮對肝臟與大腦影響的最新研究</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .citation-card {
+            transition: all 0.2s ease-in-out;
+        }
+        .citation-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .btn-icon {
+            @apply p-2 rounded-lg transition-colors duration-200;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10 border-b border-slate-200">
+        <div class="max-w-3xl mx-auto px-4 py-6">
+            <div class="flex items-center gap-3 mb-2">
+                <i data-lucide="book-open" class="text-blue-600 w-8 h-8"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-slate-900 leading-tight">
+                    近年酒癮對肝臟與大腦影響的最新研究
+                </h1>
+            </div>
+            <p class="text-sm md:text-base text-slate-500 pl-11">
+                Recent Research on Alcohol Addiction and Its Impact on the Liver and Brain
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container max-w-3xl mx-auto px-4 py-8">
+        
+        <!-- Search Box -->
+        <div class="mb-8 relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <i data-lucide="search" class="text-slate-400 w-5 h-5"></i>
+            </div>
+            <input type="text" id="searchInput" 
+                class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out shadow-sm"
+                placeholder="搜尋關鍵字 (作者、標題、期刊)...">
+        </div>
+
+        <!-- Reference List Container -->
+        <div id="referenceList" class="space-y-4">
+            <!-- Content will be injected by JS -->
+        </div>
+
+        <!-- Empty State (Hidden by default) -->
+        <div id="emptyState" class="hidden text-center py-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
+                <i data-lucide="file-search" class="text-slate-400 w-8 h-8"></i>
+            </div>
+            <h3 class="text-lg font-medium text-slate-900">找不到相符的結果</h3>
+            <p class="text-slate-500 mt-2">請嘗試使用不同的關鍵字搜尋</p>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-8">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <div class="flex justify-center mb-4">
+                <div class="p-3 bg-blue-50 rounded-full">
+                    <i data-lucide="qr-code" class="text-blue-600 w-6 h-6"></i>
+                </div>
+            </div>
+            <p class="text-slate-400 text-sm">
+                第四面牆的 QR code 專案資料整理
+            </p>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2 z-50">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+        <span>已複製到剪貼簿</span>
+    </div>
+
+    <script>
+        // Data from the uploaded document with URLs added
+        const references = [
+            {
+                authors: "Hong CM, et al.",
+                title: "Clinical Outcomes of Alcohol-Associated Liver Disease in a Medical Center in Taiwan.",
+                source: "AASLD Liver Meeting 2024.",
+                year: "2024",
+                type: "Conference",
+                url: "https://scholar.google.com/scholar?q=Clinical+Outcomes+of+Alcohol-Associated+Liver+Disease+in+a+Medical+Center+in+Taiwan+Hong+CM"
+            },
+            {
+                authors: "Huang YC, et al.",
+                title: "Men's decrease and women's increase in harmful alcohol use from the 2014 to 2018 national surveys in Taiwan: A harbinger for an emerging national trend in East Asia?",
+                source: "Int J Drug Policy. 2022 Jan;99:103441.",
+                year: "2022",
+                type: "Journal",
+                url: "https://pubmed.ncbi.nlm.nih.gov/34503897/"
+            },
+            {
+                authors: "Chung AN, et al.",
+                title: "Sex-specific incidences and risk profiles of suicide mortality in people with alcohol dependence in Taiwan.",
+                source: "Addiction. 2022 Dec;117(12):3058-3068.",
+                year: "2022",
+                type: "Journal",
+                url: "https://pubmed.ncbi.nlm.nih.gov/35913020/"
+            },
+            {
+                authors: "Ting PS, et al.",
+                title: "Exclusive liquor and cocktail consumption is associated with at-risk fibrosis among nonheavy alcohol users with metabolic dysfunction-associated steatotic liver disease.",
+                source: "Alcohol Clin Exp Res (Hoboken). 2024 Jan;48(1):88-97.",
+                year: "2024",
+                type: "Journal",
+                url: "https://pubmed.ncbi.nlm.nih.gov/38206286/"
+            },
+            {
+                authors: "Chen PH, et al.",
+                title: "Patient reflections, challenges, and supports related to early liver transplant for severe alcohol-associated liver disease.",
+                source: "Liver Transplantation 29(7):p 745-756, July 2023.",
+                year: "2023",
+                type: "Journal",
+                url: "https://pubmed.ncbi.nlm.nih.gov/36728621/"
+            },
+            {
+                authors: "Huang MC, et al.",
+                title: "Increase in plasma CCL11 (Eotaxin-1) in patients with alcohol dependence and changes during detoxification.",
+                source: "Brain Behav Immun. 2022 Jan;99:83-90.",
+                year: "2022",
+                type: "Journal",
+                url: "https://pubmed.ncbi.nlm.nih.gov/34571176/"
+            },
+            {
+                authors: "Llorente C, et al.",
+                title: "mAChR4 suppresses liver disease via GAP-induced antimicrobial immunity.",
+                source: "Nature. 2025 Oct;646(8083):180-189.",
+                year: "2025",
+                type: "Journal",
+                url: "https://scholar.google.com/scholar?q=mAChR4+suppresses+liver+disease+via+GAP-induced+antimicrobial+immunity"
+            }
+        ];
+
+        const listContainer = document.getElementById('referenceList');
+        const searchInput = document.getElementById('searchInput');
+        const emptyState = document.getElementById('emptyState');
+        const toast = document.getElementById('toast');
+
+        // Function to render the list
+        function renderList(items) {
+            listContainer.innerHTML = '';
+            
+            if (items.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            items.forEach((ref, index) => {
+                const card = document.createElement('article');
+                card.className = 'citation-card bg-white rounded-xl p-5 border border-slate-200 shadow-sm relative group';
+                
+                // Construct the full citation string for copying
+                const fullCitation = `${ref.authors} ${ref.title} ${ref.source}`;
+                
+                card.innerHTML = `
+                    <div class="flex flex-col h-full">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                ${ref.year}
+                            </span>
+                            <div class="flex gap-1">
+                                <a href="${ref.url}" target="_blank" rel="noopener noreferrer" 
+                                    class="text-slate-400 hover:text-blue-600 hover:bg-slate-50 p-1.5 rounded-md transition-colors"
+                                    title="閱讀文獻">
+                                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                                </a>
+                                <button onclick="copyToClipboard('${fullCitation.replace(/'/g, "\\'")}')" 
+                                    class="text-slate-400 hover:text-blue-600 hover:bg-slate-50 p-1.5 rounded-md transition-colors"
+                                    title="複製引用">
+                                    <i data-lucide="copy" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <h2 class="text-lg font-bold text-slate-800 mb-2 leading-snug">
+                            <a href="${ref.url}" target="_blank" class="hover:text-blue-700 hover:underline decoration-blue-300 underline-offset-4">
+                                ${highlightText(ref.title, searchInput.value)}
+                            </a>
+                        </h2>
+                        
+                        <div class="mt-auto">
+                            <p class="text-sm font-medium text-slate-600 mb-1">
+                                ${highlightText(ref.authors, searchInput.value)}
+                            </p>
+                            <p class="text-sm text-slate-500 italic font-serif border-l-2 border-slate-300 pl-3 py-1 mt-2 bg-slate-50 rounded-r">
+                                ${highlightText(ref.source, searchInput.value)}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+            
+            // Re-initialize icons for newly added elements
+            lucide.createIcons();
+        }
+
+        // Helper for highlighting search text
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<span class="bg-yellow-200 text-yellow-900">$1</span>');
+        }
+
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = references.filter(ref => {
+                return ref.title.toLowerCase().includes(query) || 
+                       ref.authors.toLowerCase().includes(query) || 
+                       ref.source.toLowerCase().includes(query) ||
+                       ref.year.includes(query);
+            });
+            renderList(filtered);
+        });
+
+        // Copy functionality
+        window.copyToClipboard = function(text) {
+            // Use textarea hack for better mobile compatibility than navigator.clipboard in some iframe contexts
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            document.body.removeChild(textArea);
+        };
+
+        function showToast() {
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2000);
+        }
+
+        // Initial render
+        renderList(references);
+        
+        // Initialize icons
+        lucide.createIcons();
+
+    </script>
+</body>
+</html>
