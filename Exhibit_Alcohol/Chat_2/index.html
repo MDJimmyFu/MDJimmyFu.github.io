@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>酒國聊天室</title>
+    <title>將盡酒之我要來戒酒團</title>
     <style>
         /* CSS Reset & 變數 */
         :root {
@@ -21,7 +21,7 @@
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            -webkit-tap-highlight-color: transparent; /* 移除點擊時的藍色高光 */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -38,11 +38,12 @@
             color: var(--frosted-lime);
             padding: 10px 15px;
             display: flex;
-            justify-content: space-between; /* 左右對齊 */
+            justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             z-index: 10;
             height: 60px;
+            flex-shrink: 0;
         }
 
         header h1 {
@@ -51,7 +52,6 @@
             margin: 0;
         }
 
-        /* 重新整理按鈕樣式 */
         #refresh-btn {
             background: transparent;
             border: none;
@@ -62,16 +62,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: auto;
-            height: auto;
-            transition: background 0.2s;
         }
 
         #refresh-btn:active {
             background-color: rgba(217, 229, 133, 0.2);
         }
 
-        /* 旋轉動畫 class */
         .spinning {
             animation: spin 1s linear infinite;
         }
@@ -88,10 +84,9 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            scroll-behavior: smooth;
+            scroll-behavior: auto; /* 切換滾動位置時移除平滑效果，避免視覺混亂 */
         }
 
-        /* 訊息氣泡樣式 */
         .message-wrapper {
             display: flex;
             flex-direction: column;
@@ -148,7 +143,8 @@
             flex-direction: column;
             gap: 8px;
             border-top: 1px solid var(--ocean-light);
-            padding-bottom: max(10px, env(safe-area-inset-bottom)); /* 適配 iPhone 底部橫條 */
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            flex-shrink: 0;
         }
 
         .input-row {
@@ -178,7 +174,6 @@
             flex: 1;
         }
 
-        /* 發送按鈕 */
         #send-btn {
             background-color: var(--frosted-lime);
             color: var(--ocean-dark);
@@ -186,7 +181,7 @@
             border-radius: 50%;
             width: 45px;
             height: 45px;
-            min-width: 45px; /* 防止壓縮 */
+            min-width: 45px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
@@ -205,6 +200,7 @@
             color: var(--ocean-light);
             font-size: 0.8rem;
             padding: 10px;
+            margin-top: 20px;
         }
 
         @keyframes fadeIn {
@@ -212,7 +208,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* 桌機適配 */
         @media (min-width: 768px) {
             body {
                 background-color: #0d222e;
@@ -238,8 +233,7 @@
 
     <div class="app-wrapper" style="display: flex; flex-direction: column; height: 100%; width: 100%;">
         <header>
-            <h1>酒國聊天室</h1>
-            <!-- 新增 Refresh 按鈕 -->
+            <h1>將盡酒之我要來戒酒團</h1>
             <button id="refresh-btn" title="重新整理訊息">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M23 4v6h-6"></path>
@@ -269,7 +263,6 @@
 
     <script>
         // ================= 配置區域 =================
-        // 請將下方的 URL 替換為你的 Google Web App URL
         const GAS_URL = 'https://script.google.com/macros/s/AKfycby5Y9_5yicGSl7ivJtWsitHfeq6-OpEfe7O_QNVMwgduD9zQxKAE-IdD9kZE93CC-9e/exec'; 
         // ===========================================
 
@@ -281,38 +274,37 @@
         let isSending = false;
         let isRefreshing = false;
 
-        // 讀取 LocalStorage 暱稱
         const savedName = localStorage.getItem('chat_nickname');
         if (savedName) nameInput.value = savedName;
 
-        // 核心功能：讀取訊息
-        async function fetchMessages() {
-            if (isRefreshing) return; // 避免重複點擊
+        /**
+         * 讀取訊息
+         * @param {boolean} scrollToBottom - 是否在渲染後捲動到底部 (True: 底部, False: 頂部)
+         */
+        async function fetchMessages(scrollToBottom = false) {
+            if (isRefreshing) return;
             
             try {
-                // UI 狀態：開始旋轉
                 isRefreshing = true;
                 refreshBtn.classList.add('spinning');
                 
                 const response = await fetch(GAS_URL);
                 const data = await response.json();
-                renderMessages(data);
+                renderMessages(data, scrollToBottom);
             } catch (error) {
                 console.error('Error fetching messages:', error);
-                // 可以在這裡顯示簡單的錯誤提示
                 const errDiv = document.createElement('div');
                 errDiv.className = 'loading-text';
                 errDiv.innerText = '讀取失敗，請檢查網路';
                 chatContainer.appendChild(errDiv);
             } finally {
-                // UI 狀態：停止旋轉
                 isRefreshing = false;
                 refreshBtn.classList.remove('spinning');
             }
         }
 
         // 渲染畫面
-        function renderMessages(messages) {
+        function renderMessages(messages, scrollToBottom) {
             chatContainer.innerHTML = ''; 
             const currentName = nameInput.value.trim();
 
@@ -339,10 +331,16 @@
                 chatContainer.appendChild(wrapper);
             });
 
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+            // 控制滾動邏輯
+            if (scrollToBottom) {
+                // 發送訊息後，看最新訊息
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            } else {
+                // 初始載入或重新整理，看最舊訊息 (頂部)
+                chatContainer.scrollTop = 0;
+            }
         }
 
-        // 核心功能：發送訊息
         async function sendMessage() {
             const name = nameInput.value.trim();
             const msg = msgInput.value.trim();
@@ -356,8 +354,6 @@
 
             localStorage.setItem('chat_nickname', name);
 
-            // UI 樂觀更新 (Optimistic UI)：你可以選擇先顯示訊息，但我這裡保持發送後才顯示
-            // 這裡做簡單的 Loading 狀態
             msgInput.value = '';
             isSending = true;
             sendBtn.style.opacity = '0.5';
@@ -367,13 +363,12 @@
             formData.append('message', msg);
 
             try {
-                // 發送請求
                 await fetch(GAS_URL, {
                     method: 'POST',
                     body: formData
                 });
-                // 發送成功後，自動呼叫一次刷新，讓使用者看到自己剛剛傳的訊息
-                await fetchMessages();
+                // 發送成功後：傳入 true，表示強制捲到底部
+                await fetchMessages(true);
             } catch (error) {
                 alert('發送失敗，請稍後再試');
                 console.error(error);
@@ -384,16 +379,16 @@
             }
         }
 
-        // 事件監聽
-        refreshBtn.addEventListener('click', fetchMessages);
-        sendBtn.addEventListener('click', sendMessage);
+        // 點擊重新整理：傳入 false (或不傳，預設為 false)，表示顯示最早訊息
+        refreshBtn.addEventListener('click', () => fetchMessages(false));
         
+        sendBtn.addEventListener('click', sendMessage);
         msgInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // 頁面初次載入時，自動抓取一次，避免畫面空白
-        fetchMessages();
+        // 頁面載入時：顯示最早訊息
+        fetchMessages(false);
 
     </script>
 </body>
