@@ -101,14 +101,21 @@
                     console.log('收到訊息:', payload);
                     
                     const newNum = payload.val;
+                    const isRecall = payload.recall || false; // 檢查是否為重播訊號
                     
                     // 觸發音效邏輯
-                    if (state.view === 'display' && newNum !== state.currentNumber && state.audioEnabled) {
-                        playAudio(newNum);
-                        const bg = document.getElementById('flash-bg');
-                        if(bg) {
-                            bg.classList.add('flash-bg');
-                            setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+                    if (state.view === 'display' && state.audioEnabled) {
+                        // 如果號碼改變 或是 強制重播 (recall)
+                        if (newNum !== state.currentNumber || isRecall) {
+                            playAudio(newNum, isRecall); // 傳入 isRecall 作為強制播放參數
+                            const bg = document.getElementById('flash-bg');
+                            if(bg) {
+                                // 重置動畫以支援連續點擊
+                                bg.classList.remove('flash-bg');
+                                void bg.offsetWidth; // Trigger reflow
+                                bg.classList.add('flash-bg');
+                                setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+                            }
                         }
                     }
 
@@ -133,13 +140,17 @@
 
         // 發布訊息 (Publish)
         // retain: true 很重要，它讓後加入的人也能收到最新的號碼
-        function publishNumber(num) {
+        function publishNumber(num, isRecall = false) {
             if (!state.client || !state.isConnected) {
                 alert("尚未連線，請稍候");
                 return;
             }
             const topic = `queue-sys/${state.channelId}/status`;
-            const payload = JSON.stringify({ val: num, ts: Date.now() });
+            const payload = JSON.stringify({ 
+                val: num, 
+                ts: Date.now(),
+                recall: isRecall // 加入 recall 標記
+            });
             
             state.client.publish(topic, payload, { qos: 0, retain: true });
         }
@@ -258,14 +269,22 @@
                                 </div>
                             </div>
 
-                            <button onclick="window.nextNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
-                                <div class="p-3 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
-                                    <i data-lucide="skip-forward" class="w-10 h-10"></i>
-                                </div>
-                                <span class="text-2xl font-bold">下一位</span>
-                            </button>
+                            <div class="space-y-3">
+                                <button onclick="window.nextNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
+                                    <div class="p-3 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
+                                        <i data-lucide="skip-forward" class="w-10 h-10"></i>
+                                    </div>
+                                    <span class="text-2xl font-bold">下一位</span>
+                                </button>
+                                
+                                <!-- 新增：再次叫號按鈕 -->
+                                <button onclick="window.recallNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-xl py-4 shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="volume-2" class="w-6 h-6"></i>
+                                    <span class="text-xl font-bold">再次叫號</span>
+                                </button>
+                            </div>
 
-                            <div class="grid gap-4">
+                            <div class="grid gap-4 pt-2">
                                 <form onsubmit="event.preventDefault(); window.jumpNum()" class="flex gap-2 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
                                     <input id="jumpInput" type="number" class="flex-1 p-3 rounded-lg outline-none bg-slate-50 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="輸入號碼">
                                     <button class="bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-lg font-medium transition-colors">插隊</button>
@@ -309,6 +328,12 @@
             publishNumber(state.currentNumber + 1);
         };
         
+        // 新增：再次叫號函式
+        window.recallNum = () => {
+            // 發送目前號碼，並帶上 isRecall = true
+            publishNumber(state.currentNumber, true);
+        };
+        
         window.jumpNum = () => {
             const val = document.getElementById('jumpInput').value;
             if(val) {
@@ -331,8 +356,10 @@
             }
         }
 
-        function playAudio(num) {
-            if (num === state.lastPlayed) return;
+        function playAudio(num, force = false) {
+            // 如果不是強制重播，且號碼跟上次一樣，則不播放
+            if (!force && num === state.lastPlayed) return;
+            
             state.lastPlayed = num;
             window.speechSynthesis.cancel();
             
