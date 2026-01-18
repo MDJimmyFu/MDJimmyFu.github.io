@@ -54,7 +54,14 @@
         const statusDisplay = document.getElementById('status-display');
 
         let conn = null;
-        let peer = new Peer(); // Auto-generate ID for controller client
+        const peer = new Peer(null, {
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
+                ]
+            }
+        }); // Auto-generate ID for controller client
 
         // Check for ID in URL
         const urlParams = new URLSearchParams(window.location.search);
