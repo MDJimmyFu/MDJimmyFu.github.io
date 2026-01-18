@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>目前號碼 | Queue Display</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+    <div id="audio-overlay">
+        <div class="overlay-content">
+            <div class="tap-icon">👆</div>
+            <h2>點擊畫面啟用語音播報</h2>
+            <p>Click anywhere to enable audio</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h1>目前叫號</h1>
+            <div id="current-number" class="number-display">0</div>
+
+            <div class="connection-info">
+                <div id="qrcode"></div>
+                <p>掃描 QR Code 或輸入 ID 連線</p>
+                <div class="id-display" id="peer-id-display">Generating ID...</div>
+                <div class="status-indicator" id="connection-status">等待連線...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const numberDisplay = document.getElementById('current-number');
+        const audioOverlay = document.getElementById('audio-overlay');
+        const peerIdDisplay = document.getElementById('peer-id-display');
+        const statusIndicator = document.getElementById('connection-status');
+        let audioEnabled = false;
+        let currentNumber = 0;
+
+        // PeerJS Setup
+        // Create a random ID ensuring uniqueness
+        const uniqueId = 'queue-' + Math.random().toString(36).substr(2, 6);
+        const peer = new Peer(uniqueId);
+
+        peer.on('open', (id) => {
+            console.log('My peer ID is: ' + id);
+            peerIdDisplay.innerText = id;
+
+            // Generate QR Code
+            // URL points to admin.html in the same directory with ?id=...
+            const adminUrl = window.location.href.replace('display.html', 'admin.html') + '?id=' + id;
+            new QRCode(document.getElementById("qrcode"), {
+                text: adminUrl,
+                width: 128,
+                height: 128,
+                colorDark: "#e0e0e0", // Light color for dark mode
+                colorLight: "#1a1a24",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
+
+        peer.on('connection', (conn) => {
+            console.log('Connected to: ' + conn.peer);
+            statusIndicator.innerText = '已連線 (Connected)';
+            statusIndicator.classList.add('connected');
+
+            // Send current state immediately
+            conn.on('open', () => {
+                conn.send({ type: 'sync', value: currentNumber });
+            });
+
+            conn.on('data', (data) => {
+                console.log('Received:', data);
+                if (data.type === 'update') {
+                    updateNumber(data.value);
+                } else if (data.type === 'reset') {
+                    updateNumber(0);
+                }
+            });
+
+            conn.on('close', () => {
+                statusIndicator.innerText = '連線中斷 (Disconnected)';
+                statusIndicator.classList.remove('connected');
+            });
+        });
+
+        function updateNumber(num) {
+            currentNumber = parseInt(num);
+            numberDisplay.innerText = currentNumber;
+
+            // Visual feedback
+            numberDisplay.classList.remove('pulse');
+            void numberDisplay.offsetWidth;
+            numberDisplay.classList.add('pulse');
+
+            playAudio(currentNumber);
+        }
+
+        function playAudio(num) {
+            if (audioEnabled && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const text = `號碼 ${num}`;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                utterance.rate = 1;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Enable Audio
+        audioOverlay.addEventListener('click', () => {
+            audioEnabled = true;
+            audioOverlay.classList.add('hidden');
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance('');
+                speechSynthesis.speak(utterance);
+            }
+        });
+    </script>
+</body>
+
+</html>

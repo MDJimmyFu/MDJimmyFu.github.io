@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>叫號控制 | Control Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- Connection Screen -->
+        <div id="connect-screen" class="card">
+            <h1>連線至顯示器</h1>
+            <div class="connection-form">
+                <p style="color: var(--text-muted); margin-bottom: 1rem;">輸入顯示器上的 ID 進行連線</p>
+                <input type="text" id="target-id-input" placeholder="例如: queue-xxxxx">
+                <button id="connect-btn" class="primary-btn">連線 (Connect)</button>
+            </div>
+        </div>
+
+        <!-- Control Panel (Hidden by default) -->
+        <div id="control-panel" class="card" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1 style="margin: 0;">目前號碼</h1>
+                <div id="status-display" class="status-indicator">已連線</div>
+            </div>
+
+            <div id="current-number" class="number-display">0</div>
+
+            <div class="controls">
+                <button id="next-btn" class="primary-btn">下一號 (Next)</button>
+
+                <div class="input-group">
+                    <input type="number" id="jump-input" placeholder="#">
+                    <button id="jump-btn" class="secondary-btn">跳號 (Jump)</button>
+                </div>
+
+                <button id="reset-btn" class="secondary-btn"
+                    style="background: rgba(255, 59, 48, 0.2); color: #ff3b30;">重置 (Reset)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const connectScreen = document.getElementById('connect-screen');
+        const controlPanel = document.getElementById('control-panel');
+        const targetIdInput = document.getElementById('target-id-input');
+        const connectBtn = document.getElementById('connect-btn');
+        const numberDisplay = document.getElementById('current-number');
+        const statusDisplay = document.getElementById('status-display');
+
+        let conn = null;
+        let peer = new Peer(); // Auto-generate ID for controller client
+
+        // Check for ID in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const autoId = urlParams.get('id');
+        if (autoId) {
+            targetIdInput.value = autoId;
+            // PeerJS needs a moment to initialize
+            peer.on('open', () => {
+                connectToPeer(autoId);
+            });
+        }
+
+        connectBtn.addEventListener('click', () => {
+            const id = targetIdInput.value;
+            if (id) connectToPeer(id);
+        });
+
+        function connectToPeer(id) {
+            connectBtn.innerText = '連線中...';
+            connectBtn.disabled = true;
+
+            conn = peer.connect(id);
+
+            conn.on('open', () => {
+                console.log('Connected to: ' + id);
+                // Switch views
+                connectScreen.style.display = 'none';
+                controlPanel.style.display = 'block';
+            });
+
+            conn.on('data', (data) => {
+                if (data.type === 'sync') {
+                    updateDisplay(data.value);
+                }
+            });
+
+            conn.on('close', () => {
+                alert('連線已中斷 (Disconnected)');
+                location.reload();
+            });
+
+            conn.on('error', (err) => {
+                console.error(err);
+                alert('連線失敗 (Connection Error)');
+                connectBtn.innerText = '連線 (Connect)';
+                connectBtn.disabled = false;
+            });
+        }
+
+        // Control Logic
+        let currentNumber = 0;
+
+        function updateDisplay(num) {
+            currentNumber = parseInt(num);
+            numberDisplay.innerText = currentNumber;
+        }
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            if (conn && conn.open) {
+                currentNumber++;
+                updateDisplay(currentNumber);
+                conn.send({ type: 'update', value: currentNumber });
+            }
+        });
+
+        document.getElementById('jump-btn').addEventListener('click', () => {
+            const input = document.getElementById('jump-input');
+            const val = parseInt(input.value);
+            if (conn && conn.open && !isNaN(val)) {
+                currentNumber = val;
+                updateDisplay(currentNumber);
+                conn.send({ type: 'update', value: currentNumber });
+                input.value = '';
+            }
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            if (conn && conn.open && confirm('確定重置？')) {
+                currentNumber = 0;
+                updateDisplay(currentNumber);
+                conn.send({ type: 'reset' });
+            }
+        });
+
+        // Allow Enter in jump input
+        document.getElementById('jump-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') document.getElementById('jump-btn').click();
+        });
+    </script>
+</body>
+
+</html>
