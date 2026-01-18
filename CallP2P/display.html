@@ -38,6 +38,7 @@
         const audioOverlay = document.getElementById('audio-overlay');
         const peerIdDisplay = document.getElementById('peer-id-display');
         const statusIndicator = document.getElementById('connection-status');
+        const connectionInfo = document.querySelector('.connection-info');
         let audioEnabled = false;
         let currentNumber = 0;
 
@@ -68,6 +69,9 @@
             statusIndicator.innerText = '已連線 (Connected)';
             statusIndicator.classList.add('connected');
 
+            // Auto hide Connection Info
+            connectionInfo.style.display = 'none';
+
             // Send current state immediately
             conn.on('open', () => {
                 conn.send({ type: 'sync', value: currentNumber });
@@ -85,6 +89,8 @@
             conn.on('close', () => {
                 statusIndicator.innerText = '連線中斷 (Disconnected)';
                 statusIndicator.classList.remove('connected');
+                // Show Connection Info again
+                connectionInfo.style.display = 'flex';
             });
         });
 
@@ -103,7 +109,7 @@
         function playAudio(num) {
             if (audioEnabled && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const text = `號碼 ${num}`;
+                const text = `號碼 ${num} 號請進入診間`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'zh-TW';
                 utterance.rate = 1;
