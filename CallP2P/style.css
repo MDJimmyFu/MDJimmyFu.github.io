@@ -56,7 +56,8 @@ h1 {
 
 /* Number Display */
 .number-display {
-    font-size: 10rem;
+    /* Responsive font size: 35% of viewport width or height, whichever is smaller, but at least 5rem */
+    font-size: max(5rem, min(35vw, 40vh));
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
@@ -259,7 +260,5 @@ input:focus {
         justify-content: center;
     }
 
-    .number-display {
-        font-size: 12rem;
-    }
+    /* Removed fixed font-size override to allow responsive sizing */
 }
