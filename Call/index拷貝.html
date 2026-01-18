@@ -1,0 +1,373 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { initializeApp } from 'firebase/app';
+import { 
+  getAuth, 
+  signInAnonymously, 
+  onAuthStateChanged,
+  signInWithCustomToken
+} from 'firebase/auth';
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  onSnapshot, 
+  collection 
+} from 'firebase/firestore';
+import { 
+  Monitor, 
+  Smartphone, 
+  Volume2, 
+  SkipForward, 
+  RotateCcw, 
+  Hash
+} from 'lucide-react';
+
+// --- Firebase Initialization ---
+const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+// --- Components ---
+
+// 1. Role Selection Screen
+const RoleSelection = ({ onSelect }: { onSelect: (role: 'display' | 'admin') => void }) => {
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+      <h1 className="text-3xl font-bold text-slate-800 mb-8 text-center">
+        雲端叫號系統
+      </h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+        <button
+          onClick={() => onSelect('display')}
+          className="group relative bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-blue-500 text-center"
+        >
+          <div className="flex justify-center mb-4">
+            <Monitor size={64} className="text-blue-500 group-hover:scale-110 transition-transform" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">叫號顯示端</h2>
+          <p className="text-slate-500">
+            顯示於大螢幕或電視。<br/>包含語音播報功能。
+          </p>
+        </button>
+
+        <button
+          onClick={() => onSelect('admin')}
+          className="group relative bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-emerald-500 text-center"
+        >
+          <div className="flex justify-center mb-4">
+            <Smartphone size={64} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">叫號控制台</h2>
+          <p className="text-slate-500">
+            櫃檯人員使用。<br/>操作下一號或指定號碼。
+          </p>
+        </button>
+      </div>
+      <p className="mt-12 text-slate-400 text-sm">
+        請在不同視窗或裝置開啟此網頁以進行連線
+      </p>
+    </div>
+  );
+};
+
+// 2. Display Screen Component
+const DisplayScreen = ({ user }: { user: any }) => {
+  const [number, setNumber] = useState(0);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isFlashing, setIsFlashing] = useState(false);
+  const lastPlayedRef = useRef(0);
+
+  // Sync data
+  useEffect(() => {
+    if (!user) return;
+
+    // Fixed path: 6 segments to ensure it points to a document
+    // artifacts(col) -> appId(doc) -> public(col) -> data(doc) -> queue(col) -> status(doc)
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+    
+    const unsubscribe = onSnapshot(docRef, 
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const newNum = data.currentNumber || 0;
+          setNumber(newNum);
+          
+          // Trigger visual effect
+          if (newNum !== lastPlayedRef.current) {
+             setIsFlashing(true);
+             setTimeout(() => setIsFlashing(false), 1000);
+          }
+        }
+      },
+      (error) => console.error("Sync error:", error)
+    );
+
+    return () => unsubscribe();
+  }, [user]);
+
+  // Handle TTS
+  useEffect(() => {
+    if (!audioEnabled || number === 0 || number === lastPlayedRef.current) return;
+
+    lastPlayedRef.current = number;
+    
+    const speak = () => {
+      try {
+        // Cancel any current speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
+        utterance.lang = 'zh-TW';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn("TTS Error:", e);
+      }
+    };
+
+    speak();
+    // Repeat once for clarity
+    setTimeout(speak, 3500);
+
+  }, [number, audioEnabled]);
+
+  if (!audioEnabled) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+        <button 
+          onClick={() => setAudioEnabled(true)}
+          className="bg-blue-600 hover:bg-blue-500 text-white text-xl px-8 py-4 rounded-full flex items-center gap-3 shadow-lg animate-bounce"
+        >
+          <Volume2 size={24} />
+          點擊以啟用音效並開始
+        </button>
+        <p className="text-slate-400 mt-4">瀏覽器需要使用者互動才能播放語音</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isFlashing ? 'bg-yellow-100' : 'bg-white'}`}>
+      <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-32 bg-blue-600 flex items-center justify-center">
+            <h1 className="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center w-full">
+            <div className="text-center">
+                <span className="text-[25vw] leading-none font-bold text-slate-800 font-mono tracking-tighter">
+                    {number.toString().padStart(3, '0')}
+                </span>
+            </div>
+        </div>
+
+        <div className="w-full bg-slate-100 py-6 border-t border-slate-200">
+             <div className="container mx-auto px-4 flex justify-between items-center text-slate-500">
+                <div className="flex items-center gap-2">
+                    <Volume2 size={20} className="text-green-600" />
+                    <span>語音播報中</span>
+                </div>
+                <div className="text-sm">
+                    系統連線正常
+                </div>
+             </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 3. Admin Panel Component
+const AdminPanel = ({ user }: { user: any }) => {
+  const [currentNumber, setCurrentNumber] = useState(0);
+  const [jumpInput, setJumpInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  // Sync data
+  useEffect(() => {
+    if (!user) return;
+
+    // Fixed path: 6 segments
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+    
+    const unsubscribe = onSnapshot(docRef, 
+      (docSnap) => {
+        if (docSnap.exists()) {
+          setCurrentNumber(docSnap.data().currentNumber || 0);
+        } else {
+            // Init if not exists
+            setDoc(docRef, { currentNumber: 0 });
+        }
+      },
+      (error) => console.error("Sync error:", error)
+    );
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const updateNumber = async (newNum: number) => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      // Fixed path: 6 segments
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+      await setDoc(docRef, { 
+        currentNumber: newNum,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (e) {
+      console.error("Update failed", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNext = () => updateNumber(currentNumber + 1);
+  
+  const handleReset = () => {
+    if (confirmReset) {
+      updateNumber(0);
+      setConfirmReset(false);
+    } else {
+      setConfirmReset(true);
+      // Auto cancel confirm after 3 seconds
+      setTimeout(() => setConfirmReset(false), 3000);
+    }
+  };
+
+  const handleJump = (e: React.FormEvent) => {
+    e.preventDefault();
+    const num = parseInt(jumpInput);
+    if (!isNaN(num) && num >= 0) {
+      updateNumber(num);
+      setJumpInput('');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
+      <div className="max-w-md mx-auto space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 flex justify-between items-center">
+            <div>
+                <h2 className="text-xl font-bold text-slate-800">控制台</h2>
+                <div className="flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span className="text-xs text-slate-500">已連線</span>
+                </div>
+            </div>
+            <div className="text-right">
+                <p className="text-xs text-slate-400 uppercase tracking-wider">目前號碼</p>
+                <p className="text-4xl font-mono font-bold text-blue-600">
+                    {currentNumber.toString().padStart(3, '0')}
+                </p>
+            </div>
+        </div>
+
+        {/* Main Action */}
+        <button
+          onClick={handleNext}
+          disabled={loading}
+          className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white rounded-2xl p-8 shadow-lg shadow-blue-200 flex flex-col items-center justify-center gap-4 group"
+        >
+            <div className="p-4 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
+                <SkipForward size={48} fill="currentColor" />
+            </div>
+            <span className="text-3xl font-bold">下一位</span>
+        </button>
+
+        {/* Secondary Actions */}
+        <div className="grid grid-cols-1 gap-4">
+            {/* Jump to Number */}
+            <form onSubmit={handleJump} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex gap-2">
+                <div className="relative flex-1">
+                    <Hash size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                        type="number" 
+                        value={jumpInput}
+                        onChange={(e) => setJumpInput(e.target.value)}
+                        placeholder="輸入號碼"
+                        className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-lg border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
+                    />
+                </div>
+                <button 
+                    type="submit"
+                    disabled={!jumpInput || loading}
+                    className="bg-slate-800 text-white px-6 rounded-lg font-medium hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                    插隊
+                </button>
+            </form>
+
+            {/* Reset - Now with Two-Step Confirmation */}
+            <button 
+                onClick={handleReset}
+                className={`w-full border py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200
+                  ${confirmReset 
+                    ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 shadow-md scale-105' 
+                    : 'bg-white text-red-500 border-red-100 hover:bg-red-50'
+                  }`}
+            >
+                <RotateCcw size={18} />
+                {confirmReset ? '再次點擊以確認歸零' : '重置號碼'}
+            </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+// 4. Main App Container
+export default function App() {
+  const [role, setRole] = useState<'select' | 'display' | 'admin'>('select');
+  const [user, setUser] = useState<any>(null);
+
+  // Authentication
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (e) {
+        console.error("Auth failed:", e);
+      }
+    };
+    initAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-4">
+            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-slate-500">正在連線至伺服器...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Router Switch
+  switch (role) {
+    case 'display':
+      return <DisplayScreen user={user} />;
+    case 'admin':
+      return <AdminPanel user={user} />;
+    default:
+      return <RoleSelection onSelect={setRole} />;
+  }
+}

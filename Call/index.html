@@ -1,373 +1,362 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInAnonymously, 
-  onAuthStateChanged,
-  signInWithCustomToken
-} from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
-  setDoc, 
-  onSnapshot, 
-  collection 
-} from 'firebase/firestore';
-import { 
-  Monitor, 
-  Smartphone, 
-  Volume2, 
-  SkipForward, 
-  RotateCcw, 
-  Hash
-} from 'lucide-react';
-
-// --- Firebase Initialization ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-// --- Components ---
-
-// 1. Role Selection Screen
-const RoleSelection = ({ onSelect }: { onSelect: (role: 'display' | 'admin') => void }) => {
-  return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-      <h1 className="text-3xl font-bold text-slate-800 mb-8 text-center">
-        雲端叫號系統
-      </h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-        <button
-          onClick={() => onSelect('display')}
-          className="group relative bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-blue-500 text-center"
-        >
-          <div className="flex justify-center mb-4">
-            <Monitor size={64} className="text-blue-500 group-hover:scale-110 transition-transform" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">叫號顯示端</h2>
-          <p className="text-slate-500">
-            顯示於大螢幕或電視。<br/>包含語音播報功能。
-          </p>
-        </button>
-
-        <button
-          onClick={() => onSelect('admin')}
-          className="group relative bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-emerald-500 text-center"
-        >
-          <div className="flex justify-center mb-4">
-            <Smartphone size={64} className="text-emerald-500 group-hover:scale-110 transition-transform" />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">叫號控制台</h2>
-          <p className="text-slate-500">
-            櫃檯人員使用。<br/>操作下一號或指定號碼。
-          </p>
-        </button>
-      </div>
-      <p className="mt-12 text-slate-400 text-sm">
-        請在不同視窗或裝置開啟此網頁以進行連線
-      </p>
-    </div>
-  );
-};
-
-// 2. Display Screen Component
-const DisplayScreen = ({ user }: { user: any }) => {
-  const [number, setNumber] = useState(0);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [isFlashing, setIsFlashing] = useState(false);
-  const lastPlayedRef = useRef(0);
-
-  // Sync data
-  useEffect(() => {
-    if (!user) return;
-
-    // Fixed path: 6 segments to ensure it points to a document
-    // artifacts(col) -> appId(doc) -> public(col) -> data(doc) -> queue(col) -> status(doc)
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雲端叫號系統</title>
     
-    const unsubscribe = onSnapshot(docRef, 
-      (docSnap) => {
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          const newNum = data.currentNumber || 0;
-          setNumber(newNum);
-          
-          // Trigger visual effect
-          if (newNum !== lastPlayedRef.current) {
-             setIsFlashing(true);
-             setTimeout(() => setIsFlashing(false), 1000);
-          }
+    <!-- 1. 引入 Tailwind CSS (樣式庫) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. 引入 Lucide Icons (圖標庫) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- 3. 自定義樣式 -->
+    <style>
+        .flash-bg {
+            animation: flash 1s ease-out;
         }
-      },
-      (error) => console.error("Sync error:", error)
-    );
+        @keyframes flash {
+            0% { background-color: #fef08a; } /* yellow-200 */
+            100% { background-color: white; }
+        }
+        /* 隱藏未載入完成的內容 */
+        [v-cloak] { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
 
-    return () => unsubscribe();
-  }, [user]);
+    <!-- 應用程式容器 -->
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- 內容將由 JavaScript 動態產生 -->
+        <div class="flex items-center justify-center h-screen">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+    </div>
 
-  // Handle TTS
-  useEffect(() => {
-    if (!audioEnabled || number === 0 || number === lastPlayedRef.current) return;
+    <!-- 4. 應用程式邏輯 -->
+    <script type="module">
+        // 匯入 Firebase 模組
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    lastPlayedRef.current = number;
-    
-    const speak = () => {
-      try {
-        // Cancel any current speech
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
-        utterance.lang = 'zh-TW';
-        utterance.rate = 0.9;
-        utterance.pitch = 1;
+        // ==========================================
+        // 設定區域 (DEPLOYMENT CONFIG)
+        // ==========================================
         
-        window.speechSynthesis.speak(utterance);
-      } catch (e) {
-        console.warn("TTS Error:", e);
-      }
-    };
+        // 預設設定變數 (用於自動偵測環境)
+        let firebaseConfig;
+        let appId = 'default-queue-app';
 
-    speak();
-    // Repeat once for clarity
-    setTimeout(speak, 3500);
-
-  }, [number, audioEnabled]);
-
-  if (!audioEnabled) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
-        <button 
-          onClick={() => setAudioEnabled(true)}
-          className="bg-blue-600 hover:bg-blue-500 text-white text-xl px-8 py-4 rounded-full flex items-center gap-3 shadow-lg animate-bounce"
-        >
-          <Volume2 size={24} />
-          點擊以啟用音效並開始
-        </button>
-        <p className="text-slate-400 mt-4">瀏覽器需要使用者互動才能播放語音</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isFlashing ? 'bg-yellow-100' : 'bg-white'}`}>
-      <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-32 bg-blue-600 flex items-center justify-center">
-            <h1 className="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
-        </div>
-
-        <div className="flex-1 flex items-center justify-center w-full">
-            <div className="text-center">
-                <span className="text-[25vw] leading-none font-bold text-slate-800 font-mono tracking-tighter">
-                    {number.toString().padStart(3, '0')}
-                </span>
-            </div>
-        </div>
-
-        <div className="w-full bg-slate-100 py-6 border-t border-slate-200">
-             <div className="container mx-auto px-4 flex justify-between items-center text-slate-500">
-                <div className="flex items-center gap-2">
-                    <Volume2 size={20} className="text-green-600" />
-                    <span>語音播報中</span>
-                </div>
-                <div className="text-sm">
-                    系統連線正常
-                </div>
-             </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// 3. Admin Panel Component
-const AdminPanel = ({ user }: { user: any }) => {
-  const [currentNumber, setCurrentNumber] = useState(0);
-  const [jumpInput, setJumpInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
-
-  // Sync data
-  useEffect(() => {
-    if (!user) return;
-
-    // Fixed path: 6 segments
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
-    
-    const unsubscribe = onSnapshot(docRef, 
-      (docSnap) => {
-        if (docSnap.exists()) {
-          setCurrentNumber(docSnap.data().currentNumber || 0);
+        // 偵測是否在 Canvas 預覽環境中
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+            if (typeof __app_id !== 'undefined') appId = __app_id;
         } else {
-            // Init if not exists
-            setDoc(docRef, { currentNumber: 0 });
+            // ============================================================
+            // TODO: 如果您要上傳到 GitHub Pages，請將下方的設定換成您自己的！
+            // ============================================================
+            firebaseConfig = {
+                apiKey: "您的_API_KEY",
+                authDomain: "您的專案.firebaseapp.com",
+                projectId: "您的專案ID",
+                storageBucket: "您的專案.appspot.com",
+                messagingSenderId: "您的ID",
+                appId: "您的APP_ID"
+            };
         }
-      },
-      (error) => console.error("Sync error:", error)
-    );
 
-    return () => unsubscribe();
-  }, [user]);
-
-  const updateNumber = async (newNum: number) => {
-    if (!user) return;
-    setLoading(true);
-    try {
-      // Fixed path: 6 segments
-      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
-      await setDoc(docRef, { 
-        currentNumber: newNum,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
-    } catch (e) {
-      console.error("Update failed", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleNext = () => updateNumber(currentNumber + 1);
-  
-  const handleReset = () => {
-    if (confirmReset) {
-      updateNumber(0);
-      setConfirmReset(false);
-    } else {
-      setConfirmReset(true);
-      // Auto cancel confirm after 3 seconds
-      setTimeout(() => setConfirmReset(false), 3000);
-    }
-  };
-
-  const handleJump = (e: React.FormEvent) => {
-    e.preventDefault();
-    const num = parseInt(jumpInput);
-    if (!isNaN(num) && num >= 0) {
-      updateNumber(num);
-      setJumpInput('');
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-slate-50 p-4 md:p-6">
-      <div className="max-w-md mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 flex justify-between items-center">
-            <div>
-                <h2 className="text-xl font-bold text-slate-800">控制台</h2>
-                <div className="flex items-center gap-2 mt-1">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    <span className="text-xs text-slate-500">已連線</span>
-                </div>
-            </div>
-            <div className="text-right">
-                <p className="text-xs text-slate-400 uppercase tracking-wider">目前號碼</p>
-                <p className="text-4xl font-mono font-bold text-blue-600">
-                    {currentNumber.toString().padStart(3, '0')}
-                </p>
-            </div>
-        </div>
-
-        {/* Main Action */}
-        <button
-          onClick={handleNext}
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white rounded-2xl p-8 shadow-lg shadow-blue-200 flex flex-col items-center justify-center gap-4 group"
-        >
-            <div className="p-4 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
-                <SkipForward size={48} fill="currentColor" />
-            </div>
-            <span className="text-3xl font-bold">下一位</span>
-        </button>
-
-        {/* Secondary Actions */}
-        <div className="grid grid-cols-1 gap-4">
-            {/* Jump to Number */}
-            <form onSubmit={handleJump} className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex gap-2">
-                <div className="relative flex-1">
-                    <Hash size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input 
-                        type="number" 
-                        value={jumpInput}
-                        onChange={(e) => setJumpInput(e.target.value)}
-                        placeholder="輸入號碼"
-                        className="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-lg border-transparent focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all"
-                    />
-                </div>
-                <button 
-                    type="submit"
-                    disabled={!jumpInput || loading}
-                    className="bg-slate-800 text-white px-6 rounded-lg font-medium hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    插隊
-                </button>
-            </form>
-
-            {/* Reset - Now with Two-Step Confirmation */}
-            <button 
-                onClick={handleReset}
-                className={`w-full border py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200
-                  ${confirmReset 
-                    ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 shadow-md scale-105' 
-                    : 'bg-white text-red-500 border-red-100 hover:bg-red-50'
-                  }`}
-            >
-                <RotateCcw size={18} />
-                {confirmReset ? '再次點擊以確認歸零' : '重置號碼'}
-            </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-
-// 4. Main App Container
-export default function App() {
-  const [role, setRole] = useState<'select' | 'display' | 'admin'>('select');
-  const [user, setUser] = useState<any>(null);
-
-  // Authentication
-  useEffect(() => {
-    const initAuth = async () => {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
+        // 初始化 Firebase
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase 初始化失敗，請檢查設定。", e);
+            document.getElementById('app').innerHTML = `<div class="p-8 text-center text-red-500">Firebase 設定錯誤，請查看 Console。</div>`;
         }
-      } catch (e) {
-        console.error("Auth failed:", e);
-      }
-    };
-    initAuth();
 
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+        // ==========================================
+        // 狀態管理 (STATE)
+        // ==========================================
+        const state = {
+            user: null,
+            view: 'loading', // loading, select, display, admin
+            currentNumber: 0,
+            lastPlayedNumber: -1,
+            audioEnabled: false,
+            confirmReset: false,
+            jumpInput: ''
+        };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-slate-500">正在連線至伺服器...</p>
-        </div>
-      </div>
-    );
-  }
+        // ==========================================
+        // 渲染函式 (RENDER)
+        // ==========================================
+        const appContainer = document.getElementById('app');
 
-  // Router Switch
-  switch (role) {
-    case 'display':
-      return <DisplayScreen user={user} />;
-    case 'admin':
-      return <AdminPanel user={user} />;
-    default:
-      return <RoleSelection onSelect={setRole} />;
-  }
-}
+        function render() {
+            // 清空容器
+            appContainer.innerHTML = '';
+
+            if (state.view === 'loading') {
+                appContainer.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-screen gap-4">
+                        <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+                        <p class="text-slate-500">正在連線系統...</p>
+                    </div>
+                `;
+            } 
+            else if (state.view === 'select') {
+                appContainer.innerHTML = `
+                    <div class="flex-1 flex flex-col items-center justify-center p-4">
+                        <h1 class="text-3xl font-bold mb-8">雲端叫號系統</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                            <button onclick="window.setRole('display')" class="group bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 text-center">
+                                <i data-lucide="monitor" class="w-16 h-16 mx-auto mb-4 text-blue-500 transition-transform group-hover:scale-110"></i>
+                                <h2 class="text-2xl font-bold mb-2">叫號顯示端</h2>
+                                <p class="text-slate-500">大螢幕顯示與語音播報</p>
+                            </button>
+                            <button onclick="window.setRole('admin')" class="group bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-emerald-500 text-center">
+                                <i data-lucide="smartphone" class="w-16 h-16 mx-auto mb-4 text-emerald-500 transition-transform group-hover:scale-110"></i>
+                                <h2 class="text-2xl font-bold mb-2">叫號控制台</h2>
+                                <p class="text-slate-500">櫃檯人員操作介面</p>
+                            </button>
+                        </div>
+                        <p class="mt-8 text-sm text-slate-400">請在不同視窗開啟以進行連線</p>
+                    </div>
+                `;
+            }
+            else if (state.view === 'display') {
+                if (!state.audioEnabled) {
+                    appContainer.innerHTML = `
+                        <div class="flex-1 bg-slate-900 flex flex-col items-center justify-center p-4 text-center">
+                            <button onclick="window.enableAudio()" class="bg-blue-600 hover:bg-blue-500 text-white text-xl px-8 py-4 rounded-full flex items-center gap-3 shadow-lg animate-bounce">
+                                <i data-lucide="volume-2"></i>
+                                點擊啟用音效並開始
+                            </button>
+                            <p class="text-slate-400 mt-4">瀏覽器需要您的允許才能自動播放語音</p>
+                        </div>
+                    `;
+                } else {
+                    appContainer.innerHTML = `
+                        <div id="display-bg" class="flex-1 flex flex-col transition-colors duration-500 bg-white">
+                            <div class="bg-blue-600 h-32 flex items-center justify-center shadow-md z-10">
+                                <h1 class="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center relative overflow-hidden">
+                                <span class="text-[25vw] leading-none font-bold text-slate-800 font-mono tracking-tighter tabular-nums">
+                                    ${String(state.currentNumber).padStart(3, '0')}
+                                </span>
+                            </div>
+                            <div class="bg-slate-100 py-4 px-6 border-t border-slate-200 flex justify-between items-center text-slate-500">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="volume-2" class="text-green-600"></i>
+                                    <span>語音待命中</span>
+                                </div>
+                                <span class="text-sm">系統連線正常</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            else if (state.view === 'admin') {
+                appContainer.innerHTML = `
+                    <div class="flex-1 p-4 md:p-6 bg-slate-50">
+                        <div class="max-w-md mx-auto space-y-6">
+                            <!-- Header -->
+                            <div class="bg-white rounded-2xl shadow-sm p-6 border border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-xl font-bold text-slate-800">控制台</h2>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-xs text-slate-500">已連線</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider">目前號碼</p>
+                                    <p class="text-4xl font-mono font-bold text-blue-600">
+                                        ${String(state.currentNumber).padStart(3, '0')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- Next Button -->
+                            <button onclick="window.nextNumber()" class="w-full bg-blue-600 hover:bg-blue-700 active:scale-[0.98] transition-all text-white rounded-2xl p-8 shadow-lg shadow-blue-200 flex flex-col items-center justify-center gap-4 group">
+                                <div class="p-4 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
+                                    <i data-lucide="skip-forward" class="w-12 h-12"></i>
+                                </div>
+                                <span class="text-3xl font-bold">下一位</span>
+                            </button>
+
+                            <!-- Actions -->
+                            <div class="grid grid-cols-1 gap-4">
+                                <form onsubmit="event.preventDefault(); window.jumpNumber()" class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex gap-2">
+                                    <div class="relative flex-1">
+                                        <i data-lucide="hash" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                                        <input type="number" id="jumpInput" placeholder="輸入號碼" class="w-full pl-10 pr-4 py-3 bg-slate-50 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 transition-all">
+                                    </div>
+                                    <button type="submit" class="bg-slate-800 text-white px-6 rounded-lg font-medium hover:bg-slate-700">插隊</button>
+                                </form>
+
+                                <button onclick="window.resetNumber()" class="w-full border py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${state.confirmReset ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-red-500 border-red-100 hover:bg-red-50'}">
+                                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                                    ${state.confirmReset ? '再次點擊確認歸零' : '重置號碼'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // 初始化圖標
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 邏輯控制 (CONTROLLERS)
+        // ==========================================
+
+        // 1. 初始化與登入
+        async function init() {
+            render(); // 顯示 Loading
+            
+            // 處理 Canvas 環境的特殊 Auth
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                 try { await signInWithCustomToken(auth, __initial_auth_token); } catch(e) { console.error(e); }
+            } else {
+                 try { await signInAnonymously(auth); } catch(e) { console.error(e); }
+            }
+
+            // 監聽登入狀態
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    state.user = user;
+                    state.view = 'select';
+                    render();
+                }
+            });
+        }
+
+        // 2. 切換角色
+        window.setRole = (role) => {
+            state.view = role;
+            render();
+            startSync(); // 開始監聽資料庫
+        };
+
+        // 3. 資料庫同步
+        function startSync() {
+            if (!state.user) return;
+            
+            // 使用公共路徑以便連線
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    const newNum = data.currentNumber || 0;
+                    
+                    // 如果是顯示端且號碼改變，觸發效果
+                    if (state.view === 'display' && newNum !== state.currentNumber && state.audioEnabled) {
+                        playAudio(newNum);
+                        flashScreen();
+                    }
+
+                    state.currentNumber = newNum;
+                    render();
+                } else {
+                    // 初始化文件
+                    setDoc(docRef, { currentNumber: 0 });
+                }
+            });
+        }
+
+        // 4. 管理員操作
+        window.nextNumber = async () => {
+            updateFirestore(state.currentNumber + 1);
+        };
+
+        window.jumpNumber = async () => {
+            const input = document.getElementById('jumpInput');
+            if (input && input.value) {
+                const num = parseInt(input.value);
+                if (num >= 0) {
+                    updateFirestore(num);
+                    input.value = '';
+                }
+            }
+        };
+
+        window.resetNumber = () => {
+            if (state.confirmReset) {
+                updateFirestore(0);
+                state.confirmReset = false;
+            } else {
+                state.confirmReset = true;
+                render();
+                setTimeout(() => {
+                    state.confirmReset = false;
+                    render(); // 重新渲染以取消紅色狀態
+                }, 3000);
+            }
+        };
+
+        async function updateFirestore(num) {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
+            try {
+                await setDoc(docRef, { 
+                    currentNumber: num,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (e) {
+                console.error("更新失敗", e);
+                alert("連線錯誤，請重試");
+            }
+        }
+
+        // 5. 顯示端功能 (音效與動畫)
+        window.enableAudio = () => {
+            state.audioEnabled = true;
+            
+            // 播放一個無聲片段以解鎖 iOS/Chrome 的音訊限制
+            const utterance = new SpeechSynthesisUtterance('');
+            window.speechSynthesis.speak(utterance);
+            
+            render();
+        };
+
+        function playAudio(number) {
+            // 避免重複播報
+            if (number === state.lastPlayedNumber) return;
+            state.lastPlayedNumber = number;
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
+            utterance.lang = 'zh-TW';
+            utterance.rate = 0.9;
+            window.speechSynthesis.speak(utterance);
+            
+            // 重複一次
+            setTimeout(() => {
+                const u2 = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
+                u2.lang = 'zh-TW';
+                u2.rate = 0.9;
+                window.speechSynthesis.speak(u2);
+            }, 3500);
+        }
+
+        function flashScreen() {
+            const bg = document.getElementById('display-bg');
+            if (bg) {
+                bg.classList.add('flash-bg');
+                setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+            }
+        }
+
+        // 啟動應用
+        init();
+    </script>
+</body>
+</html>
