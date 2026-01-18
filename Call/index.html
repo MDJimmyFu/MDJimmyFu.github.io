@@ -17,12 +17,9 @@ import {
   Monitor, 
   Smartphone, 
   Volume2, 
-  VolumeX, 
   SkipForward, 
   RotateCcw, 
-  Hash, 
-  Maximize,
-  ArrowRight
+  Hash
 } from 'lucide-react';
 
 // --- Firebase Initialization ---
@@ -86,8 +83,9 @@ const DisplayScreen = ({ user }: { user: any }) => {
   useEffect(() => {
     if (!user) return;
 
-    // Use public collection so multiple users (display + admin) can share data easily by just opening the link
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_status');
+    // Fixed path: 6 segments to ensure it points to a document
+    // artifacts(col) -> appId(doc) -> public(col) -> data(doc) -> queue(col) -> status(doc)
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
     
     const unsubscribe = onSnapshot(docRef, 
       (docSnap) => {
@@ -116,15 +114,19 @@ const DisplayScreen = ({ user }: { user: any }) => {
     lastPlayedRef.current = number;
     
     const speak = () => {
-      // Cancel any current speech
-      window.speechSynthesis.cancel();
+      try {
+        // Cancel any current speech
+        window.speechSynthesis.cancel();
 
-      const utterance = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
-      utterance.lang = 'zh-TW';
-      utterance.rate = 0.9;
-      utterance.pitch = 1;
-      
-      window.speechSynthesis.speak(utterance);
+        const utterance = new SpeechSynthesisUtterance(`請 ${number} 號顧客`);
+        utterance.lang = 'zh-TW';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {
+        console.warn("TTS Error:", e);
+      }
     };
 
     speak();
@@ -185,12 +187,14 @@ const AdminPanel = ({ user }: { user: any }) => {
   const [currentNumber, setCurrentNumber] = useState(0);
   const [jumpInput, setJumpInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   // Sync data
   useEffect(() => {
     if (!user) return;
 
-    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_status');
+    // Fixed path: 6 segments
+    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
     
     const unsubscribe = onSnapshot(docRef, 
       (docSnap) => {
@@ -211,7 +215,8 @@ const AdminPanel = ({ user }: { user: any }) => {
     if (!user) return;
     setLoading(true);
     try {
-      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_status');
+      // Fixed path: 6 segments
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue', 'status');
       await setDoc(docRef, { 
         currentNumber: newNum,
         updatedAt: new Date().toISOString()
@@ -224,9 +229,18 @@ const AdminPanel = ({ user }: { user: any }) => {
   };
 
   const handleNext = () => updateNumber(currentNumber + 1);
+  
   const handleReset = () => {
-    if(confirm('確定要歸零嗎？')) updateNumber(0);
-  }
+    if (confirmReset) {
+      updateNumber(0);
+      setConfirmReset(false);
+    } else {
+      setConfirmReset(true);
+      // Auto cancel confirm after 3 seconds
+      setTimeout(() => setConfirmReset(false), 3000);
+    }
+  };
+
   const handleJump = (e: React.FormEvent) => {
     e.preventDefault();
     const num = parseInt(jumpInput);
@@ -291,13 +305,17 @@ const AdminPanel = ({ user }: { user: any }) => {
                 </button>
             </form>
 
-            {/* Reset */}
+            {/* Reset - Now with Two-Step Confirmation */}
             <button 
                 onClick={handleReset}
-                className="w-full bg-white text-red-500 border border-red-100 hover:bg-red-50 py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-colors"
+                className={`w-full border py-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all duration-200
+                  ${confirmReset 
+                    ? 'bg-red-600 text-white border-red-600 hover:bg-red-700 shadow-md scale-105' 
+                    : 'bg-white text-red-500 border-red-100 hover:bg-red-50'
+                  }`}
             >
                 <RotateCcw size={18} />
-                重置號碼
+                {confirmReset ? '再次點擊以確認歸零' : '重置號碼'}
             </button>
         </div>
       </div>
@@ -314,10 +332,14 @@ export default function App() {
   // Authentication
   useEffect(() => {
     const initAuth = async () => {
-      if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-        await signInWithCustomToken(auth, __initial_auth_token);
-      } else {
-        await signInAnonymously(auth);
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (e) {
+        console.error("Auth failed:", e);
       }
     };
     initAuth();
