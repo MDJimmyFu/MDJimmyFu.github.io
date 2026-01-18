@@ -53,6 +53,7 @@
 
         let client = null;
         let topicCmd = '';
+        let topicState = '';
 
         // Check for ID in URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -73,6 +74,7 @@
             connectBtn.disabled = true;
 
             topicCmd = `queue-system/${sessionId}/cmd`;
+            topicState = `queue-system/${sessionId}/state`;
 
             client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
                 clientId: 'queue-client-' + Math.random().toString(16).substr(2, 8)
@@ -89,6 +91,16 @@
 
                 // Send HELLO to wake up display / hide QR code
                 client.publish(topicCmd, 'HELLO');
+
+                // Subscribe to state updates
+                client.subscribe(topicState);
+            });
+
+            client.on('message', (topic, message) => {
+                if (topic === topicState) {
+                    const num = parseInt(message.toString());
+                    document.getElementById('current-number').innerText = num;
+                }
             });
 
             client.on('error', (err) => {

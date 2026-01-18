@@ -50,6 +50,7 @@
 
         // Topics
         const topicCmd = `queue-system/${sessionId}/cmd`;
+        const topicState = `queue-system/${sessionId}/state`;
 
         // Generate QR Code
         const adminUrl = window.location.href.replace('display.html', 'admin.html') + '?id=' + sessionId;
@@ -102,9 +103,9 @@
                     // We can hide the QR code now to imitate "connection established"
                     statusIndicator.innerText = '控制器已連線';
                     connectionInfo.style.display = 'none';
-                    // Send back current state
-                    // We don't necessarily need a return channel for this simple app, 
-                    // but we can assume connection is live.
+                    
+                    // Send current state back to controller
+                    client.publish(topicState, currentNumber.toString());
                 }
             }
         });
@@ -118,7 +119,12 @@
         function updateNumber(num) {
             currentNumber = num;
             numberDisplay.innerText = currentNumber;
-
+            
+            // Sync state to all controllers
+            if (client && client.connected) {
+                client.publish(topicState, currentNumber.toString(), { retain: true });
+            }
+            
             numberDisplay.classList.remove('pulse');
             void numberDisplay.offsetWidth;
             numberDisplay.classList.add('pulse');
