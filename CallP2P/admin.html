@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>叫號控制 | Control Panel</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 </head>
 
 <body>
@@ -22,15 +22,14 @@
             </div>
         </div>
 
-        <!-- Control Panel (Hidden by default) -->
+        <!-- Control Panel -->
         <div id="control-panel" class="card" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h1 style="margin: 0;">目前號碼</h1>
-                <div id="status-display" class="status-indicator">已連線</div>
+                <h1 style="margin: 0;">目前號碼 (Remote)</h1>
+                <div id="status-display" class="status-indicator">連線中...</div>
             </div>
 
-            <div id="current-number" class="number-display">0</div>
-
+            <!-- Controls -->
             <div class="controls">
                 <button id="next-btn" class="primary-btn">下一號 (Next)</button>
 
@@ -50,103 +49,83 @@
         const controlPanel = document.getElementById('control-panel');
         const targetIdInput = document.getElementById('target-id-input');
         const connectBtn = document.getElementById('connect-btn');
-        const numberDisplay = document.getElementById('current-number');
         const statusDisplay = document.getElementById('status-display');
 
-        let conn = null;
-        const peer = new Peer(null, {
-            config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
-                ]
-            }
-        }); // Auto-generate ID for controller client
+        let client = null;
+        let topicCmd = '';
 
         // Check for ID in URL
         const urlParams = new URLSearchParams(window.location.search);
         const autoId = urlParams.get('id');
         if (autoId) {
             targetIdInput.value = autoId;
-            // PeerJS needs a moment to initialize
-            peer.on('open', () => {
-                connectToPeer(autoId);
-            });
+            // Auto connect if ID is present
+            setTimeout(() => connectMQ(autoId), 500);
         }
 
         connectBtn.addEventListener('click', () => {
-            const id = targetIdInput.value;
-            if (id) connectToPeer(id);
+            const id = targetIdInput.value.trim();
+            if (id) connectMQ(id);
         });
 
-        function connectToPeer(id) {
-            connectBtn.innerText = '連線中...';
+        function connectMQ(sessionId) {
+            connectBtn.innerText = '連線伺服器...';
             connectBtn.disabled = true;
 
-            conn = peer.connect(id);
+            topicCmd = `queue-system/${sessionId}/cmd`;
 
-            conn.on('open', () => {
-                console.log('Connected to: ' + id);
-                // Switch views
+            client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+                clientId: 'queue-client-' + Math.random().toString(16).substr(2, 8)
+            });
+
+            client.on('connect', () => {
+                console.log('Connected to MQTT Broker');
+
+                // Show control panel
                 connectScreen.style.display = 'none';
                 controlPanel.style.display = 'block';
+                statusDisplay.innerText = '已連線 (Online)';
+                statusDisplay.classList.add('connected');
+
+                // Send HELLO to wake up display / hide QR code
+                client.publish(topicCmd, 'HELLO');
             });
 
-            conn.on('data', (data) => {
-                if (data.type === 'sync') {
-                    updateDisplay(data.value);
-                }
-            });
-
-            conn.on('close', () => {
-                alert('連線已中斷 (Disconnected)');
-                location.reload();
-            });
-
-            conn.on('error', (err) => {
-                console.error(err);
-                alert('連線失敗 (Connection Error)');
-                connectBtn.innerText = '連線 (Connect)';
+            client.on('error', (err) => {
+                console.error('Connection error:', err);
+                alert('伺服器連線失敗');
                 connectBtn.disabled = false;
+                connectBtn.innerText = '連線 (Connect)';
+            });
+
+            client.on('offline', () => {
+                statusDisplay.innerText = '離線 (Offline)';
+                statusDisplay.classList.remove('connected');
             });
         }
 
         // Control Logic
-        let currentNumber = 0;
-
-        function updateDisplay(num) {
-            currentNumber = parseInt(num);
-            numberDisplay.innerText = currentNumber;
-        }
-
         document.getElementById('next-btn').addEventListener('click', () => {
-            if (conn && conn.open) {
-                currentNumber++;
-                updateDisplay(currentNumber);
-                conn.send({ type: 'update', value: currentNumber });
+            if (client && client.connected) {
+                client.publish(topicCmd, 'NEXT');
             }
         });
 
         document.getElementById('jump-btn').addEventListener('click', () => {
             const input = document.getElementById('jump-input');
             const val = parseInt(input.value);
-            if (conn && conn.open && !isNaN(val)) {
-                currentNumber = val;
-                updateDisplay(currentNumber);
-                conn.send({ type: 'update', value: currentNumber });
+            if (client && client.connected && !isNaN(val)) {
+                client.publish(topicCmd, 'JUMP:' + val);
                 input.value = '';
             }
         });
 
         document.getElementById('reset-btn').addEventListener('click', () => {
-            if (conn && conn.open && confirm('確定重置？')) {
-                currentNumber = 0;
-                updateDisplay(currentNumber);
-                conn.send({ type: 'reset' });
+            if (client && client.connected && confirm('確定重置？')) {
+                client.publish(topicCmd, 'RESET');
             }
         });
 
-        // Allow Enter in jump input
         document.getElementById('jump-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') document.getElementById('jump-btn').click();
         });

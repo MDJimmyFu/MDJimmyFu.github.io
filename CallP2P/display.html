@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>目前號碼 | Queue Display</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 
@@ -27,8 +27,8 @@
             <div class="connection-info">
                 <div id="qrcode"></div>
                 <p>掃描 QR Code 或輸入 ID 連線</p>
-                <div class="id-display" id="peer-id-display">Generating ID...</div>
-                <div class="status-indicator" id="connection-status">等待連線...</div>
+                <div class="id-display" id="session-id-display">Generating...</div>
+                <div class="status-indicator" id="connection-status">連接伺服器中...</div>
             </div>
         </div>
     </div>
@@ -36,76 +36,89 @@
     <script>
         const numberDisplay = document.getElementById('current-number');
         const audioOverlay = document.getElementById('audio-overlay');
-        const peerIdDisplay = document.getElementById('peer-id-display');
+        const sessionIdDisplay = document.getElementById('session-id-display');
         const statusIndicator = document.getElementById('connection-status');
         const connectionInfo = document.querySelector('.connection-info');
         let audioEnabled = false;
         let currentNumber = 0;
+        let isConnected = false;
 
-        // PeerJS Setup with STUN servers for better connectivity
-        // Create a random ID ensuring uniqueness
-        const uniqueId = 'queue-' + Math.random().toString(36).substr(2, 6);
-        const peer = new Peer(uniqueId, {
-            config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:global.stun.twilio.com:3478' }
-                ]
+        // MQTT Setup
+        // Generate a random Session ID
+        const sessionId = 'queue-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        sessionIdDisplay.innerText = sessionId;
+
+        // Topics
+        const topicCmd = `queue-system/${sessionId}/cmd`;
+
+        // Generate QR Code
+        const adminUrl = window.location.href.replace('display.html', 'admin.html') + '?id=' + sessionId;
+        new QRCode(document.getElementById("qrcode"), {
+            text: adminUrl,
+            width: 128,
+            height: 128,
+            colorDark: "#e0e0e0",
+            colorLight: "#1a1a24",
+            correctLevel: QRCode.CorrectLevel.M
+        });
+
+        // Connect to Public Broker (Websocket)
+        // Using EMQX public broker
+        const client = mqtt.connect('wss://broker.emqx.io:8084/mqtt', {
+            clientId: 'queue-display-' + Math.random().toString(16).substr(2, 8)
+        });
+
+        client.on('connect', () => {
+            console.log('MQTT Connected');
+            statusIndicator.innerText = '伺服器已連線，等待控制器...';
+            statusIndicator.classList.add('connected');
+
+            // Subscribe to command topic
+            client.subscribe(topicCmd, (err) => {
+                if (!err) {
+                    console.log('Subscribed to:', topicCmd);
+                }
+            });
+        });
+
+        client.on('message', (topic, message) => {
+            // Check if topic matches
+            if (topic === topicCmd) {
+                const msg = message.toString();
+                console.log('Received:', msg);
+
+                // Handle commands
+                if (msg === 'NEXT') {
+                    updateNumber(currentNumber + 1);
+                } else if (msg === 'RESET') {
+                    updateNumber(0);
+                } else if (msg.startsWith('JUMP:')) {
+                    const num = parseInt(msg.split(':')[1]);
+                    if (!isNaN(num)) {
+                        updateNumber(num);
+                    }
+                } else if (msg === 'HELLO') {
+                    // Controller attempting to connect (handshake)
+                    // We can hide the QR code now to imitate "connection established"
+                    statusIndicator.innerText = '控制器已連線';
+                    connectionInfo.style.display = 'none';
+                    // Send back current state
+                    // We don't necessarily need a return channel for this simple app, 
+                    // but we can assume connection is live.
+                }
             }
         });
 
-        peer.on('open', (id) => {
-            console.log('My peer ID is: ' + id);
-            peerIdDisplay.innerText = id;
-
-            // Generate QR Code
-            // URL points to admin.html in the same directory with ?id=...
-            const adminUrl = window.location.href.replace('display.html', 'admin.html') + '?id=' + id;
-            new QRCode(document.getElementById("qrcode"), {
-                text: adminUrl,
-                width: 128,
-                height: 128,
-                colorDark: "#e0e0e0", // Light color for dark mode
-                colorLight: "#1a1a24",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        });
-
-        peer.on('connection', (conn) => {
-            console.log('Connected to: ' + conn.peer);
-            statusIndicator.innerText = '已連線 (Connected)';
-            statusIndicator.classList.add('connected');
-
-            // Auto hide Connection Info
-            connectionInfo.style.display = 'none';
-
-            // Send current state immediately
-            conn.on('open', () => {
-                conn.send({ type: 'sync', value: currentNumber });
-            });
-
-            conn.on('data', (data) => {
-                console.log('Received:', data);
-                if (data.type === 'update') {
-                    updateNumber(data.value);
-                } else if (data.type === 'reset') {
-                    updateNumber(0);
-                }
-            });
-
-            conn.on('close', () => {
-                statusIndicator.innerText = '連線中斷 (Disconnected)';
-                statusIndicator.classList.remove('connected');
-                // Show Connection Info again
-                connectionInfo.style.display = 'flex';
-            });
+        client.on('offline', () => {
+            statusIndicator.innerText = '伺服器連線中...';
+            statusIndicator.classList.remove('connected');
+            connectionInfo.style.display = 'flex';
         });
 
         function updateNumber(num) {
-            currentNumber = parseInt(num);
+            currentNumber = num;
             numberDisplay.innerText = currentNumber;
 
-            // Visual feedback
             numberDisplay.classList.remove('pulse');
             void numberDisplay.offsetWidth;
             numberDisplay.classList.add('pulse');
@@ -116,7 +129,7 @@
         function playAudio(num) {
             if (audioEnabled && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const text = `號碼 ${num} 號請進入診間`;
+                const text = `號碼 ${num}`;
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'zh-TW';
                 utterance.rate = 1;
@@ -124,7 +137,6 @@
             }
         }
 
-        // Enable Audio
         audioOverlay.addEventListener('click', () => {
             audioEnabled = true;
             audioOverlay.classList.add('hidden');
