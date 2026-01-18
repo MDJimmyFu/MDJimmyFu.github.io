@@ -55,9 +55,10 @@ h1 {
 }
 
 /* Number Display */
+/* Number Display */
 .number-display {
-    /* Responsive font size: 35% of viewport width or height, whichever is smaller, but at least 5rem */
-    font-size: max(5rem, min(35vw, 40vh));
+    /* Responsive font size: 35% of the viewport's smaller dimension */
+    font-size: 35vmin;
     font-weight: 800;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
