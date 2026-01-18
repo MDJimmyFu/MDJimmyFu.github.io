@@ -287,14 +287,14 @@
             state.lastPlayed = num;
             window.speechSynthesis.cancel();
             
-            const u = new SpeechSynthesisUtterance(`請 ${num} 號顧客辦理`);
+            const u = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
             u.lang = 'zh-TW';
             u.rate = 0.9;
             window.speechSynthesis.speak(u);
 
             // 重複播報
             setTimeout(() => {
-                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號顧客`);
+                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
                  u2.lang = 'zh-TW';
                  u2.rate = 0.9;
                  window.speechSynthesis.speak(u2);
