@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雲端叫號系統 (Firebase版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        .flash-bg { animation: flash 1s ease-out; }
+        @keyframes flash {
+            0% { background-color: #fef08a; }
+            100% { background-color: white; }
+        }
+        /* 錯誤訊息樣式 */
+        .error-banner { background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin: 1rem; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- 預設載入畫面 -->
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <p id="status-text" class="text-slate-500">系統初始化中...</p>
+        </div>
+    </div>
+
+    <!-- 錯誤訊息容器 -->
+    <div id="error-container" class="fixed bottom-0 left-0 w-full p-4 pointer-events-none"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // 1. 設定區域
+        // ==========================================
+        let firebaseConfig = null;
+        let appId = 'cloud-call-app-v1';
+
+        if (typeof __firebase_config !== 'undefined') {
+            firebaseConfig = JSON.parse(__firebase_config);
+            if (typeof __app_id !== 'undefined') appId = __app_id;
+        } else {
+            // 使用您的正式設定
+            firebaseConfig = {
+                apiKey: "AIzaSyCYfOftCxiz6fMXxTVWU7nikecB2xknyVc",
+                authDomain: "cloud-call-97330.firebaseapp.com",
+                projectId: "cloud-call-97330",
+                storageBucket: "cloud-call-97330.firebasestorage.app",
+                messagingSenderId: "463792174311",
+                appId: "1:463792174311:web:b1e23688c5911916f1de42",
+                measurementId: "G-2X5B1G5MWQ"
+            };
+        }
+
+        // ==========================================
+        // 2. 系統邏輯
+        // ==========================================
+        const state = {
+            user: null,
+            view: 'loading',
+            currentNumber: 0,
+            audioEnabled: false,
+            confirmReset: false,
+            lastPlayed: -1,
+            lastTimestamp: 0 // 新增：用於偵測重播
+        };
+
+        const appEl = document.getElementById('app');
+        let db, auth;
+
+        function showError(msg, details = "") {
+            const container = document.getElementById('error-container');
+            const div = document.createElement('div');
+            div.className = "error-banner pointer-events-auto shadow-lg";
+            div.innerHTML = `<strong>錯誤：</strong> ${msg} <br/><span class="text-sm opacity-75">${details}</span>`;
+            container.appendChild(div);
+            
+            const statusText = document.getElementById('status-text');
+            if(statusText) statusText.innerText = "連線失敗";
+        }
+
+        async function init() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        state.user = user;
+                        state.view = 'select';
+                        render();
+                    } else {
+                        showError("無法登入", "請檢查 Firebase Authentication 是否已啟用「匿名登入」。");
+                    }
+                });
+
+            } catch (e) {
+                console.error(e);
+                showError("初始化失敗", e.message);
+            }
+        }
+
+        function render() {
+            appEl.innerHTML = ''; 
+
+            if (state.view === 'select') {
+                appEl.innerHTML = `
+                    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+                        <h1 class="text-3xl font-bold mb-8">雲端叫號系統 (Firebase)</h1>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                            <button onclick="window.selectRole('display')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 text-center">
+                                <i data-lucide="monitor" class="w-16 h-16 mx-auto mb-4 text-blue-500"></i>
+                                <h2 class="text-2xl font-bold mb-2">叫號顯示端</h2>
+                                <p class="text-slate-500">大螢幕顯示與語音播報</p>
+                            </button>
+                            <button onclick="window.selectRole('admin')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-emerald-500 text-center">
+                                <i data-lucide="smartphone" class="w-16 h-16 mx-auto mb-4 text-emerald-500"></i>
+                                <h2 class="text-2xl font-bold mb-2">叫號控制台</h2>
+                                <p class="text-slate-500">櫃檯人員操作介面</p>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (state.view === 'display') {
+                if (!state.audioEnabled) {
+                    appEl.innerHTML = `
+                        <div class="h-screen bg-slate-900 flex flex-col items-center justify-center text-center p-4">
+                            <button onclick="window.enableAudio()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full flex items-center gap-3 shadow-lg animate-bounce transition-colors">
+                                <i data-lucide="volume-2"></i> 點擊啟用音效
+                            </button>
+                            <p class="text-slate-400 mt-4 text-sm">瀏覽器需要您的互動才能播放語音</p>
+                        </div>
+                    `;
+                } else {
+                    appEl.innerHTML = `
+                        <div id="flash-bg" class="h-screen flex flex-col bg-white transition-colors duration-500">
+                            <div class="bg-blue-600 h-32 flex items-center justify-center shadow-md z-10">
+                                <h1 class="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center relative overflow-hidden">
+                                <span class="text-[25vw] font-bold text-slate-800 font-mono tracking-tighter leading-none">
+                                    ${String(state.currentNumber).padStart(3, '0')}
+                                </span>
+                            </div>
+                            <div class="bg-slate-100 py-4 px-6 border-t border-slate-200 flex justify-between items-center text-slate-500">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="volume-2" class="text-green-600"></i>
+                                    <span>語音待命中</span>
+                                </div>
+                                <span class="text-sm">系統連線正常</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else if (state.view === 'admin') {
+                appEl.innerHTML = `
+                    <div class="min-h-screen p-4 bg-slate-50 flex flex-col items-center pt-6 md:pt-10">
+                        <div class="w-full max-w-md space-y-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-xl font-bold text-slate-800">控制台</h2>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-xs text-slate-500">已連線</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider">目前號碼</p>
+                                    <span class="text-4xl font-mono font-bold text-blue-600">${String(state.currentNumber).padStart(3, '0')}</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <button onclick="window.nextNum()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
+                                    <div class="p-3 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
+                                        <i data-lucide="skip-forward" class="w-10 h-10"></i>
+                                    </div>
+                                    <span class="text-2xl font-bold">下一位</span>
+                                </button>
+
+                                <!-- 新增：再次叫號按鈕 -->
+                                <button onclick="window.recallNum()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-4 shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="volume-2" class="w-6 h-6"></i>
+                                    <span class="text-xl font-bold">再次叫號</span>
+                                </button>
+                            </div>
+
+                            <div class="grid gap-4 pt-2">
+                                <form onsubmit="event.preventDefault(); window.jumpNum()" class="flex gap-2 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                    <input id="jumpInput" type="number" class="flex-1 p-3 rounded-lg outline-none bg-slate-50 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="輸入號碼">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-lg font-medium transition-colors">插隊</button>
+                                </form>
+                                <button onclick="window.resetNum()" class="w-full border py-4 rounded-xl font-medium transition-colors ${state.confirmReset ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-red-500 border-red-100 hover:bg-red-50'}">
+                                    ${state.confirmReset ? '再次點擊確認歸零' : '重置號碼'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        window.selectRole = (role) => {
+            state.view = role;
+            render();
+            startSync();
+        };
+
+        window.enableAudio = () => {
+            state.audioEnabled = true;
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); 
+            render();
+        };
+
+        window.nextNum = () => updateDb(state.currentNumber + 1);
+        
+        // 新增：再次叫號 (直接用當前號碼更新，但 updateDb 會更新時間戳記)
+        window.recallNum = () => updateDb(state.currentNumber);
+        
+        window.jumpNum = () => {
+            const val = document.getElementById('jumpInput').value;
+            if(val) updateDb(parseInt(val));
+            const input = document.getElementById('jumpInput');
+            if(input) input.value = '';
+        }
+
+        window.resetNum = () => {
+            if(state.confirmReset) { updateDb(0); state.confirmReset = false; }
+            else { state.confirmReset = true; render(); setTimeout(() => { state.confirmReset = false; render(); }, 3000); }
+        }
+
+        function startSync() {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_system', 'status');
+            
+            onSnapshot(docRef, (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    const newNum = data.val || 0;
+                    const newTs = data.updatedAt || 0; // 取得更新時間
+                    
+                    // 判斷邏輯：
+                    // 1. 號碼變了
+                    // 2. 號碼沒變，但時間戳記變了 (代表有人按了再次叫號)
+                    const shouldPlay = (newNum !== state.currentNumber) || (newTs > state.lastTimestamp && state.lastTimestamp !== 0);
+
+                    if (state.view === 'display' && state.audioEnabled && shouldPlay) {
+                        playAudio(newNum);
+                        const bg = document.getElementById('flash-bg');
+                        if(bg) {
+                            bg.classList.remove('flash-bg');
+                            void bg.offsetWidth; // 強制重繪以重啟動畫
+                            bg.classList.add('flash-bg');
+                            setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+                        }
+                    }
+                    state.currentNumber = newNum;
+                    state.lastTimestamp = newTs;
+                    render();
+                } else {
+                    setDoc(docRef, { val: 0, updatedAt: Date.now() });
+                }
+            }, (error) => {
+                console.error(error);
+                if (error.code === 'permission-denied') {
+                    showError("權限不足", "請到 Firebase Console -> Firestore Database -> Rules 分頁，將規則改為 allow read, write: if true;");
+                } else {
+                    showError("連線中斷", error.message);
+                }
+            });
+        }
+
+        async function updateDb(num) {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_system', 'status');
+            try {
+                // 重點：加上 updatedAt 來觸發更新，即使號碼 val 一樣
+                await setDoc(docRef, { val: num, updatedAt: Date.now() }, { merge: true });
+            } catch(e) {
+                showError("更新失敗", e.message);
+            }
+        }
+
+        function playAudio(num) {
+            window.speechSynthesis.cancel();
+            
+            const u = new SpeechSynthesisUtterance(`請 ${num} 號顧客辦理`);
+            u.lang = 'zh-TW';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+
+            setTimeout(() => {
+                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號顧客`);
+                 u2.lang = 'zh-TW';
+                 u2.rate = 0.9;
+                 window.speechSynthesis.speak(u2);
+            }, 3500);
+        }
+
+        init();
+    </script>
+</body>
+</html>

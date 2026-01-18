@@ -3,136 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>雲端叫號系統 (Firebase版)</title>
+    <title>雲端叫號系統 (MQTT版)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 引入 MQTT.js 函式庫 -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
     <style>
         .flash-bg { animation: flash 1s ease-out; }
         @keyframes flash {
             0% { background-color: #fef08a; }
             100% { background-color: white; }
         }
-        /* 錯誤訊息樣式 */
-        .error-banner { background: #fee2e2; border: 1px solid #ef4444; color: #b91c1c; padding: 1rem; border-radius: 0.5rem; margin: 1rem; }
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; }
+        .connected { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .disconnected { background-color: #ef4444; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
 
     <div id="app" class="min-h-screen flex flex-col">
-        <!-- 預設載入畫面 -->
+        <!-- 初始載入畫面 -->
         <div class="flex flex-col items-center justify-center h-screen gap-4">
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-            <p id="status-text" class="text-slate-500">系統初始化中...</p>
+            <p class="text-slate-500">系統載入中...</p>
         </div>
     </div>
 
-    <!-- 錯誤訊息容器 -->
-    <div id="error-container" class="fixed bottom-0 left-0 w-full p-4 pointer-events-none"></div>
+    <!-- 狀態列 (除錯用) -->
+    <div id="connection-status" class="fixed bottom-2 right-2 text-xs text-slate-400 bg-white/80 px-2 py-1 rounded shadow hidden">
+        MQTT: <span id="mqtt-status">未連線</span>
+    </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+    <script>
         // ==========================================
-        // 1. 設定區域
+        // 1. MQTT 設定與狀態
         // ==========================================
-        let firebaseConfig = null;
-        let appId = 'cloud-call-app-v1';
-
-        if (typeof __firebase_config !== 'undefined') {
-            firebaseConfig = JSON.parse(__firebase_config);
-            if (typeof __app_id !== 'undefined') appId = __app_id;
-        } else {
-            // 使用您的正式設定
-            firebaseConfig = {
-                apiKey: "AIzaSyCYfOftCxiz6fMXxTVWU7nikecB2xknyVc",
-                authDomain: "cloud-call-97330.firebaseapp.com",
-                projectId: "cloud-call-97330",
-                storageBucket: "cloud-call-97330.firebasestorage.app",
-                messagingSenderId: "463792174311",
-                appId: "1:463792174311:web:b1e23688c5911916f1de42",
-                measurementId: "G-2X5B1G5MWQ"
-            };
-        }
-
-        // ==========================================
-        // 2. 系統邏輯
-        // ==========================================
+        // 使用公開的 EMQX Broker (支援 WebSocket Secure)
+        const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
+        
         const state = {
-            user: null,
-            view: 'loading',
+            client: null,
+            view: 'channel-select', // channel-select, role-select, display, admin
+            channelId: '',
+            role: '',
             currentNumber: 0,
             audioEnabled: false,
             confirmReset: false,
             lastPlayed: -1,
-            lastTimestamp: 0 // 新增：用於偵測重播
+            isConnected: false
         };
 
         const appEl = document.getElementById('app');
-        let db, auth;
 
-        function showError(msg, details = "") {
-            const container = document.getElementById('error-container');
-            const div = document.createElement('div');
-            div.className = "error-banner pointer-events-auto shadow-lg";
-            div.innerHTML = `<strong>錯誤：</strong> ${msg} <br/><span class="text-sm opacity-75">${details}</span>`;
-            container.appendChild(div);
+        // ==========================================
+        // 2. 核心邏輯 (MQTT)
+        // ==========================================
+
+        function connectMQTT(channelId) {
+            // 產生一個隨機 Client ID
+            const clientId = 'queue_app_' + Math.random().toString(16).substr(2, 8);
             
-            const statusText = document.getElementById('status-text');
-            if(statusText) statusText.innerText = "連線失敗";
-        }
+            // 連線選項
+            const options = {
+                keepalive: 60,
+                clientId: clientId,
+                protocolId: 'MQTT',
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 1000,
+                connectTimeout: 30 * 1000,
+            };
 
-        async function init() {
-            try {
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+            updateStatus('連線中...');
+            
+            // 建立連線
+            state.client = mqtt.connect(BROKER_URL, options);
 
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        state.user = user;
-                        state.view = 'select';
-                        render();
-                    } else {
-                        showError("無法登入", "請檢查 Firebase Authentication 是否已啟用「匿名登入」。");
+            state.client.on('connect', () => {
+                state.isConnected = true;
+                updateStatus('已連線');
+                
+                // 訂閱頻道 (Topic)
+                // topic 格式: queue-sys/您的頻道/status
+                const topic = `queue-sys/${channelId}/status`;
+                
+                state.client.subscribe(topic, { qos: 0 }, (err) => {
+                    if (!err) {
+                        console.log(`已訂閱頻道: ${topic}`);
+                        // 剛連線時，因為 MQTT Retain 機制，會自動收到最後一筆訊息(如果有)
                     }
                 });
+            });
 
-            } catch (e) {
-                console.error(e);
-                showError("初始化失敗", e.message);
-            }
+            state.client.on('message', (topic, message) => {
+                try {
+                    const payload = JSON.parse(message.toString());
+                    console.log('收到訊息:', payload);
+                    
+                    const newNum = payload.val;
+                    const isRecall = payload.recall || false; // 檢查是否為重播訊號
+                    
+                    // 觸發音效邏輯
+                    if (state.view === 'display' && state.audioEnabled) {
+                        // 如果號碼改變 或是 強制重播 (recall)
+                        if (newNum !== state.currentNumber || isRecall) {
+                            playAudio(newNum, isRecall); // 傳入 isRecall 作為強制播放參數
+                            const bg = document.getElementById('flash-bg');
+                            if(bg) {
+                                // 重置動畫以支援連續點擊
+                                bg.classList.remove('flash-bg');
+                                void bg.offsetWidth; // Trigger reflow
+                                bg.classList.add('flash-bg');
+                                setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+                            }
+                        }
+                    }
+
+                    state.currentNumber = newNum;
+                    render(); // 重新渲染畫面更新數字
+                } catch (e) {
+                    console.error('訊息解析失敗', e);
+                }
+            });
+
+            state.client.on('offline', () => {
+                state.isConnected = false;
+                updateStatus('離線');
+                render(); // 更新 UI 顯示連線狀態
+            });
+            
+            state.client.on('error', (err) => {
+                console.error('Connection error: ', err);
+                updateStatus('錯誤: ' + err.message);
+            });
         }
 
+        // 發布訊息 (Publish)
+        // retain: true 很重要，它讓後加入的人也能收到最新的號碼
+        function publishNumber(num, isRecall = false) {
+            if (!state.client || !state.isConnected) {
+                alert("尚未連線，請稍候");
+                return;
+            }
+            const topic = `queue-sys/${state.channelId}/status`;
+            const payload = JSON.stringify({ 
+                val: num, 
+                ts: Date.now(),
+                recall: isRecall // 加入 recall 標記
+            });
+            
+            state.client.publish(topic, payload, { qos: 0, retain: true });
+        }
+
+        function updateStatus(msg) {
+            const el = document.getElementById('mqtt-status');
+            if(el) el.innerText = msg;
+            const container = document.getElementById('connection-status');
+            if(container) container.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 3. UI 渲染 (Render)
+        // ==========================================
         function render() {
             appEl.innerHTML = ''; 
 
-            if (state.view === 'select') {
+            if (state.view === 'channel-select') {
+                appEl.innerHTML = `
+                    <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-slate-50">
+                        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md text-center">
+                            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i data-lucide="radio" class="w-8 h-8 text-blue-600"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold mb-2">MQTT 叫號連線</h1>
+                            <p class="text-slate-500 mb-6">請輸入頻道號碼以配對裝置<br>(例如: 手機末三碼)</p>
+                            
+                            <form onsubmit="event.preventDefault(); window.enterChannel()" class="space-y-4">
+                                <input id="channelInput" type="text" placeholder="輸入頻道代碼 (例如: 888)" 
+                                    class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none text-center text-xl font-mono tracking-widest"
+                                    required autofocus>
+                                <button type="submit" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors">
+                                    開始連線
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (state.view === 'role-select') {
                 appEl.innerHTML = `
                     <div class="min-h-screen flex flex-col items-center justify-center p-4">
-                        <h1 class="text-3xl font-bold mb-8">雲端叫號系統 (Firebase)</h1>
+                        <div class="mb-8 text-center">
+                            <h1 class="text-3xl font-bold text-slate-800">選擇模式</h1>
+                            <p class="text-slate-500 mt-2 flex items-center justify-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${state.isConnected ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                頻道: ${state.channelId}
+                            </p>
+                        </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
-                            <button onclick="window.selectRole('display')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 text-center">
-                                <i data-lucide="monitor" class="w-16 h-16 mx-auto mb-4 text-blue-500"></i>
+                            <button onclick="window.selectRole('display')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 group">
+                                <i data-lucide="monitor" class="w-16 h-16 mx-auto mb-4 text-blue-500 group-hover:scale-110 transition-transform"></i>
                                 <h2 class="text-2xl font-bold mb-2">叫號顯示端</h2>
-                                <p class="text-slate-500">大螢幕顯示與語音播報</p>
+                                <p class="text-slate-500">大螢幕顯示 / 語音</p>
                             </button>
-                            <button onclick="window.selectRole('admin')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-emerald-500 text-center">
-                                <i data-lucide="smartphone" class="w-16 h-16 mx-auto mb-4 text-emerald-500"></i>
-                                <h2 class="text-2xl font-bold mb-2">叫號控制台</h2>
-                                <p class="text-slate-500">櫃檯人員操作介面</p>
+                            <button onclick="window.selectRole('admin')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-emerald-500 group">
+                                <i data-lucide="smartphone" class="w-16 h-16 mx-auto mb-4 text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                                <h2 class="text-2xl font-bold mb-2">控制台</h2>
+                                <p class="text-slate-500">操作叫號 / 插隊</p>
                             </button>
                         </div>
                     </div>
                 `;
-            } else if (state.view === 'display') {
+            } 
+            else if (state.view === 'display') {
                 if (!state.audioEnabled) {
                     appEl.innerHTML = `
                         <div class="h-screen bg-slate-900 flex flex-col items-center justify-center text-center p-4">
@@ -145,11 +228,15 @@
                 } else {
                     appEl.innerHTML = `
                         <div id="flash-bg" class="h-screen flex flex-col bg-white transition-colors duration-500">
-                            <div class="bg-blue-600 h-32 flex items-center justify-center shadow-md z-10">
+                            <div class="bg-blue-600 h-32 flex items-center justify-center shadow-md z-10 relative">
                                 <h1 class="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-blue-700/50 px-3 py-1 rounded-full text-white text-sm">
+                                    <div class="status-dot ${state.isConnected ? 'connected' : 'disconnected'}"></div>
+                                    <span>CH: ${state.channelId}</span>
+                                </div>
                             </div>
                             <div class="flex-1 flex items-center justify-center relative overflow-hidden">
-                                <span class="text-[25vw] font-bold text-slate-800 font-mono tracking-tighter leading-none">
+                                <span class="text-[25vw] font-bold text-slate-800 font-mono tracking-tighter leading-none select-none">
                                     ${String(state.currentNumber).padStart(3, '0')}
                                 </span>
                             </div>
@@ -158,12 +245,13 @@
                                     <i data-lucide="volume-2" class="text-green-600"></i>
                                     <span>語音待命中</span>
                                 </div>
-                                <span class="text-sm">系統連線正常</span>
+                                <span class="text-sm">連線狀態: ${state.isConnected ? '正常' : '斷線重連中...'}</span>
                             </div>
                         </div>
                     `;
                 }
-            } else if (state.view === 'admin') {
+            } 
+            else if (state.view === 'admin') {
                 appEl.innerHTML = `
                     <div class="min-h-screen p-4 bg-slate-50 flex flex-col items-center pt-6 md:pt-10">
                         <div class="w-full max-w-md space-y-6">
@@ -171,8 +259,8 @@
                                 <div>
                                     <h2 class="text-xl font-bold text-slate-800">控制台</h2>
                                     <div class="flex items-center gap-2 mt-1">
-                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                        <span class="text-xs text-slate-500">已連線</span>
+                                        <span class="w-2 h-2 rounded-full ${state.isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}"></span>
+                                        <span class="text-xs text-slate-500">${state.isConnected ? '已連線' : '斷線'} (CH:${state.channelId})</span>
                                     </div>
                                 </div>
                                 <div class="text-right">
@@ -182,15 +270,15 @@
                             </div>
 
                             <div class="space-y-3">
-                                <button onclick="window.nextNum()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
+                                <button onclick="window.nextNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
                                     <div class="p-3 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
                                         <i data-lucide="skip-forward" class="w-10 h-10"></i>
                                     </div>
                                     <span class="text-2xl font-bold">下一位</span>
                                 </button>
-
+                                
                                 <!-- 新增：再次叫號按鈕 -->
-                                <button onclick="window.recallNum()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-4 shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                <button onclick="window.recallNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-xl py-4 shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-2">
                                     <i data-lucide="volume-2" class="w-6 h-6"></i>
                                     <span class="text-xl font-bold">再次叫號</span>
                                 </button>
@@ -212,102 +300,85 @@
             lucide.createIcons();
         }
 
+        // ==========================================
+        // 4. 事件綁定 (Global Functions)
+        // ==========================================
+        window.enterChannel = () => {
+            const input = document.getElementById('channelInput');
+            if(input && input.value) {
+                state.channelId = input.value;
+                connectMQTT(state.channelId);
+                state.view = 'role-select';
+                render();
+            }
+        };
+
         window.selectRole = (role) => {
             state.view = role;
             render();
-            startSync();
         };
 
         window.enableAudio = () => {
             state.audioEnabled = true;
-            window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); 
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); // iOS unlock
             render();
         };
 
-        window.nextNum = () => updateDb(state.currentNumber + 1);
+        window.nextNum = () => {
+            publishNumber(state.currentNumber + 1);
+        };
         
-        // 新增：再次叫號 (直接用當前號碼更新，但 updateDb 會更新時間戳記)
-        window.recallNum = () => updateDb(state.currentNumber);
+        // 新增：再次叫號函式
+        window.recallNum = () => {
+            // 發送目前號碼，並帶上 isRecall = true
+            publishNumber(state.currentNumber, true);
+        };
         
         window.jumpNum = () => {
             const val = document.getElementById('jumpInput').value;
-            if(val) updateDb(parseInt(val));
-            const input = document.getElementById('jumpInput');
-            if(input) input.value = '';
-        }
-
-        window.resetNum = () => {
-            if(state.confirmReset) { updateDb(0); state.confirmReset = false; }
-            else { state.confirmReset = true; render(); setTimeout(() => { state.confirmReset = false; render(); }, 3000); }
-        }
-
-        function startSync() {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_system', 'status');
-            
-            onSnapshot(docRef, (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    const newNum = data.val || 0;
-                    const newTs = data.updatedAt || 0; // 取得更新時間
-                    
-                    // 判斷邏輯：
-                    // 1. 號碼變了
-                    // 2. 號碼沒變，但時間戳記變了 (代表有人按了再次叫號)
-                    const shouldPlay = (newNum !== state.currentNumber) || (newTs > state.lastTimestamp && state.lastTimestamp !== 0);
-
-                    if (state.view === 'display' && state.audioEnabled && shouldPlay) {
-                        playAudio(newNum);
-                        const bg = document.getElementById('flash-bg');
-                        if(bg) {
-                            bg.classList.remove('flash-bg');
-                            void bg.offsetWidth; // 強制重繪以重啟動畫
-                            bg.classList.add('flash-bg');
-                            setTimeout(() => bg.classList.remove('flash-bg'), 1000);
-                        }
-                    }
-                    state.currentNumber = newNum;
-                    state.lastTimestamp = newTs;
-                    render();
-                } else {
-                    setDoc(docRef, { val: 0, updatedAt: Date.now() });
-                }
-            }, (error) => {
-                console.error(error);
-                if (error.code === 'permission-denied') {
-                    showError("權限不足", "請到 Firebase Console -> Firestore Database -> Rules 分頁，將規則改為 allow read, write: if true;");
-                } else {
-                    showError("連線中斷", error.message);
-                }
-            });
-        }
-
-        async function updateDb(num) {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'queue_system', 'status');
-            try {
-                // 重點：加上 updatedAt 來觸發更新，即使號碼 val 一樣
-                await setDoc(docRef, { val: num, updatedAt: Date.now() }, { merge: true });
-            } catch(e) {
-                showError("更新失敗", e.message);
+            if(val) {
+                publishNumber(parseInt(val));
+                document.getElementById('jumpInput').value = '';
             }
         }
 
-        function playAudio(num) {
+        window.resetNum = () => {
+            if(state.confirmReset) { 
+                publishNumber(0); 
+                state.confirmReset = false; 
+            } else { 
+                state.confirmReset = true; 
+                render(); 
+                setTimeout(() => { 
+                    state.confirmReset = false; 
+                    render(); 
+                }, 3000); 
+            }
+        }
+
+        function playAudio(num, force = false) {
+            // 如果不是強制重播，且號碼跟上次一樣，則不播放
+            if (!force && num === state.lastPlayed) return;
+            
+            state.lastPlayed = num;
             window.speechSynthesis.cancel();
             
-            const u = new SpeechSynthesisUtterance(`請 ${num} 號顧客辦理`);
+            const u = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
             u.lang = 'zh-TW';
             u.rate = 0.9;
             window.speechSynthesis.speak(u);
 
             setTimeout(() => {
-                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號顧客`);
+                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
                  u2.lang = 'zh-TW';
                  u2.rate = 0.9;
                  window.speechSynthesis.speak(u2);
             }, 3500);
         }
 
-        init();
+        // Start
+        render();
+
     </script>
 </body>
 </html>
