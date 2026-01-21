@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>輔醫麻醉手術排程查詢</title>
+    <style>
+        :root {
+            --primary: #0077b6;
+            --secondary: #48cae4;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #333;
+            --border: #dee2e6;
+            --success: #28a745;
+            --danger: #dc3545;
+            --gray: #6c757d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+        }
+
+        .controls {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .control-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="date"],
+        input[type="text"],
+        select {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #023e8a;
+        }
+
+        button.secondary {
+            background-color: #6c757d;
+        }
+
+        /* Anesthesia Filter */
+        #ane-filter-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+
+        .ane-checkbox label {
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Schedule List */
+        .schedule-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .surgery-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-left: 8px solid var(--gray);
+            /* Default gray for unfinished pre-ane */
+            cursor: pointer;
+            transition: transform 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+
+        .surgery-card.pre-ane-finished {
+            border-left-color: var(--success);
+        }
+
+        .surgery-card.is-emg {
+            background-color: #fff0f0;
+            border: 2px solid var(--danger);
+            border-left-width: 8px;
+            /* Keep left border thicker */
+        }
+
+        .surgery-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--primary);
+            background: #e7f5ff;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .card-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-width: 85px;
+            margin-right: 15px;
+            padding-right: 15px;
+            border-right: 1px solid #eee;
+        }
+
+        .room-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .time-box {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .info-box {
+            flex: 1;
+            padding: 0 1rem;
+        }
+
+        .patient-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .procedure {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .tags span {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #495057;
+            margin-right: 5px;
+        }
+
+        /* Details Modal/Section */
+        #detail-view {
+            display: none;
+            background: var(--bg);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .detail-card {
+            background: var(--card);
+            max-width: 800px;
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+        }
+
+        .detail-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            color: var(--primary);
+            border-left: 4px solid var(--secondary);
+            padding-left: 10px;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            color: #666;
+            font-weight: 600;
+        }
+
+        .sub-list {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 10px 0;
+        }
+
+        .sub-list li {
+            padding: 2px 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .error {
+            color: #dc3545;
+            text-align: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="schedule-view">
+        <header>
+            <h1>輔醫麻醉手術排程</h1>
+        </header>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="filter-group">
+                    <label>日期區間：</label>
+                    <input type="date" id="bgOpDate">
+                    <span>~</span>
+                    <input type="date" id="endOpDate">
+                </div>
+                <button onclick="fetchSchedule()">查詢</button>
+            </div>
+
+            <div class="control-row">
+                <div class="filter-group">
+                    <input type="text" id="searchId" placeholder="輸入病歷號搜尋..." oninput="applyFilters()">
+                </div>
+                <div class="filter-group">
+                    <label>房號：</label>
+                    <select id="filterRoom" onchange="applyFilters()">
+                        <option value="">全部</option>
+                        <!-- Dynamic Options -->
+                    </select>
+                </div>
+            </div>
+
+            <div id="ane-filter-container">
+                <!-- Dynamic Anesthesia Checkboxes -->
+            </div>
+        </div>
+
+        <div id="schedule-list" class="schedule-grid">
+            <!-- Results will appear here -->
+            <div style="text-align:center; color:#999;">請選擇日期並點擊查詢</div>
+        </div>
+    </div>
+
+    <!-- Detail View (Overlay) -->
+    <div id="detail-view">
+        <div class="detail-card">
+            <div class="detail-header">
+                <div>
+                    <h2 id="d-patient-name" style="margin:0;"></h2>
+                    <span id="d-meta" style="color:#666;"></span>
+                </div>
+                <button class="secondary" onclick="closeDetail()">關閉</button>
+            </div>
+
+            <div id="d-content">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug Section -->
+    <div style="margin-top: 30px; border-top: 2px dashed #ccc; padding-top: 20px;">
+        <h3>除錯訊息 (Debug Output)</h3>
+        <textarea id="debug-output"
+            style="width: 100%; height: 200px; font-family: monospace; background: #f0f0f0; border: 1px solid #999; padding: 10px; box-sizing: border-box;"
+            readonly></textarea>
+        <button onclick="document.getElementById('debug-output').value=''"
+            style="margin-top: 5px; background: #666; font-size: 0.8rem;">清空 Log</button>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE = 'http://10.10.246.61/ANEOPSCHWS/WSTemp.asmx';
+
+        // Global State for Data
+        let currentScheduleData = [];
+
+        // Set default date to today (Local Time)
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
+        document.getElementById('bgOpDate').value = todayStr;
+        document.getElementById('endOpDate').value = todayStr;
+
+        function logDebug(message) {
+            const el = document.getElementById('debug-output');
+            const time = new Date().toLocaleTimeString();
+            el.value += `[${time}] ${message}\n----------------------------------------\n`;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function callApi(endpoint, params, method = 'GET') {
+            const url = new URL(`${API_BASE}/${endpoint}`);
+            const options = { method };
+
+            logDebug(`Preparing request to: ${endpoint}`);
+
+            if (method === 'GET') {
+                Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+                logDebug(`Params (Query): ${new URLSearchParams(params).toString()}`);
+            } else if (method === 'POST') {
+                options.headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+                options.body = new URLSearchParams(params).toString();
+                logDebug(`Params (Body): ${options.body}`);
+            }
+
+            logDebug(`Full URL: ${url.toString()}`);
+
+            try {
+                const res = await fetch(url, options);
+                logDebug(`Response Status: ${res.status} ${res.statusText}`);
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+                // The API returns XML string wrapped in <string>...</string> according to new specs
+                const text = await res.text();
+                logDebug(`Raw Response Text (first 500 chars): ${text.substring(0, 500)}...`);
+
+                // Allow for direct JSON return (just in case) or XML wrapped
+                let jsonString = text;
+                if (text.trim().startsWith('<?xml') || text.trim().startsWith('<string')) {
+                    const parser = new DOMParser();
+                    const xmlDoc = parser.parseFromString(text, "text/xml");
+                    const stringNode = xmlDoc.getElementsByTagName("string")[0];
+                    if (stringNode) {
+                        jsonString = stringNode.textContent;
+                    }
+                }
+
+                const json = JSON.parse(jsonString);
+
+                // Handle wrapper format based on documentation
+                // Format: { datastatus: X, errorMsg: ..., returnList: [...] }
+                if (json.datastatus === 1) return json.returnList || [];
+                if (json.datastatus === 0) return []; // Success but empty
+
+                // Throw error with datastatus
+                const err = new Error(json.errorMsg || 'API Error');
+                err.datastatus = json.datastatus;
+                throw err;
+
+            } catch (e) {
+                console.error(e);
+                logDebug(`ERROR: ${e.name} - ${e.message}`);
+                if (e.message.includes('Failed to fetch')) {
+                    logDebug(`HINT: 'Failed to fetch' usually means CORS error or Network error.\n如果是 CORS，請安裝擴充套件或參考 cors_guide.md。`);
+                }
+                throw e; // Propagate error
+            }
+        }
+
+        async function fetchSchedule() {
+            const bgDate = document.getElementById('bgOpDate').value;
+            const endDate = document.getElementById('endOpDate').value;
+            const listDiv = document.getElementById('schedule-list');
+            listDiv.innerHTML = '<div class="loading">查詢中...</div>';
+
+            try {
+                // User provided example uses yyyyMMdd
+                const bgParam = bgDate.replace(/-/g, '');
+                const endParam = endDate.replace(/-/g, '');
+
+                const data = await callApi('getPatOperationList', {
+                    pBGOPDATE: bgParam,
+                    pENDOPDATE: endParam
+                }, 'POST');
+
+                listDiv.innerHTML = '';
+                currentScheduleData = data || []; // Update global state
+
+                if (currentScheduleData.length === 0) {
+                    listDiv.innerHTML = '<div class="loading">該日期區間無手術資料</div>';
+                    return;
+                }
+
+                initFilters(currentScheduleData);
+                applyFilters();
+
+            } catch (error) {
+                const errorInfo = error.datastatus
+                    ? `錯誤碼: ${error.datastatus}<br>${error.message}`
+                    : error.message || '查詢失敗，請檢查網路連接';
+                listDiv.innerHTML = `<div class="error">${errorInfo}</div>`;
+            }
+        }
+
+        function initFilters(data) {
+            // Populate Rooms
+            const roomSet = new Set(data.map(i => i.OROPROOM).filter(x => x));
+            const roomSelect = document.getElementById('filterRoom');
+            roomSelect.innerHTML = '<option value="">全部房號</option>';
+            Array.from(roomSet).sort().forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r;
+                opt.textContent = r;
+                roomSelect.appendChild(opt);
+            });
+
+            // Populate Anesthesia Methods
+            const aneSet = new Set(data.map(i => i.ORANENM).filter(x => x));
+            const aneContainer = document.getElementById('ane-filter-container');
+            aneContainer.innerHTML = '';
+
+            Array.from(aneSet).sort().forEach(ane => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'ane-checkbox';
+                // Default hide LA and NI
+                const isChecked = !(ane === 'LA' || ane === 'NI');
+
+                wrapper.innerHTML = `
+                    <label>
+                        <input type="checkbox" value="${ane}" ${isChecked ? 'checked' : ''} onchange="applyFilters()">
+                        ${ane}
+                    </label>
+                `;
+                aneContainer.appendChild(wrapper);
+            });
+        }
+
+        function applyFilters() {
+            const listDiv = document.getElementById('schedule-list');
+            const searchId = document.getElementById('searchId').value.trim();
+            const filterRoom = document.getElementById('filterRoom').value;
+
+            // Get checked anesthesia methods
+            const checkedAne = Array.from(document.querySelectorAll('#ane-filter-container input:checked')).map(cb => cb.value);
+
+            const filtered = currentScheduleData.filter(item => {
+                const idMatch = !searchId || (item.HHISTNUM && item.HHISTNUM.includes(searchId));
+                const roomMatch = !filterRoom || item.OROPROOM === filterRoom;
+                const aneMatch = checkedAne.length === 0 || (item.ORANENM && checkedAne.includes(item.ORANENM));
+                return idMatch && roomMatch && aneMatch;
+            });
+
+            renderSchedule(filtered);
+        }
+
+        function renderSchedule(data) {
+            const listDiv = document.getElementById('schedule-list');
+            listDiv.innerHTML = '';
+
+            if (data.length === 0) {
+                listDiv.innerHTML = '<div class="loading">無符合篩選條件的資料</div>';
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+
+                // --- Logic for Styles ---
+                // Pre-Anesthesia: Finished (Y/完) -> Green, else -> Gray (Default)
+                const isPreAneFinished = item.PREANEASSESFIN === 'Y' || item.PREANEASSESFIN === '完';
+                // EMG: Has value -> Red highlight
+                const isEmg = !!item.EMG;
+
+                const classes = ['surgery-card'];
+                if (isPreAneFinished) classes.push('pre-ane-finished');
+                if (isEmg) classes.push('is-emg');
+
+                card.className = classes.join(' ');
+                card.onclick = () => showDetail(item);
+
+                // Field mapping based on 2024-12 API Doc
+                const time = item.OP_TIME || item.OpTime || '--:--';
+                const name = item.HNAMEC || item.Hnamec || 'Unknown';
+                const gender = item.HSEXE || item.Hsexe || '';
+                const age = item.AGE || item.Age || '';
+                const procedure = item.ORDPROCED || item.OrdProced || 'No Procedure Name';
+                const room = item.OROPROOM || item.OrOpRoom || '';
+                const surgeon = item.ORDOCNM || item.OrDocNm || '';
+                const bed = item.HBED || item.HBed || '';
+                const status = item.STATUS || ''; // Top-right status
+
+                card.innerHTML = `
+                <div class="status-badge">${status}</div>
+                <div class="card-left">
+                    <div class="room-number">${room || '--'}</div>
+                    <div class="time-box">${time}</div>
+                </div>
+                <div class="info-box">
+                    <div class="patient-name">
+                        ${name} 
+                        <span style="font-weight:normal; font-size:0.9em">(${gender}/${age})</span>
+                        ${isEmg ? '<span style="color:red; font-weight:bold; font-size:0.8em; margin-left:5px;">[EMG]</span>' : ''}
+                    </div>
+                    <div class="procedure">${procedure}</div>
+                    <div class="tags">
+                        <span>${surgeon}</span>
+                        <span>${bed}</span>
+                        <span style="background:#fff3cd; color:#856404">${item.ORANENM || ''}</span>
+                    </div>
+                </div>
+                <div style="color:#ccc;">❯</div>
+            `;
+                listDiv.appendChild(card);
+            });
+        }
+
+        async function showDetail(patient) {
+            const detailView = document.getElementById('detail-view');
+            const contentDiv = document.getElementById('d-content');
+
+            // Populate Header
+            const name = patient.HNAMEC || patient.Hnamec;
+            const hhisNum = patient.HHISTNUM || patient.HhistNum;
+            const encntNo = patient.HCASENO || patient.HcaseNo;
+
+            document.getElementById('d-patient-name').textContent = name;
+
+            // Header Content
+            const headerMeta = `病歷號: ${hhisNum} | 就診號: ${encntNo || '--'}`;
+            document.getElementById('d-meta').innerHTML = headerMeta;
+
+            detailView.style.display = 'block';
+            contentDiv.innerHTML = '<div class="loading">載入詳細資料中...</div>';
+
+            const ordSeq = patient.ORDSEQ || patient.OrdSeq;
+
+            const safeCall = (promise) => promise.catch(e => {
+                console.warn('Detail fetch failed:', e);
+                return [];
+            });
+
+            // Parallel Data Fetching
+            const [phy, cxr, aneHist, consults, meds, hist, memos] = await Promise.all([
+                // 1. Physiological (New)
+                ordSeq ? safeCall(callApi('getAneAssessOrdseqDTTM', { pOrdSeq: ordSeq })) : [],
+                // 2. Imaging (Renamed)
+                ordSeq ? safeCall(callApi('getAneAssessCXRList', { pOrdSeq: ordSeq })) : [],
+                // 3. Ane History (New)
+                hhisNum ? safeCall(callApi('getPatAnaestheHistList', { pHHISNum: hhisNum })) : [],
+                // 4. Consultations (New)
+                encntNo ? safeCall(callApi('getPatConsultationList', { pENCNTNO: encntNo })) : [],
+                // 5. Meds
+                encntNo ? safeCall(callApi('getPatADMDrugList', { pENCNTNO: encntNo })) : [],
+                // 6. Admission History
+                hhisNum ? safeCall(callApi('getPatADMHistList', { pHHISNum: hhisNum })) : [],
+                // 7. Memos (Moved to bottom)
+                ordSeq ? safeCall(callApi('getAneAssessDrMemoList', { pOrdSeq: ordSeq })) : []
+            ]);
+
+            // --- Header Badges Logic ---
+            if (phy && phy.length > 0) {
+                const p = phy[0];
+                const badges = [];
+                if (p.ANEHIGHRISK === 'Y') {
+                    badges.push('<span style="background:#dc3545; color:white; padding:2px 8px; border-radius:4px; font-size:0.8rem; margin-left:10px;">麻醉高風險 (ANEHIGHRISK)</span>');
+                }
+                if (p.ANEDIFFICINTUB === 'Y') {
+                    badges.push('<span style="background:#ffc107; color:black; padding:2px 8px; border-radius:4px; font-size:0.8rem; margin-left:5px;">困難插管 (ANEDIFFICINTUB)</span>');
+                }
+                if (badges.length > 0) {
+                    document.getElementById('d-meta').innerHTML += badges.join('');
+                }
+            }
+
+            let html = '';
+
+            // --- Data Logic: Stale Check ---
+            // Try to parse surgery date for comparison
+            const opDateStr = patient.OP_DATE || patient.OpDate || patient.OPDATE || new Date().toISOString();
+            const opDateObj = new Date(opDateStr);
+
+            // Helper to format value + time
+            const showVal = (val, dttm) => {
+                if (!val && val !== 0) return '<span style="color:#eee">--</span>';
+
+                let timeHtml = '';
+                let isStale = false;
+
+                if (dttm) {
+                    const dObj = new Date(dttm);
+                    // Check if difference > 30 days
+                    const diffTime = Math.abs(opDateObj - dObj);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    if (diffDays > 30) isStale = true;
+
+                    // Smaller font size (0.5em) and conditional gray color
+                    const timeColor = isStale ? '#ccc' : '#888';
+                    timeHtml = `<div style="font-size:5pt; color:${timeColor}; white-space:nowrap;">${dttm.replace('T', ' ')}</div>`;
+                }
+
+                // If stale, value is also gray
+                const valColor = isStale ? '#aaa' : 'var(--primary)';
+                return `<div><strong style="color:${valColor}">${val}</strong>${timeHtml}</div>`;
+            };
+
+            // --- 1. Physiological Measurements (Separated) ---
+            html += `<h3 class="section-title">生理量測資料 (Physiological)</h3>`;
+            if (phy && phy.length > 0) {
+                const p = phy[0];
+                const fields = [
+                    { k: 'BLOODTYPE', label: '血型' },
+                    { k: 'HEIGHT', label: '身高(Height)' }, { k: 'WEIGHT', label: '體重(Weight)' },
+                    { k: 'BTEAR', label: '體溫(Temp)' },
+                    { k: 'PULSEUSUAL', label: '心跳(Pulse)' },
+                    { k: 'RESPIRATORY', label: '呼吸' },
+                    { k: 'BPNBP', label: '血壓(BP)' },
+                    { k: 'SPO2', label: 'SPO2' }
+                ];
+                html += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:10px; background:#f8f9fa; padding:15px; border-radius:8px;">`;
+                fields.forEach(f => {
+                    const val = p[f.k];
+                    const dttm = p[f.k + 'DTTM']; // Helper to find matching DTTM key
+                    if (val || val === 0) {
+                        html += `<div style="background:white; padding:5px; border-radius:4px; border:1px solid #eee;">
+                            <div style="font-size:0.75rem; color:#666">${f.label}</div>
+                            ${showVal(val, dttm)}
+                         </div>`;
+                    }
+                });
+                html += `</div>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // --- 1.5 Lab Data (Separated) ---
+            html += `<h3 class="section-title">檢驗資料 (Lab Data)</h3>`;
+            if (phy && phy.length > 0) {
+                const p = phy[0];
+                // Note: Using WBC instead of WEB if user typo, check key existence via API doc
+                // API Doc says WBC. Code previously implemented WBC.
+                const labFields = [
+                    { k: 'WBC', label: 'WBC' }, { k: 'HGB', label: 'HGB' },
+                    { k: 'HCT', label: 'HCT' }, { k: 'PLT', label: 'PLT' },
+                    { k: 'PT', label: 'PT' }, { k: 'APTT', label: 'APTT' },
+                    { k: 'INR', label: 'INR' }, { k: 'BIL', label: 'BIL' },
+                    { k: 'AST', label: 'AST' }, { k: 'ALT', label: 'ALT' },
+                    { k: 'BUN', label: 'BUN' }, { k: 'CREA', label: 'CREA' },
+                    { k: 'NA', label: 'NA' }, { k: 'K', label: 'K' },
+                    { k: 'CL', label: 'CL' }, { k: 'CA', label: 'CA' },
+                    { k: 'GLUCOSE', label: 'GLUCOSE' }
+                ];
+
+                html += `<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap:10px; background:#f8f9fa; padding:15px; border-radius:8px;">`;
+                let hasData = false;
+                labFields.forEach(f => {
+                    const val = p[f.k];
+                    const dttm = p[f.k + 'DTTM'];
+                    // Show item if value exists
+                    if (val || val === 0) {
+                        hasData = true;
+                        html += `<div style="background:white; padding:5px; border-radius:4px; border:1px solid #eee;">
+                            <div style="font-size:0.75rem; color:#666">${f.label}</div>
+                            ${showVal(val, dttm)}
+                         </div>`;
+                    }
+                });
+                html += `</div>`;
+                if (!hasData) html += `<p style="color:#999; font-size:0.9em; margin-top:-10px; padding-left:5px;">(無數值)</p>`;
+
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // --- 2. Imaging Reports (Renamed) ---
+            html += `<h3 class="section-title">影像報告 (Imaging Reports)</h3>`;
+            if (cxr && cxr.length > 0) {
+                html += `<div style="display:flex; flex-wrap:wrap; gap:10px;">`;
+                cxr.forEach(c => {
+                    html += `<a href="${c.CXRURL}" target="_blank" style="display:block; padding:10px; background:#f0f8ff; border:1px solid #cce5ff; border-radius:5px; text-decoration:none; color:var(--primary)">
+                        <div style="font-weight:bold">${c.PFTYPE || 'Image'} - ${c.ORDPROCED}</div>
+                        <small style="color:#666">${c.ORDSIGNDTTM ? c.ORDSIGNDTTM.replace('T', ' ') : ''}</small>
+                    </a>`;
+                });
+                html += `</div>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // Add EKG Link (Always visible if HHISTNUM exists)
+            if (hhisNum) {
+                html += `<div style="margin-top:10px;">
+                    <a href="http://10.10.246.140/musescripts/museweb.dll?RetrieveTestList?PatientID=${hhisNum}&site=1" target="_blank" style="display:inline-block; padding:6px 12px; background:#fff0f5; border:1px solid #ffccd5; border-radius:5px; text-decoration:none; color:#d63384; font-size:0.9rem;">
+                        <strong>EKG System</strong>
+                    </a>
+                </div>`;
+            }
+
+            // --- 3. Anesthesia History (Filtered) ---
+            html += `<h3 class="section-title">麻醉歷史紀錄 (Anesthesia History)</h3>`;
+            const filteredAneHist = (aneHist || []).filter(h => {
+                const aneMethod = h.ANENM || '';
+                // Filter out 'LA' and 'NI'
+                return aneMethod !== 'LA' && aneMethod !== 'NI';
+            });
+
+            if (filteredAneHist.length > 0) {
+                html += `<table class="data-table">
+                    <thead><tr><th>日期</th><th>手術名稱</th><th>麻醉方式</th><th>詳情</th></tr></thead>
+                    <tbody>`;
+                filteredAneHist.forEach((h, index) => {
+                    // Create a unique ID for the detail row
+                    const detailRowId = `ane-hist-detail-${index}`;
+                    html += `
+                    <tr>
+                        <td>${h.OPDATE}</td>
+                        <td>${h.ORDPROCED}</td>
+                        <td>${h.ANENM}</td>
+                        <td>
+                            <button class="secondary" style="padding:2px 8px; font-size:0.8rem;" 
+                                onclick="toggleAneDetail('${h.ORDSEQ}', '${detailRowId}', this)">
+                                展開
+                            </button>
+                        </td>
+                    </tr>
+                    <tr id="${detailRowId}" style="display:none; background-color:#fafafa;">
+                        <td colspan="4" style="padding:10px;">
+                            <div class="loading">載入中...</div>
+                        </td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+            } else {
+                html += `<p style="color:#999">無符合條件資料 (LA/NI 已隱藏)</p>`;
+            }
+
+            // --- 4. Consultations (New) ---
+            html += `<h3 class="section-title">會診紀錄 (Consultations)</h3>`;
+            if (consults && consults.length > 0) {
+                html += `<table class="data-table"><thead><tr><th>科別</th><th>醫師</th><th>類別</th><th>日期</th></tr></thead><tbody>`;
+                consults.forEach(c => {
+                    html += `<tr>
+                        <td>${c.SECTIONNMC}</td>
+                        <td>${c.ORDOEDRNMC}</td>
+                        <td>${c.CONSTYPE}</td>
+                        <td>${c.ORDMODDTTM ? c.ORDMODDTTM.split('T')[0] : ''}</td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // --- 5. Meds ---
+            html += `<h3 class="section-title">用藥紀錄 (Medications)</h3>`;
+            if (meds && meds.length > 0) {
+                // Separate Active and Stopped
+                const activeMeds = meds.filter(d => (d.CURRENTUSE === 'Y' || d.CurrentUse === 'Y'));
+                const stoppedMeds = meds.filter(d => !(d.CURRENTUSE === 'Y' || d.CurrentUse === 'Y'));
+
+                html += `<table class="data-table"><thead><tr><th>藥名</th><th>劑量</th><th>頻次</th><th>狀態</th></tr></thead>`;
+
+                // Helper to render med row
+                const renderMedRow = (d, isActive) => {
+                    const style = isActive ? 'style="background-color:#e8f5e9"' : 'style="color:#999"';
+                    let drugName = d.ORDPROCED || d.OrdProced || d.PFNM || d.Pfnm || 'Unknown Drug';
+
+                    // --- Display Note if Name contains "自備藥" ---
+                    if (drugName.includes('自備藥') || drugName.includes('劑量用法')) {
+                        // Priority: Drug-specific Instruction (UDOINSTRUCTION) or Memo (ORDERMEMO)
+                        // Note: The API returns specific instructions in UDOINSTRUCTION for the drug row
+                        const replacement = d.UDOINSTRUCTION || d.UdoInstruction || d.ORDERMEMO || d.OrderMemo;
+                        if (replacement) {
+                            drugName = replacement; // Replace entire name
+                        }
+                    }
+                    return `<tr ${style}>
+                        <td>${drugName}</td>
+                        <td>${d.DOSE} ${d.GIVUNIT}</td>
+                        <td>${d.FREQUENCY}</td>
+                        <td>${isActive ? '使用中' : '停用'}</td>
+                    </tr>`;
+                };
+
+                html += `<tbody>`;
+
+                // Render Active First
+                if (activeMeds.length > 0) {
+                    activeMeds.forEach(d => {
+                        html += renderMedRow(d, true);
+                    });
+                } else {
+                    html += `<tr><td colspan="4" style="color:#999; text-align:center;">無使用中藥物</td></tr>`;
+                }
+
+                html += `</tbody>`;
+
+                // Render Stopped (Hidden by default)
+                if (stoppedMeds.length > 0) {
+                    html += `<tbody>
+                        <tr>
+                            <td colspan="4" style="text-align:center; background:#f9f9f9; cursor:pointer;" onclick="
+                                const tb = document.getElementById('stopped-meds-body'); 
+                                const btn = this.querySelector('span');
+                                if(tb.style.display==='none'){
+                                    tb.style.display='table-row-group'; 
+                                    btn.textContent='隱藏停用藥物';
+                                }else{
+                                    tb.style.display='none';
+                                    btn.textContent='顯示停用藥物 (${stoppedMeds.length})';
+                                }
+                            ">
+                                <span style="color:var(--primary); font-weight:bold; font-size:0.9rem;">顯示停用藥物 (${stoppedMeds.length})</span>
+                            </td>
+                        </tr>
+                     </tbody>`;
+
+                    html += `<tbody id="stopped-meds-body" style="display:none; background:#f0f0f0;">`;
+                    stoppedMeds.forEach(d => {
+                        html += renderMedRow(d, false);
+                    });
+                    html += `</tbody>`;
+                }
+
+                html += `</table>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // --- 6. Admission History ---
+            html += `<h3 class="section-title">住院歷史 (Admission History)</h3>`;
+            if (hist && hist.length > 0) {
+                html += `<ul style="padding-left:20px; font-size:0.9em;">`;
+                hist.forEach(h => {
+                    html += `<li>${h.HADMDT} ~ ${h.HLVDT ? h.HLVDT.split('T')[0] : 'Now'}: <strong>${h.HDIAGTXC}</strong> (${h.HPATSTATNM})</li>`;
+                });
+                html += `</ul>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            // --- 7. Memos (Moved to Bottom) ---
+            html += `<h3 class="section-title">交班事項 (Shift Memos)</h3>`;
+            if (memos && memos.length > 0) {
+                html += `<ul style="padding-left:20px;">`;
+                memos.forEach(m => {
+                    html += `<li><div style="white-space:pre-wrap">${m.CONTEXT}</div><small style="color:#888">${m.OPNM} @ ${m.CREATEDT}</small></li>`;
+                });
+                html += `</ul>`;
+            } else {
+                html += `<p style="color:#999">無資料</p>`;
+            }
+
+            contentDiv.innerHTML = html;
+        }
+
+        async function toggleAneDetail(ordSeq, rowId, btn) {
+            const row = document.getElementById(rowId);
+            if (row.style.display !== 'none') {
+                row.style.display = 'none';
+                btn.textContent = '展開';
+                return;
+            }
+
+            row.style.display = 'table-row';
+            btn.textContent = '關閉';
+
+            try {
+                // Fetch Details
+                // 1. Billing: getBilAnaestheOrderList
+                // 2. Drugs: getBilAnaestheDrugList
+                // 3. Materials: getBilAnaestheMaterialList
+
+                const safe = (p) => p.catch(() => []);
+                const [bill, drugs, mat] = await Promise.all([
+                    safe(callApi('getBilAnaestheOrderList', { pOrdSeq: ordSeq })),
+                    safe(callApi('getBilAnaestheDrugList', { pOrdSeq: ordSeq })),
+                    safe(callApi('getBilAnaestheMaterialList', { pOrdSeq: ordSeq }))
+                ]);
+
+                let dHtml = `<div style="padding:10px; border:1px solid #eee; background:#fff">`;
+
+                // --- Billing ---
+                if (bill.length) {
+                    dHtml += `<h5>麻醉計價 (Billing)</h5>`;
+                    dHtml += `<ul class="sub-list">` +
+                        bill.map(b => `<li>${b.ORDPROCED} ($${b.PFPRICE1})</li>`).join('') +
+                        `</ul>`;
+                }
+
+                // --- Procedures / Materials (Filtered) ---
+                // Request: Only show > 1000. Others hidden but clickable.
+                if (mat.length) {
+                    const highPrice = mat.filter(m => (parseFloat(m.PFPRICE1) || 0) > 1000);
+                    const lowPrice = mat.filter(m => (parseFloat(m.PFPRICE1) || 0) <= 1000);
+
+                    dHtml += `<h5>麻醉處置 (Procedures)</h5>`;
+
+                    // Always Show High Price
+                    if (highPrice.length > 0) {
+                        dHtml += `<ul class="sub-list">` +
+                            highPrice.map(m => `<li>${m.ORDPROCED} (<span style="color:#dc3545; font-weight:bold">$${m.PFPRICE1}</span>)</li>`).join('') +
+                            `</ul>`;
+                    }
+
+                    // Toggle for Low Price
+                    if (lowPrice.length > 0) {
+                        const lowId = `mat-low-${ordSeq}`;
+                        dHtml += `<div style="margin-top:5px;">
+                            <button class="secondary" style="font-size:0.8rem; padding:2px 6px;" onclick="document.getElementById('${lowId}').style.display = 'block'; this.style.display='none'">
+                                顯示其他 ${lowPrice.length} 項細節...
+                            </button>
+                            <ul id="${lowId}" class="sub-list" style="display:none; margin-top:5px; border-left:3px solid #eee; padding-left:10px;">
+                                ${lowPrice.map(m => `<li>${m.ORDPROCED} ($${m.PFPRICE1})</li>`).join('')}
+                            </ul>
+                         </div>`;
+                    }
+
+                    if (highPrice.length === 0 && lowPrice.length === 0) {
+                        dHtml += `<span style="color:#ccc">無資料</span>`;
+                    }
+                }
+
+                // --- Drugs (Default Hidden) ---
+                if (drugs.length) {
+                    const drugId = `drug-list-${ordSeq}`;
+                    dHtml += `<h5>麻醉藥品 (Drugs)</h5>`;
+                    dHtml += `<div style="margin-top:5px;">
+                            <button class="secondary" style="font-size:0.8rem; padding:2px 6px;" onclick="document.getElementById('${drugId}').style.display = 'block'; this.style.display='none'">
+                                顯示全部藥品 (${drugs.length})...
+                            </button>
+                            <ul id="${drugId}" class="sub-list" style="display:none; margin-top:5px;">
+                                ${drugs.map(d => `<li>${d.ORDPROCED} (${d.OCQNTY} ${d.GIVUNIT || ''})</li>`).join('')}
+                            </ul>
+                         </div>`;
+                }
+
+                dHtml += `</div>`;
+
+                const cell = row.querySelector('td');
+                cell.innerHTML = dHtml;
+
+            } catch (e) {
+                row.querySelector('td').innerHTML = `<div class="error">載入失敗: ${e.message}</div>`;
+            }
+        }
+
+        function closeDetail() {
+            document.getElementById('detail-view').style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
