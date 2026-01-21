@@ -48,28 +48,9 @@
     <!-- Main Content -->
     <main class="flex-grow container max-w-3xl mx-auto px-4 py-8">
         
-        <!-- Search Box -->
-        <div class="mb-8 relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <i data-lucide="search" class="text-slate-400 w-5 h-5"></i>
-            </div>
-            <input type="text" id="searchInput" 
-                class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out shadow-sm"
-                placeholder="搜尋關鍵字 (作者、標題、期刊)...">
-        </div>
-
         <!-- Reference List Container -->
         <div id="referenceList" class="space-y-4">
             <!-- Content will be injected by JS -->
-        </div>
-
-        <!-- Empty State (Hidden by default) -->
-        <div id="emptyState" class="hidden text-center py-12">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 mb-4">
-                <i data-lucide="file-search" class="text-slate-400 w-8 h-8"></i>
-            </div>
-            <h3 class="text-lg font-medium text-slate-900">找不到相符的結果</h3>
-            <p class="text-slate-500 mt-2">請嘗試使用不同的關鍵字搜尋</p>
         </div>
 
     </main>
@@ -82,9 +63,23 @@
                     <i data-lucide="qr-code" class="text-blue-600 w-6 h-6"></i>
                 </div>
             </div>
-            <p class="text-slate-400 text-sm">
-                第四面牆的 QR code 專案資料整理
+            <p class="text-slate-400 text-sm mb-6">
+                © 2026 國立台灣大學醫學人文博物館 
             </p>
+            
+            <!-- External Links -->
+            <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm border-t border-slate-100 pt-6">
+                <a href="https://mdjimmyfu.github.io/Exhibit_Alcohol/Sources/" target="_blank" rel="noopener noreferrer" 
+                   class="text-slate-500 hover:text-blue-600 hover:underline transition-colors flex items-center gap-1.5 px-2 py-1">
+                    <i data-lucide="link" class="w-4 h-4"></i>
+                    資料來源
+                </a>
+                <a href="https://mdjimmyfu.github.io/Exhibit_Alcohol/Credits/" target="_blank" rel="noopener noreferrer" 
+                   class="text-slate-500 hover:text-blue-600 hover:underline transition-colors flex items-center gap-1.5 px-2 py-1">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    策展與致謝名單
+                </a>
+            </div>
         </div>
     </footer>
 
@@ -156,21 +151,12 @@
         ];
 
         const listContainer = document.getElementById('referenceList');
-        const searchInput = document.getElementById('searchInput');
-        const emptyState = document.getElementById('emptyState');
         const toast = document.getElementById('toast');
 
         // Function to render the list
         function renderList(items) {
             listContainer.innerHTML = '';
             
-            if (items.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
             items.forEach((ref, index) => {
                 const card = document.createElement('article');
                 card.className = 'citation-card bg-white rounded-xl p-5 border border-slate-200 shadow-sm relative group';
@@ -200,16 +186,16 @@
                         
                         <h2 class="text-lg font-bold text-slate-800 mb-2 leading-snug">
                             <a href="${ref.url}" target="_blank" class="hover:text-blue-700 hover:underline decoration-blue-300 underline-offset-4">
-                                ${highlightText(ref.title, searchInput.value)}
+                                ${ref.title}
                             </a>
                         </h2>
                         
                         <div class="mt-auto">
                             <p class="text-sm font-medium text-slate-600 mb-1">
-                                ${highlightText(ref.authors, searchInput.value)}
+                                ${ref.authors}
                             </p>
                             <p class="text-sm text-slate-500 italic font-serif border-l-2 border-slate-300 pl-3 py-1 mt-2 bg-slate-50 rounded-r">
-                                ${highlightText(ref.source, searchInput.value)}
+                                ${ref.source}
                             </p>
                         </div>
                     </div>
@@ -220,25 +206,6 @@
             // Re-initialize icons for newly added elements
             lucide.createIcons();
         }
-
-        // Helper for highlighting search text
-        function highlightText(text, query) {
-            if (!query) return text;
-            const regex = new RegExp(`(${query})`, 'gi');
-            return text.replace(regex, '<span class="bg-yellow-200 text-yellow-900">$1</span>');
-        }
-
-        // Search functionality
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const filtered = references.filter(ref => {
-                return ref.title.toLowerCase().includes(query) || 
-                       ref.authors.toLowerCase().includes(query) || 
-                       ref.source.toLowerCase().includes(query) ||
-                       ref.year.includes(query);
-            });
-            renderList(filtered);
-        });
 
         // Copy functionality
         window.copyToClipboard = function(text) {
