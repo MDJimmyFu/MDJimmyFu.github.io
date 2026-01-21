@@ -73,8 +73,74 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        // --- Weather Service ---
+        // Uses Open-Meteo API (which sources data from JMA in Japan)
+        const WeatherService = {
+            // Coordinates for itinerary locations
+            locations: {
+                "Tokyo": { lat: 35.6895, lon: 139.6917 },
+                "Kawaguchiko": { lat: 35.4988, lon: 138.7673 },
+                "Kamakura": { lat: 35.3192, lon: 139.5467 }, // Fixed: Added 'lon' key
+                "Nikko": { lat: 36.7199, lon: 139.6982 }
+            },
+            
+            // Map WMO Weather Codes to our app's descriptions & icons
+            wmoCodes: {
+                0: { desc: "晴朗無雲", icon: "sun" },
+                1: { desc: "晴時多雲", icon: "sun-horizon" },
+                2: { desc: "多雲", icon: "cloud-sun" },
+                3: { desc: "陰天", icon: "cloud" },
+                45: { desc: "有霧", icon: "cloud-fog" },
+                48: { desc: "有霧", icon: "cloud-fog" },
+                51: { desc: "毛毛雨", icon: "cloud-drizzle" },
+                53: { desc: "小雨", icon: "cloud-drizzle" },
+                55: { desc: "持續降雨", icon: "cloud-rain" },
+                61: { desc: "小雨", icon: "cloud-rain" },
+                63: { desc: "下雨", icon: "cloud-rain" },
+                65: { desc: "大雨", icon: "cloud-rain" },
+                71: { desc: "小雪", icon: "snowflake" },
+                73: { desc: "下雪", icon: "snowflake" },
+                75: { desc: "大雪", icon: "snowflake" },
+                95: { desc: "雷雨", icon: "cloud-lightning" }
+            },
+
+            async fetchForecast(lat, lon, dateStr) {
+                try {
+                    // Check if date is within 10 days from now (Open-Meteo Forecast Limit)
+                    const tripDate = new Date(dateStr);
+                    const today = new Date();
+                    const diffTime = tripDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                    if (diffDays >= 0 && diffDays <= 10) {
+                        // Fetch Live Forecast
+                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&start_date=${dateStr}&end_date=${dateStr}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+                        
+                        if (data.daily && data.daily.time.length > 0) {
+                            const code = data.daily.weather_code[0];
+                            const max = Math.round(data.daily.temperature_2m_max[0]);
+                            const min = Math.round(data.daily.temperature_2m_min[0]);
+                            const weatherInfo = this.wmoCodes[code] || { desc: "多雲", icon: "cloud" };
+                            
+                            return {
+                                weather: `${weatherInfo.desc} ${min}°C~${max}°C`,
+                                icon: weatherInfo.icon,
+                                isLive: true
+                            };
+                        }
+                    }
+                    return null; // Date too far or API error
+                } catch (e) {
+                    console.error("Weather fetch failed", e);
+                    return null;
+                }
+            }
+        };
+
         // --- Data Source ---
-        const tripData = {
+        const initialTripData = {
             meta: {
                 title: "東京 & 河口湖 浪漫之旅",
                 dates: "2026/01/24 - 01/31",
@@ -336,7 +402,9 @@
             itinerary: [
                 {
                     day: 1, date: "1/24 (六)", title: "抵達東京 & 新宿之夜",
-                    weather: "晴時多雲 3°C~9°C",
+                    // UPDATED: Highs ~11C, Lows ~3C. Sunny/Cloudy.
+                    weather: "晴時多雲 3°C~11°C",
+                    location: "Tokyo",
                     outfit: {
                         male: "【舒適機上裝】連帽衫 + 彈性休閒褲。抵達後加件防風外套。",
                         female: "【洋蔥式穿法】針織洋裝 + 褲襪 + 長版大衣。機上可穿拖鞋。"
@@ -366,7 +434,9 @@
                 },
                 {
                     day: 2, date: "1/25 (日)", title: "Lady Gaga & 敘敘苑",
-                    weather: "晴天 2°C~10°C",
+                    // UPDATED: Highs ~10C, Lows ~2C. Sunny.
+                    weather: "晴朗 2°C~10°C",
+                    location: "Tokyo",
                     outfit: {
                         male: "【時尚休閒】皮夾克/飛行外套 + 黑色牛仔褲。適合演唱會氛圍。",
                         female: "【演唱會戰袍】亮眼上衣 + 舒適寬褲/短裙配靴子。避免細跟高跟鞋(久站)。"
@@ -396,7 +466,9 @@
                 },
                 {
                     day: 3, date: "1/26 (一)", title: "前往河口湖",
-                    weather: "多雲轉晴 -2°C~5°C",
+                    // UPDATED: Highs ~5C, Lows ~-7C. Cloudy->Sunny. Cold!
+                    weather: "多雲轉晴 -7°C~5°C",
+                    location: "Kawaguchiko",
                     outfit: {
                         male: "【極保暖】羽絨外套 + 發熱衣 + 圍巾。山區溫差大。",
                         female: "【保暖且美】淺色毛衣(拍照好看) + 發熱褲襪 + 毛帽 + 暖暖包。"
@@ -441,7 +513,9 @@
                 },
                 {
                     day: 4, date: "1/27 (二)", title: "河口湖深度放鬆",
-                    weather: "晴朗 -3°C~6°C",
+                    // UPDATED: Highs ~6C, Lows ~-6C. Sunny.
+                    weather: "晴朗 -6°C~6°C",
+                    location: "Kawaguchiko",
                     outfit: {
                         male: "【休閒保暖】高領毛衣 + 厚外套。方便行動的鞋子。",
                         female: "【優雅冬裝】長裙內搭發熱褲 + 短版羽絨/大衣 (顯比例) + 圍巾。"
@@ -758,7 +832,7 @@
             );
         };
 
-        const ItineraryView = ({ onSelectEvent }) => {
+        const ItineraryView = ({ onSelectEvent, tripData }) => {
             const [activeDay, setActiveDay] = useState(1);
             
             return (
@@ -787,8 +861,9 @@
                                 <div className="mb-4">
                                     <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{day.date}</h2>
                                     <div className="flex items-center text-slate-500 dark:text-slate-400 mt-1">
-                                        <Icon name="sun-dim" className="mr-1.5" />
+                                        <Icon name={day.isLiveWeather ? "rss" : "sun-dim"} className={`mr-1.5 ${day.isLiveWeather ? 'text-green-500 animate-pulse' : ''}`} />
                                         <span>{day.weather}</span>
+                                        {day.isLiveWeather && <span className="ml-2 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">LIVE</span>}
                                     </div>
                                     <div className="text-lg font-medium text-blue-600 dark:text-blue-400 mt-1">{day.title}</div>
                                 </div>
@@ -1144,6 +1219,39 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('itinerary');
             const [selectedEvent, setSelectedEvent] = useState(null);
+            const [data, setData] = useState(initialTripData);
+
+            useEffect(() => {
+                // Try to fetch live weather for each day
+                const updateWeather = async () => {
+                    const updatedItinerary = await Promise.all(initialTripData.itinerary.map(async (day) => {
+                        // Extract date from string like "1/24 (六)" -> "2026-01-24"
+                        const dateParts = day.date.split(' ')[0].split('/');
+                        const year = 2026;
+                        const month = dateParts[0].padStart(2, '0');
+                        const d = dateParts[1].padStart(2, '0');
+                        const dateStr = `${year}-${month}-${d}`;
+                        
+                        const loc = WeatherService.locations[day.location];
+                        if (loc) {
+                            const forecast = await WeatherService.fetchForecast(loc.lat, loc.lon, dateStr);
+                            if (forecast) {
+                                return { 
+                                    ...day, 
+                                    weather: forecast.weather, 
+                                    weatherIcon: forecast.icon,
+                                    isLiveWeather: true 
+                                };
+                            }
+                        }
+                        return day;
+                    }));
+                    
+                    setData(prev => ({ ...prev, itinerary: updatedItinerary }));
+                };
+
+                updateWeather();
+            }, []);
 
             return (
                 <div className="max-w-md mx-auto min-h-screen bg-slate-50 dark:bg-slate-950 shadow-2xl overflow-hidden relative transition-colors duration-300">
@@ -1152,7 +1260,7 @@
                         <div className="flex justify-between items-start">
                             <div>
                                 <h1 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">東京浪漫之旅</h1>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">{tripData.meta.dates} | {tripData.meta.travelers[0]} & Wife</p>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mt-1">{data.meta.dates} | {data.meta.travelers[0]} & Wife</p>
                             </div>
                             <div className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 p-2 rounded-full">
                                 <Icon name="mountains" className="text-2xl" weight="fill"/>
@@ -1162,7 +1270,7 @@
 
                     {/* Main Content */}
                     <main>
-                        {activeTab === 'itinerary' && <ItineraryView onSelectEvent={setSelectedEvent} />}
+                        {activeTab === 'itinerary' && <ItineraryView onSelectEvent={setSelectedEvent} tripData={data} />}
                         {activeTab === 'backup' && <BackupView onSelectEvent={setSelectedEvent} />}
                         {activeTab === 'food' && <FoodView onSelectEvent={setSelectedEvent} />}
                         {activeTab === 'booking' && <BookingView />}
