@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>互動式投票系統</title>
+    <title>現代人喝酒的理由：飲酒動機調查</title>
     
     <!-- 1. 載入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -329,11 +329,11 @@
                     {/* 數據卡片 */}
                     <div className="grid grid-cols-2 gap-4">
                         <div className="bg-blue-50 p-4 rounded-xl text-center">
-                            <div className="text-blue-500 text-sm mb-1 font-medium">總票數(人次)</div>
+                            <div className="text-blue-500 text-sm mb-1 font-medium">總票數</div>
                             <div className="text-2xl font-bold text-blue-800">{totalVotes}</div>
                         </div>
                         <div className="bg-purple-50 p-4 rounded-xl text-center">
-                            <div className="text-purple-500 text-sm mb-1 font-medium">最高人氣</div>
+                            <div className="text-purple-500 text-sm mb-1 font-medium">第一名原因</div>
                             <div className="text-lg font-bold text-purple-800 truncate px-2">
                                 {data.length > 0 ? data[0].name : "-"}
                             </div>
@@ -356,7 +356,7 @@
                             )}
                         </button>
                         <p className="text-center mt-3 text-xs text-gray-400">
-                            * 數據約有 1-2 分鐘延遲，請重新整理查看最新結果
+                            * 系統數據約有 5 分鐘延遲，請重新整理查看最新結果
                         </p>
                     </div>
                 </div>
