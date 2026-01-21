@@ -104,34 +104,64 @@
                 95: { desc: "雷雨", icon: "cloud-lightning" }
             },
 
-            async fetchForecast(lat, lon, dateStr) {
+            // Helper to fetch from API
+            async fetchFromApi(lat, lon, dateStr) {
+                 const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&start_date=${dateStr}&end_date=${dateStr}`;
+                 const response = await fetch(url);
+                 const data = await response.json();
+                 
+                 if (data.daily && data.daily.time.length > 0) {
+                    const code = data.daily.weather_code[0];
+                    const max = Math.round(data.daily.temperature_2m_max[0]);
+                    const min = Math.round(data.daily.temperature_2m_min[0]);
+                    const weatherInfo = this.wmoCodes[code] || { desc: "多雲", icon: "cloud" };
+                    
+                    return {
+                        weather: `${weatherInfo.desc} ${min}°C~${max}°C`,
+                        icon: weatherInfo.icon
+                    };
+                }
+                return null;
+            },
+
+            async fetchForecast(lat, lon, targetDateStr) {
                 try {
-                    // Check if date is within 10 days from now (Open-Meteo Forecast Limit)
-                    const tripDate = new Date(dateStr);
+                    const targetDate = new Date(targetDateStr);
                     const today = new Date();
-                    const diffTime = tripDate - today;
+                    // Reset time to compare dates only
+                    today.setHours(0,0,0,0);
+                    targetDate.setHours(0,0,0,0);
+
+                    const diffTime = targetDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    if (diffDays >= 0 && diffDays <= 10) {
-                        // Fetch Live Forecast
-                        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&start_date=${dateStr}&end_date=${dateStr}`;
-                        const response = await fetch(url);
-                        const data = await response.json();
+                    // 1. Try Live Forecast (Up to 16 days in future)
+                    if (diffDays >= 0 && diffDays <= 16) {
+                        const result = await this.fetchFromApi(lat, lon, targetDateStr);
+                        if (result) return { ...result, type: 'live' };
+                    }
+
+                    // 2. Demo/Simulation Mode: If target is too far (e.g., 2026), 
+                    // try fetching "Current Year" same date to show capability
+                    if (diffDays > 16) {
+                        const currentYear = today.getFullYear();
+                        // Construct same date but for current year
+                        const parts = targetDateStr.split('-'); // 2026-01-24
+                        const simDateStr = `${currentYear}-${parts[1]}-${parts[2]}`;
                         
-                        if (data.daily && data.daily.time.length > 0) {
-                            const code = data.daily.weather_code[0];
-                            const max = Math.round(data.daily.temperature_2m_max[0]);
-                            const min = Math.round(data.daily.temperature_2m_min[0]);
-                            const weatherInfo = this.wmoCodes[code] || { desc: "多雲", icon: "cloud" };
-                            
-                            return {
-                                weather: `${weatherInfo.desc} ${min}°C~${max}°C`,
-                                icon: weatherInfo.icon,
-                                isLive: true
-                            };
+                        // Check if simulation date is within fetchable range (past or near future)
+                        // Actually, historical data or near-past forecast is better, 
+                        // but let's try standard forecast if within 14 days, otherwise ignore to avoid errors
+                        const simDate = new Date(simDateStr);
+                        const simDiff = Math.ceil((simDate - today) / (1000 * 60 * 60 * 24));
+
+                        if (simDiff >= 0 && simDiff <= 14) {
+                             const result = await this.fetchFromApi(lat, lon, simDateStr);
+                             if (result) return { ...result, type: 'demo' };
                         }
                     }
-                    return null; // Date too far or API error
+
+                    return null; 
                 } catch (e) {
                     console.error("Weather fetch failed", e);
                     return null;
@@ -863,7 +893,13 @@
                                     <div className="flex items-center text-slate-500 dark:text-slate-400 mt-1">
                                         <Icon name={day.isLiveWeather ? "rss" : "sun-dim"} className={`mr-1.5 ${day.isLiveWeather ? 'text-green-500 animate-pulse' : ''}`} />
                                         <span>{day.weather}</span>
-                                        {day.isLiveWeather && <span className="ml-2 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">LIVE</span>}
+                                        {day.isLiveWeather && (
+                                            <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
+                                                day.weatherType === 'live' ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' : 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+                                            }`}>
+                                                {day.weatherType === 'live' ? 'LIVE' : '模擬'}
+                                            </span>
+                                        )}
                                     </div>
                                     <div className="text-lg font-medium text-blue-600 dark:text-blue-400 mt-1">{day.title}</div>
                                 </div>
@@ -1240,7 +1276,8 @@
                                     ...day, 
                                     weather: forecast.weather, 
                                     weatherIcon: forecast.icon,
-                                    isLiveWeather: true 
+                                    isLiveWeather: true,
+                                    weatherType: forecast.type 
                                 };
                             }
                         }
