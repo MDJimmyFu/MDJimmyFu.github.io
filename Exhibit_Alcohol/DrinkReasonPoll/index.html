@@ -160,12 +160,12 @@
             
             // 選項設定 (注意：label 文字必須與 Google Form 選項完全一致)
             options: [
-                { id: "opt1", label: "從眾動機", icon: "fa-users", color: "#6366F1" },      // Indigo (群體)
-                { id: "opt2", label: "助眠動機", icon: "fa-moon", color: "#4B5563" },       // Gray (夜晚/睡眠)
-                { id: "opt3", label: "社交與犒賞", icon: "fa-champagne-glasses", color: "#F59E0B" }, // Amber (慶祝)
-                { id: "opt4", label: "創作", icon: "fa-lightbulb", color: "#EC4899" },      // Pink (靈感)
-                { id: "opt5", label: "被灌酒", icon: "fa-face-dizzy", color: "#EF4444" },   // Red (無奈/暈)
-                { id: "opt6", label: "應對動機", icon: "fa-shield-heart", color: "#10B981" } // Emerald (防禦/應對)
+                { id: "opt1", label: "從眾動機", desc: "喝酒不是因為我想喝，而是因為大家都在喝。", icon: "fa-users", color: "#6366F1" },
+                { id: "opt2", label: "助眠動機", desc: "一杯酒，換一夜好眠？", icon: "fa-moon", color: "#4B5563" },
+                { id: "opt3", label: "社交與犒賞", desc: "為了快樂，為了自己，為了更有趣的聚會！", icon: "fa-champagne-glasses", color: "#F59E0B" },
+                { id: "opt4", label: "創作", desc: "微醺一點，靈感多一點。", icon: "fa-lightbulb", color: "#EC4899" },
+                { id: "opt5", label: "被灌酒", desc: "朋友的壓力，杯中的酒意。", icon: "fa-face-dizzy", color: "#EF4444" },
+                { id: "opt6", label: "應對動機", desc: "用酒精暫時填補心中的空洞。", icon: "fa-shield-heart", color: "#10B981" }
             ]
         };
 
@@ -219,12 +219,17 @@
                                         <i className={`fas ${opt.icon}`}></i>
                                     </div>
                                     
-                                    <div className="flex-grow font-medium text-gray-700 text-lg">
-                                        {opt.label}
+                                    <div className="flex-grow">
+                                        <div className="font-medium text-gray-700 text-lg leading-tight">
+                                            {opt.label}
+                                        </div>
+                                        <div className="text-xs text-gray-400 mt-1 font-normal">
+                                            {opt.desc}
+                                        </div>
                                     </div>
 
                                     {/* 複選框 UI */}
-                                    <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-colors
+                                    <div className={`w-6 h-6 rounded border-2 flex-shrink-0 flex items-center justify-center transition-colors
                                         ${isSelected ? "border-indigo-600 bg-indigo-600" : "border-gray-300"}`}>
                                         {isSelected && <i className="fas fa-check text-white text-xs"></i>}
                                     </div>
