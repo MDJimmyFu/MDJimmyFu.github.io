@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒、文化、與健康 — 策展感謝名單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'wine-dark': '#4A1C22',
+                        'wine-red': '#722F37',
+                        'wine-light': '#9E5A63',
+                        'cream': '#F9F7F2',
+                        'paper': '#F0EBE5',
+                        'text-main': '#2D2D2D',
+                        'text-muted': '#666666',
+                    },
+                    fontFamily: {
+                        'sans': ['"Noto Sans TC"', 'sans-serif'],
+                        'serif': ['"Noto Serif TC"', 'serif'],
+                        'display': ['"Playfair Display"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F9F7F2;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23722f37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .fade-in-up {
+            animation: fadeInUp 1s ease-out forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .section-divider::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background-color: #722F37;
+            margin: 2rem auto;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body class="text-text-main font-sans antialiased leading-relaxed">
+
+    <!-- Hero Section -->
+    <header class="relative min-h-screen flex flex-col justify-center items-center text-center px-6 py-20 overflow-hidden">
+        <!-- Decorative Background Element -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+             <div class="absolute -top-[10%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-wine-red opacity-5 blur-[100px]"></div>
+             <div class="absolute -bottom-[10%] -left-[10%] w-[40vw] h-[40vw] rounded-full bg-wine-dark opacity-5 blur-[80px]"></div>
+        </div>
+
+        <div class="max-w-4xl mx-auto z-10">
+            <p class="text-wine-red tracking-[0.2em] font-medium mb-4 uppercase text-sm md:text-base fade-in-up">Special Exhibition</p>
+            
+            <h1 class="text-4xl md:text-6xl lg:text-7xl font-serif font-bold text-wine-dark mb-6 leading-tight fade-in-up delay-100">
+                酒、文化、與健康
+                <span class="block text-2xl md:text-4xl mt-4 font-normal text-wine-red">這杯酒、身體買單！</span>
+            </h1>
+            
+            <div class="h-px w-24 bg-wine-red mx-auto my-8 opacity-50 fade-in-up delay-200"></div>
+            
+            <h2 class="text-xl md:text-2xl font-display italic text-text-muted mb-12 fade-in-up delay-200 max-w-2xl mx-auto">
+                Alcohol, Culture, and Health: <br class="md:hidden">Every Drink Has a Cost
+            </h2>
+            
+            <div class="inline-block border border-wine-red/30 bg-white/50 backdrop-blur-sm px-8 py-4 rounded-full fade-in-up delay-300 shadow-sm">
+                <span class="text-sm text-text-muted uppercase tracking-wider mr-2">Curator</span>
+                <span class="text-lg font-serif font-bold text-wine-dark">策展人：陳慧玲</span>
+            </div>
+        </div>
+
+        <div class="absolute bottom-10 left-0 w-full text-center animate-bounce opacity-50">
+            <svg class="w-6 h-6 mx-auto text-wine-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-5xl mx-auto px-6 pb-20">
+
+        <!-- Organizers -->
+        <section class="py-16 text-center fade-in-up delay-300">
+            <h3 class="text-2xl font-serif font-bold text-wine-dark mb-8 section-divider">主辦單位</h3>
+            <div class="flex flex-wrap justify-center gap-6 md:gap-12">
+                <div class="group relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-wine-red/10 w-full md:w-auto flex-1 min-w-[280px]">
+                    <div class="text-lg font-medium text-gray-800 group-hover:text-wine-red transition-colors">
+                        國立臺灣大學<br>醫學教育暨生醫倫理研究所
+                    </div>
+                </div>
+                <div class="group relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-wine-red/10 w-full md:w-auto flex-1 min-w-[280px]">
+                    <div class="text-lg font-medium text-gray-800 group-hover:text-wine-red transition-colors">
+                        國立臺灣大學<br>醫學人文博物館
+                    </div>
+                </div>
+                <div class="group relative bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-wine-red/10 w-full md:w-auto flex-1 min-w-[280px]">
+                    <div class="text-lg font-medium text-gray-800 group-hover:text-wine-red transition-colors">
+                        國立臺灣大學<br>醫學院附設醫院
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Curatorial Team -->
+        <section class="py-16 fade-in-up delay-400">
+            <h3 class="text-2xl font-serif font-bold text-wine-dark mb-12 text-center section-divider">策展團隊</h3>
+            
+            <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
+                <!-- Left Column -->
+                <div class="space-y-8">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-l-4 border-wine-red hover:shadow-md transition-shadow">
+                        <h4 class="text-sm uppercase tracking-widest text-wine-red font-bold mb-4">共同策展</h4>
+                        <p class="text-xl font-serif text-gray-800">廖泊喬、蔡巧琳</p>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-l-4 border-wine-light hover:shadow-md transition-shadow">
+                        <h4 class="text-sm uppercase tracking-widest text-wine-light font-bold mb-4">醫學生策展夥伴</h4>
+                        <p class="text-lg text-gray-700 leading-relaxed">
+                            盧泓達、林聖哲、張倚瑛<br>
+                            劉勁麟、巫勝傑、曾仲遠<br>
+                            <span class="text-sm text-gray-500 mt-2 block">（臺大醫學三）</span>
+                        </p>
+                    </div>
+                    
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-l-4 border-gray-300 hover:shadow-md transition-shadow">
+                        <h4 class="text-sm uppercase tracking-widest text-gray-500 font-bold mb-4">行政協力</h4>
+                        <ul class="space-y-2 text-gray-700">
+                            <li><span class="font-medium text-gray-900">林珮琪</span> <span class="text-sm text-gray-500">（醫教生倫所）</span></li>
+                            <li><span class="font-medium text-gray-900">陳淑娟</span> <span class="text-sm text-gray-500">（醫學人文博物館）</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-8">
+                    <div class="bg-white p-8 rounded-xl shadow-sm border-t-4 md:border-t-0 md:border-l-4 border-wine-red/60 hover:shadow-md transition-shadow h-full">
+                        <h4 class="text-sm uppercase tracking-widest text-wine-red/80 font-bold mb-6">編審顧問群</h4>
+                        
+                        <div class="space-y-6">
+                            <div>
+                                <h5 class="font-serif font-bold text-gray-900 mb-1">臺大內科部</h5>
+                                <p class="text-gray-600">蘇東弘、洪俊銘</p>
+                            </div>
+                            <div class="w-full h-px bg-gray-100"></div>
+                            <div>
+                                <h5 class="font-serif font-bold text-gray-900 mb-1">北市聯醫松德院區</h5>
+                                <p class="text-gray-600">黃名琪、張祜銘、張立</p>
+                            </div>
+                            <div class="w-full h-px bg-gray-100"></div>
+                            <div>
+                                <h5 class="font-serif font-bold text-gray-900 mb-1">臺灣酒駕防制社會關懷協會</h5>
+                                <p class="text-gray-600">高淑真、王儷潔</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Special Thanks -->
+        <section class="py-16 fade-in-up delay-500">
+            <div class="bg-wine-dark text-cream rounded-2xl p-8 md:p-12 relative overflow-hidden">
+                <!-- Decorative Circle -->
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white opacity-5"></div>
+                
+                <h3 class="text-2xl font-serif font-bold mb-8 text-center border-b border-wine-light/30 pb-4 inline-block w-full">特別感謝</h3>
+                
+                <div class="grid md:grid-cols-2 gap-x-12 gap-y-6 text-center md:text-left">
+                    <ul class="space-y-3 font-light text-lg">
+                        <li>Po-Hung (Victor) Chen</li>
+                        <li>Bernd Schnabl</li>
+                        <li>臺北市立聯合醫院松德院區</li>
+                        <li>臺南市政府衛生局（ＶＲ設備提供）</li>
+                    </ul>
+                    <ul class="space-y-3 font-light text-lg">
+                        <li>臺灣酒駕防制社會關懷協會</li>
+                        <li>鄭永銘（臺大病理部）</li>
+                        <li>洪子瞻（臺大癌醫）</li>
+                        <li>傅俊銜（醫教生倫所）</li>
+                    </ul>
+                </div>
+
+                <div class="mt-12 pt-8 border-t border-wine-light/20 text-center">
+                    <p class="text-sm text-wine-light uppercase tracking-widest mb-2">Design By</p>
+                    <p class="text-xl font-serif font-bold">星采設計有限公司</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-100 py-8 text-center text-gray-500 text-sm border-t border-gray-200">
+        <p>&copy; 2024 Alcohol, Culture, and Health Exhibition. All Rights Reserved.</p>
+    </footer>
+
+</body>
+</html>
