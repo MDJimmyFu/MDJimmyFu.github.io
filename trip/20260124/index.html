@@ -74,17 +74,13 @@
         const { useState, useEffect } = React;
 
         // --- Weather Service ---
-        // Uses Open-Meteo API (which sources data from JMA in Japan)
         const WeatherService = {
-            // Coordinates for itinerary locations
             locations: {
                 "Tokyo": { lat: 35.6895, lon: 139.6917 },
                 "Kawaguchiko": { lat: 35.4988, lon: 138.7673 },
-                "Kamakura": { lat: 35.3192, lon: 139.5467 }, // Fixed: Added 'lon' key
+                "Kamakura": { lat: 35.3192, lon: 139.5467 },
                 "Nikko": { lat: 36.7199, lon: 139.6982 }
             },
-            
-            // Map WMO Weather Codes to our app's descriptions & icons
             wmoCodes: {
                 0: { desc: "晴朗無雲", icon: "sun" },
                 1: { desc: "晴時多雲", icon: "sun-horizon" },
@@ -103,8 +99,6 @@
                 75: { desc: "大雪", icon: "snowflake" },
                 95: { desc: "雷雨", icon: "cloud-lightning" }
             },
-
-            // Helper to fetch from API
             async fetchFromApi(lat, lon, dateStr) {
                  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&start_date=${dateStr}&end_date=${dateStr}`;
                  const response = await fetch(url);
@@ -115,7 +109,6 @@
                     const max = Math.round(data.daily.temperature_2m_max[0]);
                     const min = Math.round(data.daily.temperature_2m_min[0]);
                     const weatherInfo = this.wmoCodes[code] || { desc: "多雲", icon: "cloud" };
-                    
                     return {
                         weather: `${weatherInfo.desc} ${min}°C~${max}°C`,
                         icon: weatherInfo.icon
@@ -123,44 +116,31 @@
                 }
                 return null;
             },
-
             async fetchForecast(lat, lon, targetDateStr) {
                 try {
                     const targetDate = new Date(targetDateStr);
                     const today = new Date();
-                    // Reset time to compare dates only
                     today.setHours(0,0,0,0);
                     targetDate.setHours(0,0,0,0);
-
                     const diffTime = targetDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                    // 1. Try Live Forecast (Up to 16 days in future)
                     if (diffDays >= 0 && diffDays <= 16) {
                         const result = await this.fetchFromApi(lat, lon, targetDateStr);
                         if (result) return { ...result, type: 'live' };
                     }
-
-                    // 2. Demo/Simulation Mode: If target is too far (e.g., 2026), 
-                    // try fetching "Current Year" same date to show capability
+                    // Demo Mode for > 16 days
                     if (diffDays > 16) {
                         const currentYear = today.getFullYear();
-                        // Construct same date but for current year
-                        const parts = targetDateStr.split('-'); // 2026-01-24
+                        const parts = targetDateStr.split('-');
                         const simDateStr = `${currentYear}-${parts[1]}-${parts[2]}`;
-                        
-                        // Check if simulation date is within fetchable range (past or near future)
-                        // Actually, historical data or near-past forecast is better, 
-                        // but let's try standard forecast if within 14 days, otherwise ignore to avoid errors
                         const simDate = new Date(simDateStr);
                         const simDiff = Math.ceil((simDate - today) / (1000 * 60 * 60 * 24));
-
                         if (simDiff >= 0 && simDiff <= 14) {
                              const result = await this.fetchFromApi(lat, lon, simDateStr);
                              if (result) return { ...result, type: 'demo' };
                         }
                     }
-
                     return null; 
                 } catch (e) {
                     console.error("Weather fetch failed", e);
@@ -169,8 +149,8 @@
             }
         };
 
-        // --- Data Source ---
-        const initialTripData = {
+        // --- GLOBAL DATA CONSTANT (Renamed back to tripData to avoid ReferenceError) ---
+        const tripDataSource = {
             meta: {
                 title: "東京 & 河口湖 浪漫之旅",
                 dates: "2026/01/24 - 01/31",
@@ -422,7 +402,6 @@
                     ]
                 }
             ],
-            // Added emergency array back
             emergency: [
                 { title: "警察局", number: "110", icon: "siren" },
                 { title: "火警/救護車", number: "119", icon: "ambulance" },
@@ -432,7 +411,6 @@
             itinerary: [
                 {
                     day: 1, date: "1/24 (六)", title: "抵達東京 & 新宿之夜",
-                    // UPDATED: Highs ~11C, Lows ~3C. Sunny/Cloudy.
                     weather: "晴時多雲 3°C~11°C",
                     location: "Tokyo",
                     outfit: {
@@ -457,14 +435,13 @@
                         },
                         { 
                             time: "18:00", title: "六本木田舎家 (爐端燒)", desc: "已預約：東店 (Inakaya East)", icon: "fork-knife", map: "Inakaya East Roppongi", important: true,
-                            image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKOfnlSJUN07gHKJmraqsHVU5xawwHl1Y_-g&s",
+                            image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/cc/0a/dc/photo0jpg.jpg?w=1200&h=-1&s=1",
                             details: "經典的日式爐端燒名店，氣氛非常熱鬧。預約人: FU (2位)。請準時抵達。" 
                         }
                     ]
                 },
                 {
                     day: 2, date: "1/25 (日)", title: "Lady Gaga & 敘敘苑",
-                    // UPDATED: Highs ~10C, Lows ~2C. Sunny.
                     weather: "晴朗 2°C~10°C",
                     location: "Tokyo",
                     outfit: {
@@ -496,7 +473,6 @@
                 },
                 {
                     day: 3, date: "1/26 (一)", title: "前往河口湖",
-                    // UPDATED: Highs ~5C, Lows ~-7C. Cloudy->Sunny. Cold!
                     weather: "多雲轉晴 -7°C~5°C",
                     location: "Kawaguchiko",
                     outfit: {
@@ -543,7 +519,6 @@
                 },
                 {
                     day: 4, date: "1/27 (二)", title: "河口湖深度放鬆",
-                    // UPDATED: Highs ~6C, Lows ~-6C. Sunny.
                     weather: "晴朗 -6°C~6°C",
                     location: "Kawaguchiko",
                     outfit: {
@@ -586,6 +561,7 @@
                 {
                     day: 5, date: "1/28 (三)", title: "返回東京 & 麻布台",
                     weather: "晴時多雲 2°C~9°C",
+                    location: "Tokyo",
                     outfit: {
                         male: "【Smart Casual】襯衫 + 休閒西裝外套 (適合晚上麻布台)。",
                         female: "【都會優雅】連身裙 + 風衣/大衣。適合麻布台的高級氛圍。"
@@ -631,6 +607,7 @@
                 {
                     day: 6, date: "1/29 (四)", title: "鎌倉 & 江之島",
                     weather: "晴天 4°C~11°C",
+                    location: "Kamakura",
                     outfit: {
                         male: "【防風層次】風衣/衝鋒衣 + 衛衣。海邊風大需注意頭部保暖。",
                         female: "【日系清新】長裙/寬褲 + 貝雷帽 + 防風大衣。避免短裙(風大)。"
@@ -681,6 +658,7 @@
                 {
                     day: 7, date: "1/30 (五)", title: "日光世界遺產",
                     weather: "多雲 (山區冷) -1°C~5°C",
+                    location: "Nikko",
                     outfit: {
                         male: "【特級保暖】羽絨衣 + 手套 + 毛帽。鞋子需防滑(可能有雪/冰)。",
                         female: "【雪國穿搭】長版羽絨 + 圍巾/耳罩 + 止滑雪靴/防水靴。"
@@ -731,6 +709,11 @@
                 {
                     day: 8, date: "1/31 (六)", title: "返台",
                     weather: "晴天 3°C~10°C",
+                    location: "Tokyo",
+                    outfit: {
+                        male: "【舒適便裝】寬鬆上衣 + 彈性褲。鞋子好穿脫(安檢)。",
+                        female: "【休閒風】棉質長洋裝 + 牛仔外套。包包要大(裝戰利品)。"
+                    },
                     events: [
                         { 
                             time: "10:00", title: "新宿御苑", desc: "晨間散步 (行李寄放飯店)", icon: "leaf", map: "Shinjuku Gyoen National Garden",
@@ -970,7 +953,7 @@
             );
         };
 
-        const BackupView = ({ onSelectEvent }) => (
+        const BackupView = ({ onSelectEvent, tripData }) => (
             <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1 mb-2">備用方案</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm px-1 mb-4">點擊卡片查看詳細資訊。</p>
@@ -1014,7 +997,7 @@
             </div>
         );
 
-        const FoodView = ({ onSelectEvent }) => (
+        const FoodView = ({ onSelectEvent, tripData }) => (
             <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1 mb-2">在地美食推薦</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm px-1 mb-4">點擊卡片查看詳細資訊。</p>
@@ -1062,7 +1045,7 @@
             </div>
         );
 
-        const BookingView = () => (
+        const BookingView = ({ tripData }) => (
             <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1">預訂資訊</h2>
                 
@@ -1196,7 +1179,7 @@
             </div>
         );
 
-        const InfoView = () => (
+        const InfoView = ({ tripData }) => (
             <div className="p-4 space-y-6 pb-24 animate-[fade-in_0.3s_ease-out]">
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white px-1">實用資訊</h2>
 
@@ -1255,12 +1238,12 @@
         const App = () => {
             const [activeTab, setActiveTab] = useState('itinerary');
             const [selectedEvent, setSelectedEvent] = useState(null);
-            const [data, setData] = useState(initialTripData);
+            const [data, setData] = useState(tripDataSource);
 
             useEffect(() => {
                 // Try to fetch live weather for each day
                 const updateWeather = async () => {
-                    const updatedItinerary = await Promise.all(initialTripData.itinerary.map(async (day) => {
+                    const updatedItinerary = await Promise.all(tripDataSource.itinerary.map(async (day) => {
                         // Extract date from string like "1/24 (六)" -> "2026-01-24"
                         const dateParts = day.date.split(' ')[0].split('/');
                         const year = 2026;
@@ -1308,10 +1291,10 @@
                     {/* Main Content */}
                     <main>
                         {activeTab === 'itinerary' && <ItineraryView onSelectEvent={setSelectedEvent} tripData={data} />}
-                        {activeTab === 'backup' && <BackupView onSelectEvent={setSelectedEvent} />}
-                        {activeTab === 'food' && <FoodView onSelectEvent={setSelectedEvent} />}
-                        {activeTab === 'booking' && <BookingView />}
-                        {activeTab === 'info' && <InfoView />}
+                        {activeTab === 'backup' && <BackupView onSelectEvent={setSelectedEvent} tripData={data} />}
+                        {activeTab === 'food' && <FoodView onSelectEvent={setSelectedEvent} tripData={data} />}
+                        {activeTab === 'booking' && <BookingView tripData={data} />}
+                        {activeTab === 'info' && <InfoView tripData={data} />}
                     </main>
 
                     {/* Modals */}
@@ -1332,3 +1315,4 @@
     </script>
 </body>
 </html>
+
