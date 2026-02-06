@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雲端叫號系統 (ANE專用版)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 引入 MQTT.js 函式庫 -->
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        .flash-bg { animation: flash 1s ease-out; }
+        @keyframes flash {
+            0% { background-color: #fef08a; }
+            100% { background-color: white; }
+        }
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; }
+        .connected { background-color: #22c55e; box-shadow: 0 0 10px #22c55e; }
+        .disconnected { background-color: #ef4444; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- 初始載入畫面 -->
+        <div class="flex flex-col items-center justify-center h-screen gap-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
+            <p class="text-slate-500">系統載入中 (Channel: ane)...</p>
+        </div>
+    </div>
+
+    <!-- 狀態列 (除錯用) -->
+    <div id="connection-status" class="fixed bottom-2 right-2 text-xs text-slate-400 bg-white/80 px-2 py-1 rounded shadow hidden">
+        MQTT: <span id="mqtt-status">未連線</span>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. MQTT 設定與狀態
+        // ==========================================
+        const BROKER_URL = 'wss://broker.emqx.io:8084/mqtt';
+        
+        const state = {
+            client: null,
+            // 修改點 1: 預設跳過輸入畫面，直接進入角色選擇
+            view: 'role-select', 
+            // 修改點 2: 預設頻道設為 'ane'
+            channelId: 'ane',
+            role: '',
+            currentNumber: 0,
+            audioEnabled: false,
+            confirmReset: false,
+            lastPlayed: -1,
+            isConnected: false
+        };
+
+        const appEl = document.getElementById('app');
+
+        // ==========================================
+        // 2. 核心邏輯 (MQTT)
+        // ==========================================
+
+        function connectMQTT(channelId) {
+            const clientId = 'queue_ane_' + Math.random().toString(16).substr(2, 8);
+            
+            const options = {
+                keepalive: 60,
+                clientId: clientId,
+                protocolId: 'MQTT',
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 1000,
+                connectTimeout: 30 * 1000,
+            };
+
+            updateStatus('連線中...');
+            
+            state.client = mqtt.connect(BROKER_URL, options);
+
+            state.client.on('connect', () => {
+                state.isConnected = true;
+                updateStatus('已連線');
+                
+                const topic = `queue-sys/${channelId}/status`;
+                
+                state.client.subscribe(topic, { qos: 0 }, (err) => {
+                    if (!err) {
+                        console.log(`已訂閱頻道: ${topic}`);
+                    }
+                });
+            });
+
+            state.client.on('message', (topic, message) => {
+                try {
+                    const payload = JSON.parse(message.toString());
+                    console.log('收到訊息:', payload);
+                    
+                    const newNum = payload.val;
+                    const isRecall = payload.recall || false;
+                    
+                    if (state.view === 'display' && state.audioEnabled) {
+                        if (newNum !== state.currentNumber || isRecall) {
+                            playAudio(newNum, isRecall);
+                            const bg = document.getElementById('flash-bg');
+                            if(bg) {
+                                bg.classList.remove('flash-bg');
+                                void bg.offsetWidth; 
+                                bg.classList.add('flash-bg');
+                                setTimeout(() => bg.classList.remove('flash-bg'), 1000);
+                            }
+                        }
+                    }
+
+                    state.currentNumber = newNum;
+                    render();
+                } catch (e) {
+                    console.error('訊息解析失敗', e);
+                }
+            });
+
+            state.client.on('offline', () => {
+                state.isConnected = false;
+                updateStatus('離線');
+                render();
+            });
+            
+            state.client.on('error', (err) => {
+                console.error('Connection error: ', err);
+                updateStatus('錯誤: ' + err.message);
+            });
+        }
+
+        function publishNumber(num, isRecall = false) {
+            if (!state.client || !state.isConnected) {
+                alert("連線中，請稍候...");
+                return;
+            }
+            const topic = `queue-sys/${state.channelId}/status`;
+            const payload = JSON.stringify({ 
+                val: num, 
+                ts: Date.now(),
+                recall: isRecall 
+            });
+            
+            state.client.publish(topic, payload, { qos: 0, retain: true });
+        }
+
+        function updateStatus(msg) {
+            const el = document.getElementById('mqtt-status');
+            if(el) el.innerText = msg;
+            const container = document.getElementById('connection-status');
+            if(container) container.classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 3. UI 渲染 (Render)
+        // ==========================================
+        function render() {
+            appEl.innerHTML = ''; 
+
+            if (state.view === 'role-select') {
+                appEl.innerHTML = `
+                    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+                        <div class="mb-8 text-center">
+                            <h1 class="text-3xl font-bold text-slate-800">雲端叫號 (ANE版)</h1>
+                            <p class="text-slate-500 mt-2 flex items-center justify-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${state.isConnected ? 'bg-green-500' : 'bg-red-500'}"></span>
+                                頻道: <span class="font-mono font-bold text-blue-600">${state.channelId}</span>
+                            </p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+                            <button onclick="window.selectRole('display')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-blue-500 group">
+                                <i data-lucide="monitor" class="w-16 h-16 mx-auto mb-4 text-blue-500 group-hover:scale-110 transition-transform"></i>
+                                <h2 class="text-2xl font-bold mb-2">叫號顯示端</h2>
+                                <p class="text-slate-500">大螢幕顯示 / 語音</p>
+                            </button>
+                            <button onclick="window.selectRole('admin')" class="bg-white p-8 rounded-2xl shadow-xl hover:shadow-2xl transition-all border-2 border-transparent hover:border-emerald-500 group">
+                                <i data-lucide="smartphone" class="w-16 h-16 mx-auto mb-4 text-emerald-500 group-hover:scale-110 transition-transform"></i>
+                                <h2 class="text-2xl font-bold mb-2">控制台</h2>
+                                <p class="text-slate-500">操作叫號 / 插隊</p>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } 
+            else if (state.view === 'display') {
+                if (!state.audioEnabled) {
+                    appEl.innerHTML = `
+                        <div class="h-screen bg-slate-900 flex flex-col items-center justify-center text-center p-4">
+                            <button onclick="window.enableAudio()" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-full flex items-center gap-3 shadow-lg animate-bounce transition-colors">
+                                <i data-lucide="volume-2"></i> 點擊啟用音效
+                            </button>
+                            <p class="text-slate-400 mt-4 text-sm">瀏覽器需要您的互動才能播放語音</p>
+                        </div>
+                    `;
+                } else {
+                    appEl.innerHTML = `
+                        <div id="flash-bg" class="h-screen flex flex-col bg-white transition-colors duration-500">
+                            <div class="bg-blue-600 h-32 flex items-center justify-center shadow-md z-10 relative">
+                                <h1 class="text-white text-3xl font-bold tracking-widest">目前叫號</h1>
+                                <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 bg-blue-700/50 px-3 py-1 rounded-full text-white text-sm">
+                                    <div class="status-dot ${state.isConnected ? 'connected' : 'disconnected'}"></div>
+                                    <span>CH: ${state.channelId}</span>
+                                </div>
+                            </div>
+                            <div class="flex-1 flex items-center justify-center relative overflow-hidden">
+                                <span class="text-[25vw] font-bold text-slate-800 font-mono tracking-tighter leading-none select-none">
+                                    ${String(state.currentNumber).padStart(3, '0')}
+                                </span>
+                            </div>
+                            <div class="bg-slate-100 py-4 px-6 border-t border-slate-200 flex justify-between items-center text-slate-500">
+                                <div class="flex items-center gap-2">
+                                    <i data-lucide="volume-2" class="text-green-600"></i>
+                                    <span>語音待命中</span>
+                                </div>
+                                <span class="text-sm">連線狀態: ${state.isConnected ? '正常' : '斷線重連中...'}</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            } 
+            else if (state.view === 'admin') {
+                appEl.innerHTML = `
+                    <div class="min-h-screen p-4 bg-slate-50 flex flex-col items-center pt-6 md:pt-10">
+                        <div class="w-full max-w-md space-y-6">
+                            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-xl font-bold text-slate-800">控制台</h2>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="w-2 h-2 rounded-full ${state.isConnected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}"></span>
+                                        <span class="text-xs text-slate-500">${state.isConnected ? '已連線' : '斷線'} (CH:${state.channelId})</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs text-slate-400 uppercase tracking-wider">目前號碼</p>
+                                    <span class="text-4xl font-mono font-bold text-blue-600">${String(state.currentNumber).padStart(3, '0')}</span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3">
+                                <button onclick="window.nextNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-2xl p-8 shadow-lg shadow-blue-200 active:scale-95 transition-all flex flex-col items-center gap-2 group">
+                                    <div class="p-3 bg-blue-500/30 rounded-full group-hover:bg-blue-500/40 transition-colors">
+                                        <i data-lucide="skip-forward" class="w-10 h-10"></i>
+                                    </div>
+                                    <span class="text-2xl font-bold">下一位</span>
+                                </button>
+                                
+                                <button onclick="window.recallNum()" ${!state.isConnected ? 'disabled' : ''} class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-400 text-white rounded-xl py-4 shadow-md shadow-emerald-200 active:scale-95 transition-all flex items-center justify-center gap-2">
+                                    <i data-lucide="volume-2" class="w-6 h-6"></i>
+                                    <span class="text-xl font-bold">再次叫號</span>
+                                </button>
+                            </div>
+
+                            <div class="grid gap-4 pt-2">
+                                <form onsubmit="event.preventDefault(); window.jumpNum()" class="flex gap-2 bg-white p-3 rounded-xl shadow-sm border border-slate-100">
+                                    <input id="jumpInput" type="number" class="flex-1 p-3 rounded-lg outline-none bg-slate-50 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="輸入號碼">
+                                    <button class="bg-slate-800 hover:bg-slate-700 text-white px-6 rounded-lg font-medium transition-colors">插隊</button>
+                                </form>
+                                <button onclick="window.resetNum()" class="w-full border py-4 rounded-xl font-medium transition-colors ${state.confirmReset ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-red-500 border-red-100 hover:bg-red-50'}">
+                                    ${state.confirmReset ? '再次點擊確認歸零' : '重置號碼'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+        }
+
+        // ==========================================
+        // 4. 事件綁定
+        // ==========================================
+        window.selectRole = (role) => {
+            state.view = role;
+            render();
+        };
+
+        window.enableAudio = () => {
+            state.audioEnabled = true;
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); 
+            render();
+        };
+
+        window.nextNum = () => publishNumber(state.currentNumber + 1);
+        
+        window.recallNum = () => publishNumber(state.currentNumber, true);
+        
+        window.jumpNum = () => {
+            const val = document.getElementById('jumpInput').value;
+            if(val) {
+                publishNumber(parseInt(val));
+                document.getElementById('jumpInput').value = '';
+            }
+        }
+
+        window.resetNum = () => {
+            if(state.confirmReset) { 
+                publishNumber(0); 
+                state.confirmReset = false; 
+            } else { 
+                state.confirmReset = true; 
+                render(); 
+                setTimeout(() => { 
+                    state.confirmReset = false; 
+                    render(); 
+                }, 3000); 
+            }
+        }
+
+        function playAudio(num, force = false) {
+            if (!force && num === state.lastPlayed) return;
+            state.lastPlayed = num;
+            window.speechSynthesis.cancel();
+            
+            const u = new SpeechSynthesisUtterance(`請 ${num} 號顧客辦理`);
+            u.lang = 'zh-TW';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
+
+            setTimeout(() => {
+                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號顧客`);
+                 u2.lang = 'zh-TW';
+                 u2.rate = 0.9;
+                 window.speechSynthesis.speak(u2);
+            }, 3500);
+        }
+
+        // ==========================================
+        // 5. 啟動 (修改點 3: 自動連線)
+        // ==========================================
+        connectMQTT(state.channelId);
+        render();
+
+    </script>
+</body>
+</html>
