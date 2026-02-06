@@ -276,6 +276,12 @@
         window.enableAudio = () => {
             state.audioEnabled = true;
             window.speechSynthesis.speak(new SpeechSynthesisUtterance('')); 
+            // 預先載入語音包
+            if (window.speechSynthesis.getVoices().length === 0) {
+                window.speechSynthesis.onvoiceschanged = () => {
+                    console.log("Voices loaded:", window.speechSynthesis.getVoices().length);
+                };
+            }
             render();
         };
 
@@ -312,10 +318,13 @@
             // 停止目前的發音
             window.speechSynthesis.cancel();
             
+            // 1. 取得所有可用語音包
+            const voices = window.speechSynthesis.getVoices();
+
             // 雙語播報邏輯 (國語 -> 英語)
             const messages = [
-                { text: `請 ${num} 號顧客辦理`, lang: 'zh-TW', rate: 1.0 }, // 國語
-                { text: `Number ${num}, please`, lang: 'en-US', rate: 0.9 } // 英語
+                { text: `請 ${num} 號進入診間看診`, lang: 'zh-TW', rate: 1.0 }, // 國語
+                { text: `Number ${num}, please enter the consultation room to see the doctor`, lang: 'en-US', rate: 0.9 } // 英語
             ];
 
             let index = 0;
@@ -328,6 +337,23 @@
                 u.lang = item.lang;
                 u.rate = item.rate;
                 
+                // 2. 強制尋找最適合的語音包 (如果找得到)
+                if (voices.length > 0) {
+                    // 策略 A: 找完全符合 (zh-TW)
+                    let voice = voices.find(v => v.lang.replace('_', '-') === item.lang);
+                    // 策略 B: 找部分符合 (zh, en)
+                    if (!voice) {
+                        const shortLang = item.lang.split('-')[0];
+                        voice = voices.find(v => v.lang.replace('_', '-').startsWith(shortLang));
+                    }
+                    // 策略 C: 針對英文，找任何名稱包含 English 的
+                    if (!voice && item.lang.startsWith('en')) {
+                        voice = voices.find(v => v.name.includes('English'));
+                    }
+
+                    if (voice) u.voice = voice;
+                }
+
                 // 這段唸完後，延遲 0.6 秒再唸下一段
                 u.onend = () => {
                     index++;
@@ -336,8 +362,9 @@
                 
                 u.onerror = (e) => {
                     console.error("TTS Error", e);
+                    // 發生錯誤也要嘗試繼續念下一段
                     index++;
-                    speakNext();
+                    setTimeout(speakNext, 100);
                 };
 
                 window.speechSynthesis.speak(u);
@@ -351,6 +378,14 @@
         // 5. 啟動
         // ==========================================
         connectMQTT(state.channelId);
+        
+        // 確保語音包載入
+        if (window.speechSynthesis.onvoiceschanged !== undefined) {
+             window.speechSynthesis.onvoiceschanged = () => {
+                 // 這裡不需要做什麼，只是為了觸發 chrome 載入語音
+             };
+        }
+        
         render();
 
     </script>
