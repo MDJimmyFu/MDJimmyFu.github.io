@@ -42,8 +42,10 @@
         
         const state = {
             client: null,
+            // 修改點 1: 預設跳過輸入畫面，直接進入角色選擇
             view: 'role-select', 
-            channelId: 'ane', // 預設頻道
+            // 修改點 2: 預設頻道設為 'ane'
+            channelId: 'ane',
             role: '',
             currentNumber: 0,
             audioEnabled: false,
@@ -209,7 +211,7 @@
                             <div class="bg-slate-100 py-4 px-6 border-t border-slate-200 flex justify-between items-center text-slate-500">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="volume-2" class="text-green-600"></i>
-                                    <span>國語 / 英語 播報中</span>
+                                    <span>語音待命中</span>
                                 </div>
                                 <span class="text-sm">連線狀態: ${state.isConnected ? '正常' : '斷線重連中...'}</span>
                             </div>
@@ -308,47 +310,23 @@
         function playAudio(num, force = false) {
             if (!force && num === state.lastPlayed) return;
             state.lastPlayed = num;
-            
-            // 停止目前的發音
             window.speechSynthesis.cancel();
             
-            // 雙語播報邏輯 (國語 -> 英語)
-            const messages = [
-                { text: `請 ${num} 號顧客辦理`, lang: 'zh-TW', rate: 1.0 }, // 國語
-                { text: `Number ${num}, please`, lang: 'en-US', rate: 0.9 } // 英語
-            ];
+            const u = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
+            u.lang = 'zh-TW';
+            u.rate = 0.9;
+            window.speechSynthesis.speak(u);
 
-            let index = 0;
-
-            function speakNext() {
-                if (index >= messages.length) return;
-                
-                const item = messages[index];
-                const u = new SpeechSynthesisUtterance(item.text);
-                u.lang = item.lang;
-                u.rate = item.rate;
-                
-                // 這段唸完後，延遲 0.6 秒再唸下一段
-                u.onend = () => {
-                    index++;
-                    setTimeout(speakNext, 600);
-                };
-                
-                u.onerror = (e) => {
-                    console.error("TTS Error", e);
-                    index++;
-                    speakNext();
-                };
-
-                window.speechSynthesis.speak(u);
-            }
-
-            // 開始播報
-            speakNext();
+            setTimeout(() => {
+                 const u2 = new SpeechSynthesisUtterance(`請 ${num} 號進入診間`);
+                 u2.lang = 'zh-TW';
+                 u2.rate = 0.9;
+                 window.speechSynthesis.speak(u2);
+            }, 3500);
         }
 
         // ==========================================
-        // 5. 啟動
+        // 5. 啟動 (修改點 3: 自動連線)
         // ==========================================
         connectMQTT(state.channelId);
         render();
