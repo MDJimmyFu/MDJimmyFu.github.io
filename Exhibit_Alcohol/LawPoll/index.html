@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒與文化特展 - 法律意見徵集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 引入 CSV 解析工具 PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-12 px-4">
+
+    <div class="max-w-4xl mx-auto space-y-12">
+        <!-- 標題區域 -->
+        
+        <header class="text-center space-y-4">
+            <div class="inline-block p-3 bg-indigo-100 rounded-full mb-2">
+                <i data-lucide="gavel" class="w-8 h-8 text-indigo-600"></i>
+            </div>
+            <h1 class="text-4xl font-bold text-gray-900 tracking-tight">如果有一部專談「酒害」的法律...</h1>
+            <p class="text-xl text-gray-500 max-w-lg mx-auto leading-relaxed">
+                你希望寫上什麼？先保護誰？
+            </p>
+        </header>
+
+        <!-- 問卷填寫區域 -->
+        <div class="glass-card rounded-3xl shadow-xl p-8 md:p-12">
+            <form id="opinionForm" class="space-y-6">
+                <div class="space-y-2">
+                    <label for="lawContent" class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        <i data-lucide="message-square" class="w-4 h-4"></i>
+                        你希望寫上什麼？先保護誰？ <span class="text-red-500">*</span>
+                    </label>
+                    <textarea 
+                        id="lawContent" 
+                        name="entry.715581539" 
+                        rows="5" 
+                        required
+                        placeholder="請跟我們分享你的想法..."
+                        class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all outline-none text-gray-700 resize-none"
+                    ></textarea>
+                </div>
+
+                <button 
+                    type="submit" 
+                    id="submitBtn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 transition-all transform hover:-translate-y-1 active:scale-[0.98] flex items-center justify-center gap-2"
+                >
+                    <span>送出</span>
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <!-- 成功訊息 -->
+            <div id="successMessage" class="hidden text-center py-8 space-y-4 animate-in fade-in zoom-in duration-500">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full">
+                    <i data-lucide="check-circle" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900">感謝您的回覆！</h3>
+                <p class="text-gray-500">每個人的想法都可以改變這個社會。資料更新可能會有幾分鐘延遲。</p>
+                <button onclick="location.reload()" class="text-indigo-600 font-medium hover:underline text-sm">再寫一份</button>
+            </div>
+        </div>
+
+        <!-- 他人回覆展示區域 -->
+        <section class="space-y-6">
+            <div class="flex items-center justify-between px-2">
+                <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="users" class="w-6 h-6 text-indigo-500"></i>
+                    大家都在說什麼
+                </h2>
+                <span class="text-sm text-gray-400" id="resultCount">載入中...</span>
+            </div>
+
+            <div id="resultsList" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-full py-20 text-center text-gray-400 italic">
+                    正在獲取最新公開回覆...
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="mt-20 text-center text-gray-400 text-sm">
+        <p>&copy; 2026 國立臺灣大學醫學人文博物館</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const form = document.getElementById('opinionForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMsg = document.getElementById('successMessage');
+        const resultsList = document.getElementById('resultsList');
+        const resultCount = document.getElementById('resultCount');
+
+        // --- 1. 設定 CSV 資料來源 ---
+        // 請依照以下步驟操作：
+        // 1. 開啟試算表 > 檔案 > 共用 > 發佈到網路
+        // 2. 選擇「連結」、整份文件（或特定工作表）、格式選擇「逗號分隔值 (.csv)」
+        // 3. 點選發佈，並將產生的網址貼在下方：
+        const PUBLIC_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vS8UxdkLfK9tqszRHWYmf_CStZKRhplYvn2joiIre-cQddxWISNwvNB2JbYlcXnS7_lBhdki1Bkau6B/pub?gid=820664448&single=true&output=csv'; 
+
+        // --- 2. 提交到 Google Forms ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> 提交中...';
+            lucide.createIcons();
+
+            const formData = new FormData(form);
+            const GOOGLE_FORM_URL = 'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdcL26kZo85gYfZV3oWwYRjMx3dPii03Q8dw9uJLvvWY9jLyg/formResponse';
+
+            try {
+                await fetch(GOOGLE_FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                });
+
+                form.classList.add('hidden');
+                successMsg.classList.remove('hidden');
+                
+                // 提交後嘗試更新列表（雖然 CSV 可能還沒更新）
+                fetchResultsFromCSV(); 
+
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('提交失敗，請檢查網路。');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>提交意見</span><i data-lucide="send" class="w-5 h-5"></i>';
+                lucide.createIcons();
+            }
+        });
+
+        // --- 3. 從公開 CSV 讀取資料 ---
+        async function fetchResultsFromCSV() {
+            if (!PUBLIC_CSV_URL) {
+                renderResults(getMockData());
+                return;
+            }
+
+            // 使用 PapaParse 讀取遠端 URL
+            Papa.parse(PUBLIC_CSV_URL, {
+                download: true,
+                header: true, // 自動將第一列作為 Key
+                complete: function(results) {
+                    // CSV 檔案通常包含 "時間戳記" 和 "法律內容與保護"
+                    // 根據 Google 表單產生的 CSV，欄位名稱會是題目名稱
+                    const data = results.data.filter(row => row['法律內容與保護']).reverse(); 
+                    renderResults(data);
+                },
+                error: function(err) {
+                    console.error('CSV 讀取失敗:', err);
+                    renderResults(getMockData());
+                }
+            });
+        }
+
+        function renderResults(items) {
+            resultCount.innerText = `共有 ${items.length} 筆回覆`;
+            
+            if (items.length === 0) {
+                resultsList.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">尚無公開回覆內容。</div>`;
+                return;
+            }
+
+            resultsList.innerHTML = items.map(item => `
+                <div class="glass-card p-6 rounded-2xl hover:shadow-md transition-all border border-gray-100 group">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex-shrink-0 flex items-center justify-center text-white text-xs font-bold shadow-inner group-hover:scale-110 transition-transform">
+                            User
+                        </div>
+                        <div class="space-y-2 flex-grow">
+                            <p class="text-gray-700 leading-relaxed">${item['法律內容與保護'] || item.content}</p>
+                            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                ${item['時間戳記'] || item.timestamp || '剛剛'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function showToast(msg) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'fixed top-4 right-4 bg-red-500 text-white px-6 py-3 rounded-2xl shadow-2xl z-50 animate-in slide-in-from-top';
+            errorDiv.innerText = msg;
+            document.body.appendChild(errorDiv);
+            setTimeout(() => errorDiv.remove(), 3000);
+        }
+
+        function getMockData() {
+            return [
+                { content: "展示資料目前為模擬狀態，請設定 CSV 網址以顯示真實數據。", timestamp: "系統訊息" },
+                { content: "這次展覽對酒類廣告的法律限制講得很清楚，受益良多。", timestamp: "2 小時前" },
+                { content: "希望能增加更多關於未成年飲酒法律防制的部分。", timestamp: "5 小時前" }
+            ];
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchResultsFromCSV);
+    </script>
+</body>
+</html>
