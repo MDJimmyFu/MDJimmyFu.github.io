@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>病歷號檢核碼計算機 (雙模式)</title>
+    <!-- 使用 Tailwind CSS 進行快速、現代化的樣式設計 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 JsBarcode 產生一維條碼 -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <style>
+        /* 自定義捲軸樣式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        /* 避免手機雙擊放大 */
+        button {
+            touch-action: manipulation;
+        }
+        /* 數字顯示佔位符動畫 */
+        .digit-slot {
+            display: inline-block;
+            width: 1ch;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- 標題區塊 -->
+        <header class="mb-6 text-center md:text-left flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-blue-700 flex items-center justify-center md:justify-start gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    病歷號檢核碼計算機
+                </h1>
+                <p class="text-slate-500 mt-2">支援單筆虛擬鍵盤快打與多筆批次轉換</p>
+            </div>
+            <button onclick="loadSampleData()" class="text-sm bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-4 py-2 rounded-lg font-medium transition-colors hidden md:block" id="sampleBtn">
+                載入範例資料
+            </button>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+            <!-- 左側：輸入區塊 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6 flex flex-col h-full">
+                
+                <!-- 頁籤切換 -->
+                <div class="flex p-1 mb-5 bg-slate-100 rounded-xl">
+                    <button id="tabBtnSingle" onclick="switchTab('single')" class="flex-1 py-2.5 rounded-lg bg-white shadow-sm text-blue-600 font-bold transition-all">單筆快打</button>
+                    <button id="tabBtnBatch" onclick="switchTab('batch')" class="flex-1 py-2.5 rounded-lg text-slate-500 font-medium hover:bg-slate-200 transition-all">批次轉換</button>
+                </div>
+                
+                <!-- 模式 1：單筆數字鍵盤 (預設顯示) -->
+                <div id="singleInputView" class="flex flex-col flex-grow">
+                    <!-- 顯示螢幕 -->
+                    <div class="mb-4 p-4 bg-slate-50 border border-slate-300 rounded-xl text-center flex flex-col justify-center items-center min-h-[140px] relative overflow-hidden transition-all duration-300">
+                        <!-- 一維條碼顯示區 (預設隱藏) -->
+                        <svg id="barcode" class="hidden h-12 mb-2 z-10 transition-opacity duration-300"></svg>
+                        
+                        <div class="flex justify-center items-center z-10">
+                            <div id="singleDisplay" class="text-4xl font-mono tracking-widest text-slate-800 font-semibold"></div>
+                            <div id="singleResult" class="text-5xl font-mono font-bold text-red-500 ml-2 scale-0 transition-transform duration-300 origin-left"></div>
+                        </div>
+                        <!-- 裝飾用背景浮水印 -->
+                        <div class="absolute inset-0 opacity-5 flex justify-center items-center pointer-events-none">
+                            <span class="text-6xl font-mono tracking-widest text-slate-900"></span>
+                        </div>
+                    </div>
+
+                    <!-- 虛擬數字鍵盤 -->
+                    <div class="grid grid-cols-3 gap-3 flex-grow max-h-[400px]">
+                        <button onclick="pressKey('1')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">1</button>
+                        <button onclick="pressKey('2')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">2</button>
+                        <button onclick="pressKey('3')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">3</button>
+                        
+                        <button onclick="pressKey('4')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">4</button>
+                        <button onclick="pressKey('5')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">5</button>
+                        <button onclick="pressKey('6')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">6</button>
+                        
+                        <button onclick="pressKey('7')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">7</button>
+                        <button onclick="pressKey('8')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">8</button>
+                        <button onclick="pressKey('9')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">9</button>
+                        
+                        <button onclick="pressKey('C')" class="bg-red-50 text-red-500 border border-red-100 shadow-sm rounded-xl text-xl font-semibold py-4 hover:bg-red-100 active:bg-red-200 transition-colors">清除</button>
+                        <button onclick="pressKey('0')" class="bg-white border border-slate-200 shadow-sm rounded-xl text-2xl font-semibold py-4 hover:bg-blue-50 active:bg-blue-100 transition-colors">0</button>
+                        <button onclick="pressKey('B')" class="bg-slate-100 text-slate-600 border border-slate-200 shadow-sm rounded-xl text-xl font-semibold py-4 flex justify-center items-center hover:bg-slate-200 active:bg-slate-300 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 模式 2：批次輸入 (預設隱藏) -->
+                <div id="batchInputView" class="hidden flex-col flex-grow">
+                    <div class="flex justify-between items-center mb-3">
+                        <label for="inputData" class="font-semibold text-lg text-slate-700">請貼上多筆 9 碼數字</label>
+                        <span class="text-xs text-slate-400">一行一筆資料</span>
+                    </div>
+                    
+                    <textarea id="inputData" 
+                        class="w-full flex-grow min-h-[300px] p-4 bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-none font-mono text-lg transition-all" 
+                        placeholder="例如：&#10;003235483&#10;003544223&#10;003603277"></textarea>
+
+                    <div class="flex gap-3 mt-4">
+                        <button onclick="processBatch()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm shadow-blue-200 transition-all active:scale-[0.98]">
+                            開始批次轉換
+                        </button>
+                        <button onclick="clearBatchInput()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold py-3 px-6 rounded-xl transition-all">
+                            清空
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 右側：結果與歷史區塊 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:p-6 flex flex-col h-[500px] lg:h-auto lg:min-h-[500px]" id="resultContainer">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-semibold text-lg text-slate-700 flex items-center gap-2">
+                        轉換紀錄 
+                        <span id="validCountBadge" class="bg-green-100 text-green-700 text-xs py-1 px-2 rounded-full font-bold hidden">0 筆</span>
+                    </h2>
+                    <div class="flex gap-2">
+                        <button onclick="clearResults()" class="text-slate-400 hover:text-red-500 text-sm font-semibold py-1.5 px-2 transition-colors" title="清除紀錄">
+                            清除
+                        </button>
+                        <button onclick="copyResults()" class="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-1.5 px-3 rounded-lg transition-colors shadow-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                            <span class="hidden sm:inline">複製結果</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex-grow overflow-auto border border-slate-200 rounded-xl relative bg-slate-50">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-slate-100 sticky top-0 z-10 shadow-sm">
+                            <tr>
+                                <th class="py-3 px-3 sm:px-4 font-semibold text-slate-600 border-b border-slate-200 w-10 text-center text-sm">#</th>
+                                <th class="py-3 px-3 sm:px-4 font-semibold text-slate-600 border-b border-slate-200 text-sm">原始數字</th>
+                                <th class="py-3 px-3 sm:px-4 font-semibold text-slate-600 border-b border-slate-200 text-center text-sm">檢核碼</th>
+                                <th class="py-3 px-3 sm:px-4 font-semibold text-slate-600 border-b border-slate-200 text-sm">完整病歷號</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultTableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- JS 動態插入列，若為空顯示提示 -->
+                            <tr id="emptyStateRow">
+                                <td colspan="4" class="py-12 text-center text-slate-400">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    尚無轉換紀錄<br><span class="text-sm">請由左側輸入資料</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定義 Toast 提示訊息框 -->
+    <div id="toastMessage" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg font-medium opacity-0 translate-y-full transition-all duration-300 pointer-events-none z-50 flex items-center gap-2">
+        <span id="toastIcon">ℹ️</span>
+        <span id="toastText">訊息內容</span>
+    </div>
+
+    <script>
+        // ================= 全局狀態與核心演算法 =================
+        let totalValidCount = 0;
+        let singleInputStr = "";
+
+        // 核心邏輯：計算檢核碼
+        function calculateCheckDigit(numStr) {
+            const weights = [9, 8, 7, 6, 5, 4, 3, 2, 1];
+            let sum = 0;
+            for(let i = 0; i < 9; i++) {
+                sum += parseInt(numStr[i]) * weights[i];
+            }
+            const remainder = sum % 10;
+            return String.fromCharCode(remainder + 65); // ASCII 65 是 'A'
+        }
+
+
+        // ================= 頁籤切換邏輯 =================
+        function switchTab(tabName) {
+            const singleBtn = document.getElementById('tabBtnSingle');
+            const batchBtn = document.getElementById('tabBtnBatch');
+            const singleView = document.getElementById('singleInputView');
+            const batchView = document.getElementById('batchInputView');
+            const sampleBtn = document.getElementById('sampleBtn');
+
+            if (tabName === 'single') {
+                // UI 狀態更新
+                singleBtn.className = "flex-1 py-2.5 rounded-lg bg-white shadow-sm text-blue-600 font-bold transition-all";
+                batchBtn.className = "flex-1 py-2.5 rounded-lg text-slate-500 font-medium hover:bg-slate-200 transition-all";
+                singleView.classList.remove('hidden');
+                singleView.classList.add('flex');
+                batchView.classList.add('hidden');
+                batchView.classList.remove('flex');
+                sampleBtn.classList.add('hidden'); // 單筆模式藏起範例按鈕
+                updateSingleDisplay();
+            } else {
+                batchBtn.className = "flex-1 py-2.5 rounded-lg bg-white shadow-sm text-blue-600 font-bold transition-all";
+                singleBtn.className = "flex-1 py-2.5 rounded-lg text-slate-500 font-medium hover:bg-slate-200 transition-all";
+                batchView.classList.remove('hidden');
+                batchView.classList.add('flex');
+                singleView.classList.add('hidden');
+                singleView.classList.remove('flex');
+                sampleBtn.classList.remove('hidden'); // 批次模式顯示範例按鈕
+            }
+        }
+
+
+        // ================= 單筆數字鍵盤邏輯 =================
+        function pressKey(key) {
+            const resultEl = document.getElementById('singleResult');
+            const barcodeEl = document.getElementById('barcode');
+
+            if (key === 'C') {
+                singleInputStr = "";
+                resultEl.classList.remove('scale-100');
+                resultEl.classList.add('scale-0');
+                barcodeEl.classList.add('hidden');
+            } 
+            else if (key === 'B') {
+                // 如果已經滿9碼且算完結果，按退匣鍵我們刪除最後一碼並收起結果
+                if (singleInputStr.length > 0) {
+                    singleInputStr = singleInputStr.slice(0, -1);
+                    resultEl.classList.remove('scale-100');
+                    resultEl.classList.add('scale-0');
+                    barcodeEl.classList.add('hidden');
+                }
+            } 
+            else {
+                // 輸入數字 0-9
+                // 如果目前已經是 9 碼（前一筆剛算完），直接開始新的一筆
+                if (singleInputStr.length === 9) {
+                    singleInputStr = key;
+                    resultEl.classList.remove('scale-100');
+                    resultEl.classList.add('scale-0');
+                    barcodeEl.classList.add('hidden');
+                } 
+                // 還沒滿 9 碼，繼續疊加
+                else if (singleInputStr.length < 9) {
+                    singleInputStr += key;
+                }
+            }
+
+            updateSingleDisplay();
+
+            // 如果剛剛輸入達到了 9 碼，觸發自動計算
+            if (singleInputStr.length === 9) {
+                const checkLetter = calculateCheckDigit(singleInputStr);
+                const fullMRN = singleInputStr + checkLetter;
+                
+                // 動畫彈出結果
+                resultEl.innerText = checkLetter;
+                resultEl.classList.remove('scale-0');
+                resultEl.classList.add('scale-100');
+
+                // 產生並顯示一維條碼
+                barcodeEl.classList.remove('hidden');
+                JsBarcode("#barcode", fullMRN, {
+                    format: "CODE128",     // 採用支援英數字的 CODE128 標準
+                    displayValue: false,   // 隱藏條碼預設的文字 (保留我們自己設計的大字體)
+                    height: 40,            // 條碼高度
+                    width: 2,              // 條碼粗細
+                    margin: 0,
+                    lineColor: "#1e293b",
+                    background: "transparent"
+                });
+
+                // 加入右側紀錄表 (單筆輸入插在最上方)
+                addRecordToTable(singleInputStr, checkLetter, true);
+                
+                // 手機震動回饋 (如果裝置支援)
+                if (navigator.vibrate) navigator.vibrate(50);
+            }
+        }
+
+        function updateSingleDisplay() {
+            const displayEl = document.getElementById('singleDisplay');
+            
+            // 將字串拆分並加上視覺間距，未滿9碼時顯示底線的佔位符可以考慮，但為簡潔我們直接顯示目前輸入的數字
+            if (singleInputStr.length === 0) {
+                displayEl.innerHTML = '<span class="text-slate-300">請輸入數字</span>';
+            } else {
+                displayEl.innerText = singleInputStr;
+            }
+        }
+
+
+        // ================= 批次轉換邏輯 =================
+        function processBatch() {
+            const rawText = document.getElementById('inputData').value;
+            const lines = rawText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+            
+            if (lines.length === 0) {
+                showToast('請先輸入或貼上病歷號數字！', '⚠️');
+                return;
+            }
+
+            let newValidCount = 0;
+
+            // 批次轉換預設接在現有紀錄的下方，所以從頭處理
+            lines.forEach((line) => {
+                const cleanDigits = line.replace(/\D/g, '');
+                if (cleanDigits.length === 9) {
+                    const checkLetter = calculateCheckDigit(cleanDigits);
+                    // 批次加在最前面，讓最新的一整批顯示在最上面
+                    addRecordToTable(cleanDigits, checkLetter, false); 
+                    newValidCount++;
+                } else {
+                    addErrorRecordToTable(line);
+                }
+            });
+
+            if(newValidCount > 0) {
+                showToast(`✅ 批次轉換完成，新增 ${newValidCount} 筆資料！`, '✅');
+            } else {
+                showToast(`❌ 找不到有效的 9 碼數字格式！`, '❌');
+            }
+            
+            // 轉換後自動幫使用者清空輸入框，方便貼下一批
+            document.getElementById('inputData').value = '';
+        }
+
+        function clearBatchInput() {
+            document.getElementById('inputData').value = '';
+            document.getElementById('inputData').focus();
+        }
+
+        function loadSampleData() {
+            const sample = "003235483\n003544223\n003603277\n003166125\n12345 (錯誤示範)\n003611562";
+            document.getElementById('inputData').value = sample;
+            showToast('範例已載入，請點擊「開始批次轉換」', '💡');
+        }
+
+
+        // ================= 紀錄表格操作 =================
+        function removeEmptyState() {
+            const emptyState = document.getElementById('emptyStateRow');
+            if (emptyState) {
+                emptyState.remove();
+            }
+            document.getElementById('validCountBadge').classList.remove('hidden');
+        }
+
+        function updateBadgeCount() {
+            const badge = document.getElementById('validCountBadge');
+            badge.innerText = `${totalValidCount} 筆`;
+            if(totalValidCount > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+        }
+
+        function addRecordToTable(digits, letter, isPrepend = true) {
+            removeEmptyState();
+            totalValidCount++;
+            updateBadgeCount();
+
+            const tbody = document.getElementById('resultTableBody');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-blue-50/50 transition-colors animate-[fadeIn_0.3s_ease-out]";
+            
+            // 為了讓序號在上方是最新的，我們這裡的序號用總數代替
+            tr.innerHTML = `
+                <td class="py-3 px-3 sm:px-4 text-slate-400 text-center text-sm">${totalValidCount}</td>
+                <td class="py-3 px-3 sm:px-4 font-mono text-slate-700 text-sm sm:text-base">${digits}</td>
+                <td class="py-3 px-3 sm:px-4 font-mono text-center font-bold text-red-500 text-sm sm:text-base">${letter}</td>
+                <td class="py-3 px-3 sm:px-4 font-mono font-bold text-slate-800 result-mrn select-all text-sm sm:text-base">${digits}<span class="text-red-500">${letter}</span></td>
+            `;
+
+            // 單筆輸入加在最上方，批次處理為了順序我們也統一把最新的插在最上方
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+
+        function addErrorRecordToTable(originalText) {
+            removeEmptyState();
+            const tbody = document.getElementById('resultTableBody');
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-amber-50/50 transition-colors opacity-75";
+            
+            tr.innerHTML = `
+                <td class="py-3 px-3 sm:px-4 text-slate-400 text-center text-sm">-</td>
+                <td class="py-3 px-3 sm:px-4 font-mono text-slate-400 line-through text-sm sm:text-base truncate max-w-[120px]" title="${originalText}">${originalText}</td>
+                <td class="py-3 px-3 sm:px-4 text-center text-amber-500 text-xs sm:text-sm" colspan="2">
+                    <span class="bg-amber-100 text-amber-700 px-2 py-1 rounded">格式錯誤</span>
+                </td>
+            `;
+            tbody.insertBefore(tr, tbody.firstChild);
+        }
+
+        function clearResults() {
+            totalValidCount = 0;
+            updateBadgeCount();
+            const tbody = document.getElementById('resultTableBody');
+            tbody.innerHTML = `
+                <tr id="emptyStateRow">
+                    <td colspan="4" class="py-12 text-center text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        尚無轉換紀錄<br><span class="text-sm">請由左側輸入資料</span>
+                    </td>
+                </tr>
+            `;
+            
+            // 同時重置單筆輸入畫面
+            if(!document.getElementById('singleInputView').classList.contains('hidden')) {
+                pressKey('C');
+            }
+            showToast('歷史紀錄已清除', '🗑️');
+        }
+
+        // 複製結果功能
+        function copyResults() {
+            const resultElements = document.querySelectorAll('.result-mrn');
+            if (resultElements.length === 0) {
+                showToast('沒有可複製的成功結果！', '⚠️');
+                return;
+            }
+
+            // 因為我們是從上往下插入(最新的在最上)，如果使用者希望複製順序跟批次一樣，我們把陣列反轉回來
+            const textsToCopy = Array.from(resultElements).map(el => el.innerText).reverse().join('\n');
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textsToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            showToast(`已複製 ${resultElements.length} 筆完整病歷號！`, '📋');
+        }
+
+
+        // ================= UI 工具 =================
+        let toastTimeout;
+        function showToast(message, icon = 'ℹ️') {
+            const toast = document.getElementById('toastMessage');
+            document.getElementById('toastText').innerText = message;
+            document.getElementById('toastIcon').innerText = icon;
+            
+            toast.classList.remove('opacity-0', 'translate-y-full');
+            
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-full');
+            }, 3000);
+        }
+
+        // 初始化
+        updateSingleDisplay();
+
+        // ================= 實體鍵盤支援 =================
+        document.addEventListener('keydown', function(event) {
+            // 如果目前是在「批次轉換」模式（有輸入框），就不攔截鍵盤事件
+            if (document.getElementById('singleInputView').classList.contains('hidden')) {
+                return;
+            }
+
+            const key = event.key;
+
+            // 判斷按下的按鍵並對應到虛擬鍵盤的邏輯
+            if (/^[0-9]$/.test(key)) {
+                pressKey(key);
+            } 
+            // 退格鍵 (Backspace) 對應到 'B'
+            else if (key === 'Backspace') {
+                pressKey('B');
+            } 
+            // Escape, Delete 或英文字母 C 對應到清除 'C'
+            else if (key === 'Escape' || key === 'Delete' || key.toLowerCase() === 'c') {
+                pressKey('C');
+            }
+        });
+
+    </script>
+</body>
+</html>
