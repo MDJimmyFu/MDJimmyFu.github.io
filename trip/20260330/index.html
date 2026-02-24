@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>芬蘭極光孝親之旅</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        /* Hide scrollbar for horizontal scrolling but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        
+        /* Aurora Theme Custom Classes */
+        .aurora-header {
+            background: linear-gradient(135deg, #0B132B 0%, #0f303f 50%, #0d2238 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .aurora-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -50%; width: 200%; height: 100%;
+            background: radial-gradient(circle at 50% 150%, rgba(52, 211, 153, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .aurora-glow {
+            box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.2);
+        }
+        .weather-card {
+            background: linear-gradient(to right bottom, #1e293b, #0f172a);
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+        .fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .shimmer {
+            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background-size: 200% 100%;
+            animation: loadingShimmer 1.5s infinite;
+        }
+        @keyframes loadingShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-20 antialiased">
+
+    <!-- Header -->
+    <header class="aurora-header text-white p-5 sticky top-0 z-30 shadow-lg border-b border-emerald-900/30">
+        <h1 class="text-xl font-bold flex items-center gap-2 relative z-10">
+            <span class="text-emerald-400">✧</span> 芬蘭極光孝親之旅
+        </h1>
+        <p class="text-slate-300 text-xs mt-1.5 font-medium tracking-wide relative z-10">2026/03/29 - 04/08 | 傅先生與父母</p>
+    </header>
+
+    <!-- Main Content Area -->
+    <main id="app-main" class="p-4 max-w-md mx-auto md:max-w-2xl relative min-h-[70vh]">
+        <!-- Content will be injected here by JS -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-200 pb-safe z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.03)]">
+        <div class="flex justify-around items-center h-16 max-w-md mx-auto md:max-w-2xl px-2">
+            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-emerald-600 transform scale-105">
+                <i data-lucide="map" class="w-6 h-6 stroke-[2.5]"></i>
+                <span class="text-[10px] font-bold tracking-wide">行程</span>
+            </button>
+            <button onclick="switchTab('hotel')" id="nav-hotel" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+                <i data-lucide="hotel" class="w-6 h-6 stroke-2"></i>
+                <span class="text-[10px] font-medium tracking-wide">住宿</span>
+            </button>
+            <button onclick="switchTab('transport')" id="nav-transport" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+                <i data-lucide="plane" class="w-6 h-6 stroke-2"></i>
+                <span class="text-[10px] font-medium tracking-wide">交通</span>
+            </button>
+            <button onclick="switchTab('dining')" id="nav-dining" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+                <i data-lucide="utensils" class="w-6 h-6 stroke-2"></i>
+                <span class="text-[10px] font-medium tracking-wide">飲食</span>
+            </button>
+            <button onclick="switchTab('medical')" id="nav-medical" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+                <i data-lucide="heart-pulse" class="w-6 h-6 stroke-2"></i>
+                <span class="text-[10px] font-medium tracking-wide">醫療</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modal (Hidden by default) -->
+    <div id="poi-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl transform scale-95 transition-transform duration-300" id="poi-modal-content">
+            <!-- Modal Content Injected Here -->
+        </div>
+    </div>
+
+    <!-- Data and Application Logic -->
+    <script>
+        // --- DATA: POI with Images ---
+        const POI_DATABASE = {
+            "novotel": { name: "台北諾富特華航桃園機場飯店", imgUrl: "https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2024/11/25/0111/TPERA-P0001-Building.jpg/TPERA-P0001-Building.4x3.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Novotel+Taipei+Taoyuan+International+Airport", features: "機場旁的五星級過境旅館，提供舒適靜謐的休息空間，方便隔日清晨從容前往航廈。", mustDo: "🛒 必買：無特殊必買，建議於房內充分休息。\n🍽️ 必吃：飯店內有品坊西餐廳，亦有簡單素食選項。", notes: "⚠️ 3/29 僅您一人入住。提供機場免費接駁車，請留意班次時刻表。" },
+            "apukka": { name: "Apukka Resort (極光度假村)", imgUrl: "https://media.hostunusual.com/wp-content/uploads/2025/05/02074331/aurora%20cabin%20king%20outside%20under%20the%20northern%20lights%20at%20apukka%20resort%20rovaniemi%20lapland%20finland-1064x760.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Apukka+Resort+Rovaniemi", features: "位於羅瓦涅米郊區，遠離光害的極光觀賞絕佳地點。擁有特色玻璃屋與豐富的雪地活動。", mustDo: "📸 必看：夜晚天空的北極光。\n🍽️ 必吃：Aitta 餐廳的拉普蘭自助餐 (有溫熱素食燉菜)。", notes: "⚠️ 抵達後務必借用防寒連身衣。洗腎患者極度怕冷，請確保媽媽四肢保暖。手機務必下載 Aurora Alert Realtime APP。" },
+            "apukka_daytime": { name: "Apukka 白晝極致體驗 (園區活動)", imgUrl: "https://cf.bstatic.com/xdata/images/hotel/max1024x768/806854427.jpg?k=94ff109b49b1ddf3d42c0930820903edb0e7b3fec554ea04a64674b5320235e2&o=", mapsLink: "https://www.google.com/maps/search/?api=1&query=Apukka+Resort+Rovaniemi", features: "把握退房後的 5 小時黃金空檔！度假村旁就是廣闊的結冰湖面 (Lake Olkkajärvi)，並設有哈士奇營地。", mustDo: "🐶 必看：參觀哈士奇營地，與友善的極地雪橇犬互動拍照。\n🎣 必玩：向櫃檯報名輕鬆靜態的「冰上釣魚 (Ice Fishing)」，坐在冰洞旁享受極地寧靜。\n🚶‍♂️ 散步：在安全的結冰湖面上漫步，感受北歐遼闊的純白世界。", notes: "活動皆非常靜態，不耗費體力。媽媽若想休息，大廳也有極舒適的火爐沙發區可以喝熱飲看風景。" },
+            "hilton_strand": { name: "Hilton Helsinki Strand", imgUrl: "https://hravintolat.fi/wp-content/uploads/2024/04/hilton-helsinki-strand-pitkasilta1920px.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hilton+Helsinki+Strand", features: "位於 Hakaniemi 海傍的經典五星級飯店，環境清幽且交通便利，擁有極佳的海灣視野。", mustDo: "📸 必看：行政酒廊的海灣日落。\n🍽️ 必吃：飯店北歐風自助早餐、行政酒廊 Happy Hour。", notes: "💎 善用您的鑽石卡福利，長輩若不想出門，在行政酒廊喝熱茶看風景是最棒的選擇。" },
+            "lapland_hospital": { name: "Lapland Central Hospital (中央醫院)", imgUrl: "https://images.adsttc.com/media/images/681c/70cc/aad7/6200/019f/a5af/newsletter/VERSTAS_ARCHITECTS_Lapland_Central_Hospital_Extension_Niclas_M_kel__21_9741.jpg?1746694477", mapsLink: "https://www.google.com/maps/search/?api=1&query=Lapland+Central+Hospital+Rovaniemi", features: "羅瓦涅米的主要醫療中心，提供專業的血液透析服務。", mustDo: "⚠️ 醫療：抵達後請出示護照與台灣醫師開立的英文病歷/透析處方。", notes: "洗腎結束後容易虛弱，請透過護理站幫忙叫計程車返回度假村。" },
+            "renalis_clinic": { name: "Renalis Suomi Pitäjänmäki 診所", imgUrl: "https://www.bookdialysis.com/storage/3737/conversions/pitajanmaki-clinic-3-profile.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Renalis+Suomi+Pitäjänmäki+Helsinki", features: "位於赫爾辛基西北住宅/商業區的專業洗腎診所。", mustDo: "⚠️ 醫療：請確認好平日與週末的報到動線是否不同。", notes: "建議使用 Taksi Helsinki App 叫車，直接設定飯店到診所的路線，避免長輩在路邊等車吹風。" },
+            "tpe_airport": { name: "台灣桃園國際機場 (TPE)", imgUrl: "https://cdn.sanity.io/images/nxpteyfv/goguides/f2e575f11cb6e0c0b0049fcdd708841f025f1ec8-1600x1067.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Taoyuan+International+Airport", features: "台灣主要國際機場，提供多樣的免稅購物與餐飲服務。", mustDo: "🛒 必買：免稅店伴手禮。\n🍽️ 必吃：機場貴賓室或美食街熱食。", notes: "下午 16:25 的班機，時間充裕。與父母會合後，請協助辦理長輩的報到手續與輪椅服務（如有需要）。" },
+            "nrt_airport": { name: "東京成田機場 (NRT)", imgUrl: "https://res-2.cloudinary.com/jnto/image/upload/w_2064,h_1300,c_fill,f_auto,fl_lossy,q_auto/v1668563849/chiba/Chiba_t_id264_1", mapsLink: "https://www.google.com/maps/search/?api=1&query=Narita+International+Airport", features: "去程轉機點。日本主要國際樞紐機場，轉機設施完善。", mustDo: "🛒 必買：日本伴手禮 (白色戀人、Royce生巧克力)。\n🍽️ 必吃：轉機區的熱呼呼日本拉麵或壽司。", notes: "轉機需重新經過安檢，請提醒長輩留意隨身液體規定。" },
+            "hnd_airport": { name: "東京羽田機場 (HND)", imgUrl: "https://rimage.gnst.jp/livejapan.com/public/article/detail/a/00/01/a0001937/img/basic/a0001937_main.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Haneda+International+Airport+Terminal+3", features: "回程轉機點。距離東京市區極近的樞紐機場，第三航廈(T3)擁有江戶小路等豐富的餐飲區。", mustDo: "🛒 必買：各式精美和菓子與免稅品。\n🍽️ 必吃：江戶小路內的日式熱湯麵或抹茶甜點。", notes: "回程有近4小時轉機時間，非常適合讓長輩找間舒適的餐廳坐下來吃頓熱騰騰的日本料理。" },
+            "hel_airport": { name: "赫爾辛基萬塔機場 (HEL)", imgUrl: "https://q-xx.bstatic.com/xdata/images/hotel/max500/417777704.jpg?k=849f0dc657accdb121b327b7731800817dca47d79d49a516d018abd02af9eac2&o=", mapsLink: "https://www.google.com/maps/search/?api=1&query=Helsinki+Airport", features: "芬蘭最大機場，以溫潤的木質北歐設計風格聞名，動線清晰。", mustDo: "🛒 必買：Moomin 嚕嚕米周邊商品。\n☕ 必吃：機場咖啡廳的道地芬蘭肉桂捲。", notes: "去程清晨抵達有約6小時轉機時間，機場內設有多處免費飲水機與舒適躺椅，可讓長輩好好休息。" },
+            "rvn_airport": { name: "羅瓦涅米機場 (RVN)", imgUrl: "https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=center,quality=60,width=400,height=265,dpr=2/tour_img/f399ad8fde2d32fa.jpeg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Rovaniemi+Airport", features: "聖誕老人的官方機場！機場小巧溫馨，隨處可見聖誕老人與馴鹿的佈置。", mustDo: "📸 必看：行李轉盤區的野生動物與聖誕佈景。", notes: "機場極小，領取行李後走出大門即是接送區，Apukka 的司機會在此等候。" },
+            "tsa_airport": { name: "台北松山機場 (TSA)", imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/台北松山機場.JPG/1280px-台北松山機場.JPG", mapsLink: "https://www.google.com/maps/search/?api=1&query=Taipei+Songshan+Airport", features: "位於台北市區，交通極度便利的國際機場。", mustDo: "📸 必看：三樓觀景台欣賞飛機起降。", notes: "抵達後搭乘捷運或計程車皆可極快返家，結束完美旅程。" },
+            "golden_bowl": { name: "Golden Bowl Dim Sum", imgUrl: "https://santaclausvillage.info/wp-content/uploads/2023/06/IMG_2650-scaled.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Golden+Bowl+Dim+Sum+Santa+Claus+Village", features: "聖誕老人村內極少數提供亞洲熱食的餐廳，是雪地裡暖胃的救星。", mustDo: "🍽️ 必吃(素食)：提供獨立素食菜單！必點素豆腐湯麵、素餃子。\n🍽️ 必吃(大眾)：各類港式點心與熱湯麵。", notes: "非常適合爸爸，吃完熱食後才有體力繼續在雪地裡逛街。" },
+            "da_zhong_hua": { name: "大中華餐廳 (Da Zhong Hua)", imgUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKWsE9POsd_S2hm8BCpJrnk3HYn8dRlzN4HQ&s", mapsLink: "https://www.google.com/maps/search/?api=1&query=Da+Zhong+Hua+Rovaniemi", features: "羅瓦涅米當地評價極高的正宗中餐廳，口味地道。", mustDo: "🍽️ 必吃(素食)：中式炒青菜、家常豆腐熱炒。\n🍽️ 必吃(大眾)：水煮牛、宮保雞丁。", notes: "媽媽在醫院洗腎時，帶爸爸來吃頓熟悉的家鄉味最合適。" },
+            "mei_lin": { name: "Mei Lin Sichuan & Vegan (美林)", imgUrl: "https://images.happycow.net/venues/1024/19/60/hcmp196037_3754429.jpeg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Mei+Lin+Sichuan+Vegan+Helsinki", features: "赫爾辛基極具盛名的四川餐廳，擁有一份極度豐富的「純素/素食專屬菜單」。", mustDo: "🍽️ 必吃(素食)：素麻婆豆腐、魚香茄子、炒上海青江菜。\n🍽️ 必吃(大眾)：正宗川味烤魚、口水雞。", notes: "長輩絕對會滿意的豐盛晚餐，強烈推薦安排在旅程後段解解鄉愁。" },
+            "sen_chay": { name: "Sen Chay (全素越南料理)", imgUrl: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/08/bd/15/ea/sen-chay.jpg?w=900&h=500&s=1", mapsLink: "https://www.google.com/maps/search/?api=1&query=Sen+Chay+Helsinki", features: "100% 全素的亞洲餐廳，靠近 Hakaniemi 市場與 Hilton Strand 飯店。", mustDo: "🍽️ 必吃(素食)：越式全素河粉湯、手工素春捲。", notes: "離飯店極近，清淡溫胃，是非常沒有負擔的熱湯選擇。" },
+            "arktikum": { name: "Arktikum 北極中心和拉普蘭省博物館", imgUrl: "https://upload.wikimedia.org/wikipedia/commons/6/67/ArtikumOutside.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Arktikum+Rovaniemi", features: "以絕美的玻璃長廊聞名，館內展示北極圈的自然生態、氣候變遷以及薩米人文化。", mustDo: "📸 必看：極光劇場與薩米人傳統服飾展。\n🛒 必買：博物館商店的北歐特色木製品。", notes: "館內溫暖、步調緩慢且設有許多休息區，非常適合長輩在媽媽洗腎空檔時參觀。" },
+            "santa_village": { name: "聖誕老人村 (Santa Claus Village)", imgUrl: "https://image.cdn-eztravel.com.tw/pS8xFFvjZUX8Vz_n3CS4pYua9xl4EP4ljodMHtDHRFc/g:ce/aHR0cHM6Ly92YWNhdGlvbi5jZG4tZXp0cmF2ZWwuY29tLnR3L2ltZy9WRFIvRklfNTk3MDk1NjY2LmpwZw.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Santa+Claus+Village+Rovaniemi", features: "全球唯一官方認證的聖誕老人故鄉，北極圈線(66°33'07\"N)貫穿整個村莊。", mustDo: "📸 必看：與聖誕老人合影、跨越北極圈線。\n🛒 必買：在聖誕老人郵局寄出蓋有特製郵戳的明信片、北極圈證書。\n🍽️ 必吃(葷食)：Santa's Salmon Place 炭烤鮭魚。", notes: "園區為平地，設有多處長椅與咖啡廳。若媽媽走累了可隨時進室內休息喝熱飲。" },
+            "k_supermarket": { name: "K-Supermarket (市區大型超市)", imgUrl: "https://angela51.com/wp-content/uploads/pixnet/110fdc37176c31dc33a5b2fe3d1fed7f.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=K-Supermarket+Rovaniemi", features: "羅瓦涅米市中心的大型超市，商品種類齊全，是在地人日常採買的好去處。", mustDo: "🛒 必買：新鮮草莓、藍莓、Fazer 巧克力、在地果汁。\n🍽️ 必吃：超市內的鮮食區或剛出爐的麵包。", notes: "適合在醫院接媽媽回度假村前順遊，買些新鮮水果帶回飯店給媽媽下午補充維他命。" },
+            "apukka_sauna": { name: "Apukka Resort 桑拿體驗", imgUrl: "https://media-cdn.tripadvisor.com/media/attractions-splice-spp-674x446/11/ab/17/3c.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Apukka+Resort+Rovaniemi", features: "芬蘭最道地的文化體驗！度假村內提供傳統的木造桑拿房，可舒緩疲勞、促進血液循環。", mustDo: "📸 必看：體驗道地「冰火五重天」的極地桑拿文化（長輩請量力而為，純熱烤亦可）。", notes: "建議爸爸在媽媽午休時可向櫃檯預約體驗。烤完桑拿後請注意保暖，避免吹風著涼。" },
+            "botanic_garden": { name: "赫爾辛基大學植物園 (Kaisaniemi)", imgUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Helsinki_July_2013-14.jpg/1280px-Helsinki_July_2013-14.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Kaisaniemi+Botanic+Garden", features: "歷史悠久的溫室植物園，擁有多個不同氣候帶的溫室，建築外觀經典優美。", mustDo: "📸 必看：巨大的睡蓮池與熱帶雨林溫室。", notes: "距離 Hilton Strand 非常近，步行平緩。溫室內非常溫暖，適合長輩早晨或午後散步。" },
+            "central_station": { name: "赫爾辛基中央車站", imgUrl: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/f9/8c/e3/the-main-entrance-of.jpg?w=1200&h=-1&s=1", mapsLink: "https://www.google.com/maps/search/?api=1&query=Helsinki+Central+Station", features: "芬蘭新藝術運動的代表建築，正門兩側有四尊巨大的捧著球形燈的石人雕像。", mustDo: "📸 必看：與巨大的石人雕像合影。", notes: "周圍人潮較多，請留意長輩腳步與隨身物品。" },
+            "oodi": { name: "頌歌中央圖書館 (Oodi)", imgUrl: "https://wowlavie-aws.hmgcdn.com/files/article/a1/15215/atl_190015215_268.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Oodi+Helsinki+Central+Library", features: "被譽為全球最美的圖書館之一，融合了木材、玻璃與鋼鐵的流線型未來感建築。", mustDo: "📸 必看：三樓「圖書天堂」的雲朵狀天花板與全景落地窗。\n☕ 必吃：在圖書館內的咖啡廳喝杯芬蘭特調拿鐵。", notes: "室內極度溫暖且座位非常多，是完美的長輩中途休息站。" },
+            "kamppi": { name: "靜默教堂 (Kamppi Chapel)", imgUrl: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Kamppi_Chapel.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Kamppi+Chapel", features: "位於繁華市中心的一個巨大木製碗狀建築，內部與外部的喧囂完全隔絕，提供心靈寧靜的空間。", mustDo: "📸 必看：無窗戶的曲面木製內牆與獨特光影。", notes: "入內需保持絕對安靜。空間不大，大約停留 10-15 分鐘即可。" },
+            "sibelius": { name: "西貝流士公園 & Cafe Regatta", imgUrl: "https://yukigo.tw/wp-content/uploads/pixnet/1542170906-2315417526.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Sibelius+Monument+Helsinki", features: "為紀念芬蘭偉大作曲家西貝流士而建，擁有數百根不鏽鋼管組成的巨大管風琴雕塑。", mustDo: "📸 必看：風吹過鋼管時的聲音。\n☕ 必吃：公園旁海畔的 Cafe Regatta 必吃肉桂捲(Korvapuusti)與熱巧克力。", notes: "計程車可直達 Cafe Regatta 門口，極度適合媽媽洗腎後免步行的順遊。" },
+            "city_museum": { name: "赫爾辛基城市博物館", imgUrl: "https://upload.wikimedia.org/wikipedia/commons/8/8f/Kaupunginmuseo2.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Helsinki+City+Museum", features: "免費開放的優質博物館，生動展示赫爾辛基市民的歷史生活樣貌。", mustDo: "📸 必看：時光機虛擬實境體驗 (若長輩有興趣)。", notes: "免費入場且設有許多沙發休息區，廁所乾淨，非常適合做為參議院廣場旁的休息點。" },
+            "uspenski": { name: "烏斯佩斯基大教堂 (紅教堂)", imgUrl: "https://image.cdn-eztravel.com.tw/_XxtIE1quxbaw7rZzvWgGPLqrmDhl56c0Y1M4r3OQ0s/g:ce/aHR0cHM6Ly92YWNhdGlvbi5jZG4tZXp0cmF2ZWwuY29tLnR3L2ltZy9WRFIvRklfMTA3MTcwNDE4LmpwZw.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Uspenski+Cathedral", features: "北歐最大的東正教教堂，紅磚外觀搭配金綠色洋蔥圓頂，極具俄羅斯風情。", mustDo: "📸 必看：教堂內部的華麗蛋彩畫與黃金聖像壁。", notes: "⚠️ 教堂建在小山丘上，有一小段階梯，請攙扶媽媽慢慢走，若喘可隨時休息。" },
+            "old_market": { name: "老農貿市場 (Old Market Hall)", imgUrl: "https://www.thelostpassport.com/wp-content/uploads/2019/11/Helsinki-Market-Hall.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Old+Market+Hall+Helsinki", features: "自1889年營業至今，是赫爾辛基最古老的室內市場，充滿精緻的芬蘭在地美食。", mustDo: "🍽️ 必吃(葷食)：Soppakeittiö 的海鮮湯或鮭魚湯。\n🍽️ 必吃(素食)：市場內也有販售素食起司、新鮮莓果與熱麵包。\n☕ 必吃：Robert's Coffee 品嚐在地咖啡。", notes: "室內溫暖舒適，但用餐尖峰時段座位較少，建議避開正中午前往。" },
+            "skywheel": { name: "赫爾辛基摩天輪 & 海邊桑拿", imgUrl: "https://www.ricacorp.com/homefeel/wp-content/uploads/2019/09/1-13.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=SkyWheel+Helsinki", features: "港邊的標誌性設施。摩天輪旁即是著名的 Allas Sea Pool，可觀看當地人在海港中泡湯游泳。", mustDo: "📸 必看：站在觀景木棧道上看海鷗與波羅的海風光。", notes: "海風較大，請幫長輩戴上毛帽與防風外套。" },
+            "hakaniemi": { name: "Hakaniemi 室內市場", imgUrl: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiUXhk0I_wizv87CVf2O9W6zNjFB0Y9DFjA1zd33v3Smnmc3NWv3fm4eE1L5F2YJDIMGfcgWK143qSfBfcDof8oCHR8_SKbkOCdaWiM1U-jEBYimQ3eyxhDKtJHmqTP13N6bx-J4dWll5o/s1600/market+hietalahti+veggies.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Hakaniemi+Market+Hall", features: "相較於老農貿市場，這裡更貼近在地人的生活。一樓賣鮮食生鮮，二樓賣手工藝品與布料。", mustDo: "🛒 必買：二樓的 Marimekko 專櫃、木作工藝品。\n🍽️ 必吃：一樓的新鮮藍莓與草莓。", notes: "就在 Hilton Strand 飯店旁邊，走路約 3-5 分鐘即達。" },
+            "temppeliaukio": { name: "岩石教堂 (Temppeliaukio Church)", imgUrl: "https://res.klook.com/image/upload/activities/iwwirxbldin3yhkypeqo.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Temppeliaukio+Church", features: "直接從一整塊天然岩石中開鑿而成的獨特教堂，頂部是巨大的銅製圓頂，音響效果極佳。", mustDo: "📸 必看：陽光透過圓頂四周的玻璃天窗灑落在岩壁上的光影。", notes: "計程車可直達門口。內部設有多排木椅，媽媽洗腎後可直接坐著休息欣賞，完全不耗體力。" },
+            "suomenlinna": { name: "芬蘭堡 (Suomenlinna)", imgUrl: "https://rosy-arts.com/wp-content/uploads/2024/07/%E8%8A%AC%E8%98%AD%E5%A0%A1-1024x768.jpg", mapsLink: "https://www.google.com/maps/search/?api=1&query=Suomenlinna+Helsinki", features: "建於 18 世紀的巨大海上要塞，被列為聯合國教科文組織世界遺產。由數個島嶼組成，風景極為優美。", mustDo: "📸 必看：國王門 (King's Gate)、古老的大砲與星形城牆。\n🚶‍♂️ 散步：在平緩的沿海步道散步看波羅的海。", notes: "島上風大且部分路段有石板路，請務必幫長輩戴上毛帽與防風外套，穿著好走的鞋子。搭乘港口渡輪約 15 分鐘即可抵達，船程非常平穩。" }
+        };
+
+        // --- DATA: TRIP (Added queryCity for Real-time Weather API) ---
+        const TRIP_DAYS = [
+            { id: "3/29", date: "3/29 (日)", location: "台北 ➔ 桃園", queryCity: "taipei", defaultClothing: "輕薄長袖", schedule: [{ time: "15:00", type: "hotel", title: "入住桃園機場飯店", desc: "您先行前往辦理入住休息", poi: "novotel" }, { time: "晚上", type: "info", title: "養足精神", desc: "準備迎接明天的長途旅行" }] },
+            { id: "3/30", date: "3/30 (一)", location: "台北 ➔ 飛行中", queryCity: "taipei", defaultClothing: "舒適搭機服裝", schedule: [{ time: "早上", type: "medical", title: "🏥 媽媽於台北洗腎", desc: "因為班機在下午，早上有充裕時間洗腎，結束後再前往機場" }, { time: "14:00", type: "transport", title: "機場會合 (TPE)", desc: "於桃園機場會合，協助辦理報到與托運手續", poi: "tpe_airport" }, { time: "16:25", type: "flight", title: "飛往東京 (JL5040)", desc: "16:25 起飛，20:30 抵達東京成田機場準備轉機", poi: "nrt_airport" }, { time: "23:05", type: "flight", title: "飛往赫爾辛基 (JL6801)", desc: "23:05 起飛，展開跨洲飛行。✈️ 今晚於機上過夜" }] },
+            { id: "3/31", date: "3/31 (二)", location: "赫爾辛基 ➔ 羅瓦涅米", queryCity: "rovaniemi", defaultClothing: "極地防寒、羊毛襪", schedule: [{ time: "05:55", type: "transport", title: "抵達赫爾辛基 (HEL)", desc: "清晨抵達，於機場內享用早餐、稍作休息後轉機", poi: "hel_airport" }, { time: "11:55", type: "flight", title: "轉機至拉普蘭 (AY0533)", desc: "11:55 起飛，13:20 抵達羅瓦涅米 (RVN)", poi: "rvn_airport" }, { time: "13:40", type: "transport", title: "度假村專車接送", desc: "抵達後，度假村司機於機場外等候接送" }, { time: "14:30", type: "hotel", title: "辦理入住", desc: "入住極光度假村，下載極光APP，洗去長途飛行的疲憊", poi: "apukka" }, { time: "晚上", type: "info", title: "等待極光", desc: "於房內休息，等待極光即時通知" }] },
+            { id: "4/1", date: "4/1 (三)", location: "羅瓦涅米", queryCity: "rovaniemi", defaultClothing: "極地防寒、毛帽手套", schedule: [{ time: "07:45", type: "transport", title: "搭車前往醫院", desc: "前一晚請飯店叫好計程車" }, { time: "08:30", type: "medical", title: "🏥 媽媽洗腎", desc: "Lapland Central Hospital", poi: "lapland_hospital" }, { time: "上午", type: "papa", title: "👨‍👧 爸爸專屬：博物館巡禮", desc: "參觀溫暖的北極中心", poi: "arktikum" }, { time: "中午", type: "dining", title: "中式熱食午餐", desc: "大中華餐廳吃素食熱炒，隨後接媽媽", poi: "da_zhong_hua" }, { time: "下午", type: "info", title: "靜態休息 (媽媽)", desc: "媽媽返回房內充分平躺靜養" }, { time: "下午", type: "papa", title: "💡 替代行程A：市區超市採買", desc: "接媽媽回度假村前，順路至市區超市購買新鮮水果與零食。", poi: "k_supermarket" }, { time: "下午", type: "papa", title: "💡 替代行程B：芬蘭桑拿", desc: "爸爸可預約傳統桑拿放鬆身心。", poi: "apukka_sauna" }, { time: "晚上", type: "night", title: "🦌 馴鹿雪橇之旅", desc: "【度假村行程】約3小時，穿著連身防寒衣" }] },
+            { id: "4/2", date: "4/2 (四)", location: "羅瓦涅米", queryCity: "rovaniemi", defaultClothing: "極地防寒、防滑鞋", schedule: [{ time: "上午", type: "info", title: "聖誕老人村圓夢", desc: "搭車約10分鐘前往", poi: "santa_village" }, { time: "中午", type: "dining", title: "素食熱湯麵", desc: "村內的 Golden Bowl 吃素湯麵/素餃子", poi: "golden_bowl" }, { time: "下午", type: "info", title: "寄送明信片", desc: "於聖誕老人郵局寄信後返回度假村" }, { time: "晚上", type: "night", title: "🚂 雪地列車極光營火", desc: "【度假村行程】約3小時，烤火喝熱飲" }] },
+            { id: "4/3", date: "4/3 (五)", location: "羅瓦涅米 ➔ 赫爾辛基", queryCity: "helsinki", defaultClothing: "防風外套、輕保暖", schedule: [{ time: "11:00", type: "hotel", title: "悠閒早晨與退房", desc: "班機在傍晚，今天不趕時間。11:00 退房後行李寄放櫃台。" }, { time: "中午", type: "dining", title: "告別拉普蘭午餐", desc: "於度假村 Aitta 餐廳或傳統木屋享用熱騰騰的午餐。", poi: "apukka" }, { time: "13:30", type: "papa", title: "🌟 Apukka 白晝極致體驗", desc: "利用長達5小時的黃金空檔！參觀哈士奇營地、報名冰上釣魚或在結冰湖面散步。", poi: "apukka_daytime" }, { time: "16:30", type: "transport", title: "搭乘專車送機", desc: "搭乘度假村免費送機專車前往羅瓦涅米機場", poi: "rvn_airport" }, { time: "18:25", type: "flight", title: "返回赫爾辛基 (AY0536)", desc: "18:25 起飛，19:40 抵達赫爾辛基 (HEL)。抵達後搭車前往市區", poi: "hel_airport" }, { time: "20:30", type: "hotel", title: "入住 Hilton 飯店", desc: "辦理入住。因抵達時間較晚，建議於機場先用晚餐或於飯店休息", poi: "hilton_strand" }] },
+            { id: "4/4", date: "4/4 (六)", location: "赫爾辛基", queryCity: "helsinki", defaultClothing: "防風外套、洋蔥式穿搭", schedule: [{ time: "依預約", type: "medical", title: "🏥 媽媽洗腎", desc: "Pitäjänmäki 診所 (請確認週末報到時間)", poi: "renalis_clinic" }, { time: "上午", type: "papa", title: "🌟 市中心建築巡禮", desc: "赫爾辛基火車站拍照", poi: "central_station" }, { time: "上午", type: "papa", title: "🌟 圖書館與教堂", desc: "頌歌圖書館休息、靜默教堂參觀", poi: "oodi" }, { time: "下午", type: "info", title: "洗腎後順遊", desc: "接媽媽離開診所，順路前往海畔喝熱飲", poi: "sibelius" }, { time: "傍晚", type: "hotel", title: "飯店休息", desc: "返回房間或行政酒廊享用 Happy Hour" }] },
+            { id: "4/5", date: "4/5 (日)", location: "赫爾辛基 (港灣日)", queryCity: "helsinki", defaultClothing: "防風保暖外套、圍巾", schedule: [{ time: "09:30", type: "papa", title: "🌟 植物園溫室散步", desc: "步行前往飯店附近的植物園，享受溫暖晨間時光", poi: "botanic_garden" }, { time: "11:00", type: "papa", title: "🌟 博物館與大教堂", desc: "參觀城市博物館與紅教堂", poi: "uspenski" }, { time: "13:00", type: "dining", title: "港灣與市場午餐", desc: "觀賞摩天輪，於老農貿市場用餐", poi: "old_market" }, { time: "15:00", type: "papa", title: "🌟 芬蘭堡觀海", desc: "搭渡輪(15分)散步看海，視體力調整", poi: "suomenlinna" }] },
+            { id: "4/6", date: "4/6 (一)", location: "赫爾辛基", queryCity: "helsinki", defaultClothing: "防水外套、雨具", schedule: [{ time: "依預約", type: "medical", title: "🏥 媽媽洗腎", desc: "Pitäjänmäki 診所", poi: "renalis_clinic" }, { time: "上午", type: "papa", title: "👨‍👧 爸爸專屬：在地市場", desc: "逛飯店旁的 Hakaniemi 市場", poi: "hakaniemi" }, { time: "中午", type: "dining", title: "越南全素湯麵", desc: "市場旁 Sen Chay 餐廳吃溫熱素食", poi: "sen_chay" }, { time: "下午", type: "info", title: "洗腎後靜態休息", desc: "接媽媽後，車停岩石教堂門口坐著休息", poi: "temppeliaukio" }, { time: "傍晚", type: "info", title: "伴手禮採購", desc: "至百貨公司買巧克力等伴手禮" }, { time: "晚餐", type: "dining", title: "Mei Lin 中式素食", desc: "享用四川純素/素食專屬菜單熱炒", poi: "mei_lin" }] },
+            { id: "4/7", date: "4/7 (二)", location: "赫爾辛基 ➔ 飛行中", queryCity: "helsinki", defaultClothing: "舒適搭機服裝", schedule: [{ time: "上午", type: "info", title: "悠閒早晨", desc: "睡到自然醒，飯店內享用早餐" }, { time: "14:00", type: "hotel", title: "💎 延遲退房", desc: "下午退房後，搭車前往赫爾辛基機場辦理報到", poi: "hel_airport" }, { time: "17:30", type: "flight", title: "飛往東京 (JL048)", desc: "17:30 起飛，隔日抵達日本。✈️ 機上過夜" }] },
+            { id: "4/8", date: "4/8 (三)", location: "東京 ➔ 台北", queryCity: "tokyo", defaultClothing: "春季服裝", schedule: [{ time: "14:20", type: "transport", title: "抵達東京 (HND)", desc: "抵達羽田機場準備轉機。有充裕時間可吃點熱食", poi: "hnd_airport" }, { time: "18:10", type: "flight", title: "飛往台北 (JL099)", desc: "18:10 羽田起飛，搭機返回松山機場", poi: "tsa_airport" }, { time: "21:00", type: "info", title: "平安抵達 (TSA)", desc: "帶著滿滿的極光回憶，平安返家！" }] }
+        ];
+
+        // --- REAL-TIME WEATHER API LOGIC ---
+        const CITY_COORDS = {
+            "taipei": { lat: 25.0330, lon: 121.5654, name: "台北" },
+            "helsinki": { lat: 60.1695, lon: 24.9354, name: "赫爾辛基" },
+            "rovaniemi": { lat: 66.5039, lon: 25.7294, name: "羅瓦涅米" },
+            "tokyo": { lat: 35.6895, lon: 139.6917, name: "東京" }
+        };
+
+        const WEATHER_CACHE = {};
+        const TRIP_YEAR = 2026;
+
+        function getWeatherMeta(code) {
+            if(code === 0) return {desc: '晴朗無雲', icon: 'sun', color: 'text-yellow-400'};
+            if(code === 1 || code === 2) return {desc: '晴時多雲', icon: 'cloud-sun', color: 'text-slate-300'};
+            if(code === 3) return {desc: '陰天', icon: 'cloud', color: 'text-slate-400'};
+            if(code >= 45 && code <= 48) return {desc: '起霧', icon: 'cloud-fog', color: 'text-slate-400'};
+            if(code >= 51 && code <= 67) return {desc: '降雨', icon: 'cloud-rain', color: 'text-blue-400'};
+            if(code >= 71 && code <= 77) return {desc: '降雪', icon: 'snowflake', color: 'text-blue-200'};
+            if(code >= 80 && code <= 82) return {desc: '陣雨', icon: 'cloud-showers-heavy', color: 'text-blue-500'};
+            if(code >= 95) return {desc: '雷陣雨', icon: 'cloud-lightning', color: 'text-purple-400'};
+            return {desc: '未知', icon: 'cloud', color: 'text-slate-400'};
+        }
+
+        async function fetchDateWeather(cityKey, dayId) {
+            const cacheKey = `${cityKey}_${dayId}`;
+            if(WEATHER_CACHE[cacheKey]) return WEATHER_CACHE[cacheKey];
+            
+            const [m, d] = dayId.split('/');
+            const targetDate = new Date(TRIP_YEAR, parseInt(m)-1, parseInt(d));
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            targetDate.setHours(0,0,0,0);
+
+            const diffDays = Math.round((targetDate - today) / (1000 * 60 * 60 * 24));
+            const coords = CITY_COORDS[cityKey];
+            const pad = (n) => n.toString().padStart(2, '0');
+            
+            let url = "";
+            let isHistorical = false;
+
+            if (diffDays >= 0 && diffDays <= 14) {
+                const targetStr = `${TRIP_YEAR}-${pad(m)}-${pad(d)}`;
+                url = `https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&start_date=${targetStr}&end_date=${targetStr}`;
+            } else {
+                isHistorical = true;
+                const histYear = 2025; 
+                const histStr = `${histYear}-${pad(m)}-${pad(d)}`;
+                url = `https://archive-api.open-meteo.com/v1/archive?latitude=${coords.lat}&longitude=${coords.lon}&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset&timezone=auto&start_date=${histStr}&end_date=${histStr}`;
+            }
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!data.daily || !data.daily.time || data.daily.time.length === 0) {
+                    throw new Error("No daily data returned");
+                }
+
+                const maxT = Math.round(data.daily.temperature_2m_max[0]);
+                const minT = Math.round(data.daily.temperature_2m_min[0]);
+                const wCode = data.daily.weather_code[0];
+                const meta = getWeatherMeta(wCode);
+                
+                const formatTime = (isoString) => {
+                    if (!isoString) return '--:--';
+                    return isoString.substring(11, 16); 
+                };
+
+                const result = {
+                    temp: `${minT}°C ~ ${maxT}°C`,
+                    desc: meta.desc,
+                    icon: meta.icon,
+                    color: meta.color,
+                    sunrise: formatTime(data.daily.sunrise[0]),
+                    sunset: formatTime(data.daily.sunset[0]),
+                    isHistorical: isHistorical,
+                    histYear: isHistorical ? 2025 : null
+                };
+                WEATHER_CACHE[cacheKey] = result;
+                return result;
+            } catch(e) {
+                console.error("Weather fetch failed", e);
+                return { temp: '--°C', desc: '暫無資料', icon: 'cloud-off', color: 'text-slate-500', sunrise: '--:--', sunset: '--:--', isHistorical: false };
+            }
+        }
+
+        // Global State
+        let currentTab = 'itinerary';
+        let currentDayId = TRIP_DAYS[0].id;
+
+        function refreshIcons() {
+            lucide.createIcons();
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            
+            // Bug Fix: Safely modify Lucide icons by accessing them correctly or modifying a wrapper.
+            // Using setAttribute on the svg/i element prevents TypeError issues when Lucide mutates DOM.
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-emerald-600', 'scale-105');
+                btn.classList.add('text-slate-400');
+                const icon = btn.querySelector('svg') || btn.querySelector('i');
+                if (icon) {
+                    icon.setAttribute('stroke-width', '2');
+                    icon.classList.remove('stroke-[2.5]');
+                }
+                const span = btn.querySelector('span');
+                if (span) {
+                    span.classList.remove('font-bold');
+                    span.classList.add('font-medium');
+                }
+            });
+
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-400');
+                activeBtn.classList.add('text-emerald-600', 'scale-105');
+                const activeIcon = activeBtn.querySelector('svg') || activeBtn.querySelector('i');
+                if (activeIcon) {
+                    activeIcon.setAttribute('stroke-width', '2.5');
+                    activeIcon.classList.add('stroke-[2.5]');
+                }
+                const activeSpan = activeBtn.querySelector('span');
+                if (activeSpan) {
+                    activeSpan.classList.remove('font-medium');
+                    activeSpan.classList.add('font-bold');
+                }
+            }
+
+            renderContent();
+        }
+
+        function switchDay(dayId) {
+            currentDayId = dayId;
+            renderItineraryContent();
+        }
+
+        function getScheduleIcon(type) {
+            switch(type) {
+                case 'medical': return `<i data-lucide="heart-pulse" class="w-4 h-4 text-rose-500 mt-0.5 shrink-0"></i>`;
+                case 'papa': return `<i data-lucide="sun" class="w-4 h-4 text-amber-500 mt-0.5 shrink-0"></i>`;
+                case 'flight': return `<i data-lucide="plane" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0"></i>`;
+                case 'night': return `<i data-lucide="moon" class="w-4 h-4 text-indigo-400 mt-0.5 shrink-0"></i>`;
+                default: return `<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></div>`;
+            }
+        }
+
+        function getScheduleTitleColor(type) {
+            switch(type) {
+                case 'medical': return 'text-rose-700';
+                case 'papa': return 'text-amber-700';
+                case 'flight': return 'text-blue-700';
+                case 'night': return 'text-indigo-700';
+                default: return 'text-slate-800';
+            }
+        }
+
+        function generatePOICard(poiId) {
+            const poi = POI_DATABASE[poiId];
+            if (!poi) return '';
+            return `
+            <div onclick="openModal('${poiId}')" class="mt-3 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-emerald-200 transition-all group">
+                <div class="h-24 bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                    <img src="${poi.imgUrl}" alt="${poi.name}" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent pointer-events-none"></div>
+                </div>
+                <div class="p-3">
+                    <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                        <span class="truncate">${poi.name}</span>
+                    </h4>
+                    <p class="text-xs text-slate-500 mt-1 line-clamp-2">${poi.features}</p>
+                    <div class="mt-2.5 flex justify-end">
+                        <span class="text-[10px] font-bold text-emerald-700 flex items-center bg-emerald-50 px-2 py-1 rounded-md group-hover:bg-emerald-100 transition-colors">
+                            查看詳情導航 <i data-lucide="chevron-right" class="w-3 h-3 ml-0.5"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function openModal(poiId) {
+            const poi = POI_DATABASE[poiId];
+            if(!poi) return;
+            
+            const modalContent = document.getElementById('poi-modal-content');
+            modalContent.innerHTML = `
+                <div class="sticky top-0 bg-white/90 backdrop-blur-md px-5 py-4 border-b border-slate-100 flex justify-between items-center z-10">
+                    <h3 class="font-bold text-lg text-slate-800 truncate pr-4">${poi.name}</h3>
+                    <button onclick="closeModal()" class="p-1.5 bg-slate-100 rounded-full hover:bg-slate-200 shrink-0 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-slate-600"></i>
+                    </button>
+                </div>
+                <div class="p-5 space-y-6">
+                    <div class="aspect-video bg-slate-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-inner">
+                        <img src="${poi.imgUrl}" alt="${poi.name}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/40 to-transparent pointer-events-none"></div>
+                    </div>
+                    <a href="${poi.mapsLink}" target="_blank" rel="noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/20">
+                        <i data-lucide="navigation" class="w-5 h-5"></i> 開啟 Google Maps 導航
+                    </a>
+                    <div>
+                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-blue-500"></i> 景點 / 設施特色</h4>
+                        <p class="text-sm text-slate-600 leading-relaxed bg-blue-50/50 p-3.5 rounded-xl border border-blue-100/50">${poi.features}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="utensils" class="w-5 h-5 text-amber-500"></i> 必看 / 必玩 / 必吃</h4>
+                        <div class="text-sm text-slate-700 leading-relaxed bg-amber-50/50 p-3.5 rounded-xl border border-amber-100/50 whitespace-pre-line">${poi.mustDo}</div>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-rose-700 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> 行程 / 注意事項</h4>
+                        <p class="text-sm text-rose-800 leading-relaxed bg-rose-50 p-3.5 rounded-xl border border-rose-100">${poi.notes}</p>
+                    </div>
+                </div>
+            `;
+            
+            const modal = document.getElementById('poi-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+            refreshIcons();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('poi-modal');
+            const modalContent = document.getElementById('poi-modal-content');
+            
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        document.getElementById('poi-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function updateClock() {
+            const el = document.getElementById('sim-clock');
+            if (el) el.innerText = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateClock, 60000);
+
+        async function renderItineraryContent() {
+            const container = document.getElementById('itinerary-content');
+            if(!container) return;
+
+            // Generate Day Picker
+            let dayPickerHTML = `<div class="flex overflow-x-auto gap-2.5 pb-4 mb-2 snap-x no-scrollbar">`;
+            TRIP_DAYS.forEach((day, index) => {
+                const isSelected = day.id === currentDayId;
+                const baseClasses = "flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap";
+                const activeClasses = isSelected ? "bg-slate-800 text-emerald-400 shadow-md ring-2 ring-emerald-400/30" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50";
+                dayPickerHTML += `<button onclick="switchDay('${day.id}')" class="${baseClasses} ${activeClasses}">Day ${index} (${day.id})</button>`;
+            });
+            dayPickerHTML += `</div>`;
+
+            const day = TRIP_DAYS.find(d => d.id === currentDayId);
+            const cityName = CITY_COORDS[day.queryCity].name;
+
+            // Render Layout with Weather Skeleton
+            let dayHTML = `
+                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden fade-in">
+                    <!-- Aurora Weather Card -->
+                    <div class="weather-card p-5 relative overflow-hidden">
+                        <!-- Aurora Glow Effect inside card -->
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                        
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <h2 class="font-bold text-lg text-white tracking-wide">${day.date} <span class="text-sm font-normal text-slate-300 ml-1.5">${day.location}</span></h2>
+                            <span class="text-[10px] bg-slate-800/80 text-emerald-300 px-2 py-1 rounded border border-emerald-500/30 backdrop-blur-sm flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span id="weather-badge-text">載入中...</span></span>
+                        </div>
+                        
+                        <div id="weather-dynamic-box" class="flex gap-4 text-sm bg-slate-800/60 backdrop-blur-md p-3.5 rounded-xl border border-slate-600/50 relative z-10">
+                            <!-- Skeleton Loading -->
+                            <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-600/50 space-y-2">
+                                <div class="w-6 h-6 rounded-full shimmer"></div>
+                                <div class="w-12 h-4 rounded shimmer"></div>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center space-y-2.5 pl-2">
+                                <div class="w-24 h-3 rounded shimmer"></div>
+                                <div class="w-20 h-3 rounded shimmer"></div>
+                                <div class="w-20 h-3 rounded shimmer"></div>
+                            </div>
+                        </div>
+                        <p id="weather-note" class="text-[10px] text-slate-400 mt-2.5 text-right relative z-10"></p>
+                    </div>
+
+                    <!-- Timeline -->
+                    <div class="p-5 space-y-6 bg-white">
+            `;
+
+            day.schedule.forEach((item, idx) => {
+                const isLast = idx === day.schedule.length - 1;
+                dayHTML += `
+                    <div class="flex gap-3.5 relative">
+                        <div class="flex flex-col items-center w-12 shrink-0">
+                            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${item.time}</span>
+                            ${!isLast ? '<div class="w-px h-full bg-slate-200 mt-2 absolute top-6 bottom-[-24px]"></div>' : ''}
+                        </div>
+                        <div class="flex-1 pb-2">
+                            <div class="flex items-start gap-1.5">
+                                ${getScheduleIcon(item.type)}
+                                <h3 class="font-bold text-sm leading-snug ${getScheduleTitleColor(item.type)}">${item.title}</h3>
+                            </div>
+                            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${item.desc}</p>
+                            ${item.poi ? generatePOICard(item.poi) : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            dayHTML += `</div></section>`;
+            
+            container.innerHTML = dayPickerHTML + dayHTML;
+            refreshIcons();
+
+            // Fetch Date Specific Weather and inject
+            const weatherData = await fetchDateWeather(day.queryCity, day.id);
+            const weatherBox = document.getElementById('weather-dynamic-box');
+            if(weatherBox) {
+                document.getElementById('weather-badge-text').innerText = weatherData.isHistorical ? '歷史氣候參考' : '旅行日預報';
+                document.getElementById('weather-note').innerText = weatherData.isHistorical ? `*(採用 ${weatherData.histYear} 年同日歷史氣候資料)` : `*(旅行當日氣象預報)`;
+
+                weatherBox.innerHTML = `
+                    <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-600/50">
+                        <i data-lucide="${weatherData.icon}" class="w-7 h-7 ${weatherData.color} mb-1"></i>
+                        <span class="font-bold text-white text-base tracking-wider">${weatherData.temp}</span>
+                        <span class="text-[11px] text-slate-300 mt-0.5">${cityName} · ${weatherData.desc}</span>
+                    </div>
+                    <div class="flex-1 flex flex-col justify-center text-xs text-slate-300 space-y-2 pl-3">
+                        <div class="flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-rose-400"></i> 穿著: <span class="font-medium text-white">${day.defaultClothing}</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="sunrise" class="w-3.5 h-3.5 text-amber-400"></i> 日出: <span class="text-white">${weatherData.sunrise}</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="sunset" class="w-3.5 h-3.5 text-indigo-400"></i> 日落: <span class="text-white">${weatherData.sunset}</span></div>
+                    </div>
+                `;
+                refreshIcons();
+            }
+        }
+
+        function renderContent() {
+            const main = document.getElementById('app-main');
+            
+            if (currentTab === 'itinerary') {
+                main.innerHTML = `<div id="itinerary-content"></div>`;
+                renderItineraryContent();
+            } 
+            else if (currentTab === 'hotel') {
+                main.innerHTML = `
+                    <div class="space-y-4 fade-in">
+                        <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2"><i data-lucide="hotel" class="text-emerald-600"></i> 住宿資訊</h2>
+                        
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
+                            <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md tracking-wide">3/29 - 3/30 (1晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-slate-800">台北諾富特華航桃園機場飯店</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">1 張特大床</p>
+                            <div class="mt-4 bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm">
+                                <p class="text-slate-700"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-slate-200 px-1 rounded ml-1">55756870</span></p>
+                                <p class="text-rose-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> 今晚僅您一人入住。</p>
+                            </div>
+                            <button onclick="openModal('novotel')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
+                            <span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md tracking-wide">3/31 - 4/3 (3晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-slate-800">APUKKA Resort <span class="text-sm font-normal text-slate-500">(極光村)</span></h3>
+                            <p class="text-xs text-slate-500 mt-0.5">羅瓦涅米郊區</p>
+                            <div class="mt-4 bg-blue-50/30 p-3 rounded-lg border border-blue-100/50 text-sm">
+                                <p class="text-slate-700"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-blue-100 text-blue-800 px-1 rounded ml-1">UCVLKBY</span></p>
+                                <p class="text-emerald-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i> 含早餐、機場接送、兩次極光行程。</p>
+                            </div>
+                            <button onclick="openModal('apukka')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
+                            <span class="text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md tracking-wide">4/3 - 4/7 (4晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-slate-800">Hilton Helsinki Strand</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">赫爾辛基 Hakaniemi 海傍</p>
+                            <div class="mt-4 bg-indigo-50/30 p-3 rounded-lg border border-indigo-100/50 text-sm">
+                                <p class="text-slate-700"><strong>狀態:</strong> 待確認</p>
+                                <p class="text-indigo-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="gem" class="w-4 h-4 shrink-0"></i> 享鑽石卡酒廊、早餐。4/7 記得延遲退房。</p>
+                            </div>
+                            <button onclick="openModal('hilton_strand')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (currentTab === 'transport') {
+                const initTime = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
+                main.innerHTML = `
+                    <div class="space-y-6 fade-in">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="plane" class="text-emerald-600"></i> 航班與機場動態</h2>
+                        
+                        <div class="weather-card rounded-2xl overflow-hidden shadow-lg">
+                            <div class="bg-slate-900/50 p-3.5 flex justify-between items-center text-xs text-emerald-300 border-b border-emerald-900/50 backdrop-blur-md">
+                                <span class="flex items-center gap-1.5 font-medium tracking-wide"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 即時航班時刻表</span>
+                                <span class="font-mono" id="sim-clock">${initTime}</span>
+                            </div>
+                            <div class="p-5 space-y-5 text-white">
+                                <!-- Outbound Flights -->
+                                <div class="border-l-2 border-emerald-500 pl-4 relative">
+                                    <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-emerald-500"></div>
+                                    <div class="text-xs text-emerald-400 font-bold mb-2 tracking-wide">去程航班 3/30 (一)</div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div>
+                                            <div class="font-mono text-lg font-bold text-slate-100">JL5040</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">TPE <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> NRT</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">16:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> 20:30</div>
+                                            <div class="text-[10px] text-emerald-400 mt-0.5 bg-emerald-900/30 inline-block px-1.5 rounded">On Time</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-mono text-lg font-bold text-slate-100">JL6801</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">NRT <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> HEL</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">23:05 <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> 05:55<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
+                                            <div class="text-[10px] text-emerald-400 mt-0.5 bg-emerald-900/30 inline-block px-1.5 rounded">機上過夜</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Domestic -->
+                                <div class="border-l-2 border-blue-400 pl-4 pt-3 border-t border-slate-700/50 relative">
+                                    <div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-blue-400"></div>
+                                    <div class="text-xs text-blue-300 font-bold mb-2 tracking-wide">芬蘭國內線 3/31 & 4/3</div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div>
+                                            <div class="font-mono text-base font-bold text-slate-100">AY0533</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> RVN</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">11:55 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 13:20</div>
+                                            <div class="text-[10px] bg-blue-900/30 text-blue-300 inline-block px-1.5 rounded mt-0.5">3/31</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-mono text-base font-bold text-slate-100">AY0536</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">RVN <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> HEL</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">18:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 19:40</div>
+                                            <div class="text-[10px] bg-blue-900/30 text-blue-300 inline-block px-1.5 rounded mt-0.5">4/3</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Return -->
+                                <div class="border-l-2 border-indigo-400 pl-4 pt-3 border-t border-slate-700/50 relative">
+                                    <div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-indigo-400"></div>
+                                    <div class="text-xs text-indigo-300 font-bold mb-2 tracking-wide">回程航班 4/7-4/8</div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div>
+                                            <div class="font-mono text-base font-bold text-slate-100">JL048</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> HND</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">17:30 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 14:20<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
+                                            <div class="text-[10px] bg-indigo-900/30 text-indigo-300 inline-block px-1.5 rounded mt-0.5">4/7</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="font-mono text-base font-bold text-slate-100">JL099</div>
+                                            <div class="text-[11px] text-slate-400 mt-0.5">HND <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> TSA</div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-sm font-bold tracking-wider">18:10 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 21:00</div>
+                                            <div class="text-[10px] bg-indigo-900/30 text-indigo-300 inline-block px-1.5 rounded mt-0.5">4/8</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm"><i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> 機場照片與接送導航</h3>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <button onclick="openModal('tpe_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">桃園機場 (TPE) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('tsa_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">松山機場 (TSA) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('nrt_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">成田機場 (NRT) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('hnd_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">羽田機場 (HND) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('hel_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">赫爾辛基 (HEL) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('rvn_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">羅瓦涅米 (RVN) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (currentTab === 'dining') {
+                main.innerHTML = `
+                    <div class="space-y-6 fade-in">
+                        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="utensils" class="text-emerald-600"></i> 美食與素食指南</h2>
+                        
+                        <div class="bg-amber-50/80 p-4 rounded-xl border border-amber-200/50 mb-4 flex items-start gap-3">
+                            <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+                            <p class="text-sm text-amber-900 leading-relaxed"><strong class="font-bold">爸爸專屬：</strong>赫爾辛基/羅瓦涅米嚴選素食與中式熱食，確保長輩胃腸溫暖舒適。</p>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
+                                <h3 class="font-bold text-lg text-slate-800 mb-1">Golden Bowl Dim Sum</h3>
+                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 羅瓦涅米 聖誕老人村內</p>
+                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 提供獨立 Vegetarian Menu！素豆腐湯麵、炒豆腐蔬菜、素餃子。雪地中喝熱湯首選。(推薦 Day 4 午餐)</p>
+                                <button onclick="openModal('golden_bowl')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
+                                <h3 class="font-bold text-lg text-slate-800 mb-1">大中華餐廳 <span class="text-sm font-normal text-slate-500">(Da Zhong Hua)</span></h3>
+                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 羅瓦涅米 市中心</p>
+                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 道地的中式炒青菜、家常豆腐熱炒。(推薦 Day 3 陪病空檔)</p>
+                                <button onclick="openModal('da_zhong_hua')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
+                                <h3 class="font-bold text-lg text-slate-800 mb-1">美林中餐廳 <span class="text-sm font-normal text-slate-500">(Mei Lin)</span></h3>
+                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 赫爾辛基 市中心</p>
+                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 知名四川餐廳，有「純素專屬菜單」。必點素麻婆豆腐、魚香茄子。(推薦 Day 8 晚餐)</p>
+                                <button onclick="openModal('mei_lin')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            </div>
+
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
+                                <h3 class="font-bold text-lg text-slate-800 mb-1">Sen Chay <span class="text-sm font-normal text-slate-500">(越南料理)</span></h3>
+                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 赫爾辛基 Hakaniemi</p>
+                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 100% 全素餐廳。越式全素河粉湯、素春捲，溫胃首選。(推薦 Day 6 陪病空檔)</p>
+                                <button onclick="openModal('sen_chay')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 mb-4 flex items-center gap-2">
+                            <div class="h-px bg-slate-200 flex-1"></div>
+                            <h3 class="font-bold text-slate-500 text-xs tracking-widest"><i data-lucide="coffee" class="w-3.5 h-3.5 inline mb-0.5"></i> 其他在地必吃美食</h3>
+                            <div class="h-px bg-slate-200 flex-1"></div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('santa_village')">
+                                <strong class="text-slate-800 text-sm">Santa's Salmon</strong>
+                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">聖誕老人村</p>
+                                <p class="text-slate-600 text-xs leading-relaxed">炭火現烤新鮮鮭魚，極度推薦。</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('sibelius')">
+                                <strong class="text-slate-800 text-sm">Cafe Regatta</strong>
+                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">西貝流士公園旁</p>
+                                <p class="text-slate-600 text-xs leading-relaxed">芬蘭必吃國民甜點「肉桂捲」。</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('old_market')">
+                                <strong class="text-slate-800 text-sm">Soppakeittiö</strong>
+                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">老農貿市場</p>
+                                <p class="text-slate-600 text-xs leading-relaxed">濃郁在地海鮮湯，沾麵包超滿足。</p>
+                            </div>
+                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('k_supermarket')">
+                                <strong class="text-slate-800 text-sm">Fazer 巧克力</strong>
+                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">各大當地超市</p>
+                                <p class="text-slate-600 text-xs leading-relaxed">芬蘭國寶，藍色包裝原味必買。</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (currentTab === 'medical') {
+                main.innerHTML = `
+                    <div class="space-y-4 fade-in">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="heart-pulse" class="text-rose-600"></i> 醫療洗腎專區</h2>
+                        
+                        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                            <h3 class="font-bold text-slate-800 text-lg">Lapland Central Hospital</h3>
+                            <p class="text-xs font-bold text-rose-600 mt-1 tracking-wide">📍 羅瓦涅米中央醫院</p>
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 mt-4 text-sm text-slate-700 space-y-2.5">
+                                <p class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> <strong>4/1 (三) 早上 08:30</strong></p>
+                                <p class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span>從 Apukka Resort 出發約 20 分鐘。<br/><span class="text-rose-600 font-bold block mt-1">⚠️ 務必於 07:45 出發，前晚請飯店叫車。</span></span></p>
+                            </div>
+                            <button onclick="openModal('lapland_hospital')" class="mt-4 w-full text-xs bg-white text-rose-700 py-2.5 rounded-xl font-bold border border-rose-200 group-hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看醫院外觀照片</button>
+                        </div>
+
+                        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
+                            <h3 class="font-bold text-slate-800 text-lg">Renalis Suomi Pitäjänmäki</h3>
+                            <p class="text-xs font-bold text-rose-600 mt-1 tracking-wide">📍 赫爾辛基西北區診所</p>
+                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 mt-4 text-sm text-slate-700 space-y-2.5">
+                                <p class="flex items-start gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span><strong>4/4 (六)</strong> - <span class="text-amber-600 font-bold">週末需確認報到時間</span><br><strong>4/6 (一)</strong> - 依預約時間</span></p>
+                                <p class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> 從 Hilton Strand 出發約 20 分鐘。建議使用 App 叫車。</p>
+                            </div>
+                            <button onclick="openModal('renalis_clinic')" class="mt-4 w-full text-xs bg-white text-rose-700 py-2.5 rounded-xl font-bold border border-rose-200 group-hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看診所外觀照片</button>
+                        </div>
+
+                        <div class="bg-slate-800 p-5 rounded-2xl shadow-sm mt-6 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-rose-900/20 to-transparent"></div>
+                            <h3 class="font-bold text-white mb-4 flex items-center gap-2 relative z-10"><i data-lucide="alert-triangle" class="w-5 h-5 text-rose-400"></i> 醫療與孝親守則</h3>
+                            <ul class="text-sm text-slate-300 space-y-4 relative z-10">
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">1</span>
+                                    <p class="leading-relaxed"><strong class="text-white">備妥英文文件：</strong>隨身攜帶台灣主治醫師開立的英文病歷、透析處方箋與用藥清單。</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">2</span>
+                                    <p class="leading-relaxed"><strong class="text-white">保暖防寒：</strong>洗腎患者極度怕冷，進出醫院需穿戴防風外套、帽子、手套與羊毛襪。</p>
+                                </li>
+                                <li class="flex items-start gap-3">
+                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">3</span>
+                                    <p class="leading-relaxed"><strong class="text-rose-300">行程絕對彈性：</strong>洗腎後容易疲倦、血壓波動。排定的行程皆可隨時取消，以媽媽回飯店躺平休息為第一優先。</p>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            refreshIcons();
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            // 智慧定位：如果在旅行期間打開 APP，自動跳轉至當天行程
+            const today = new Date();
+            const todayStr = `${today.getMonth() + 1}/${today.getDate()}`;
+            const matchDay = TRIP_DAYS.find(d => d.id === todayStr);
+            if (matchDay) {
+                currentDayId = todayStr;
+            }
+
+            renderContent();
+            refreshIcons();
+        });
+    </script>
+</body>
+</html>
