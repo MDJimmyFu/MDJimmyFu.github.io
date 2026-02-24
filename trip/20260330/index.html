@@ -513,8 +513,8 @@
             TRIP_DAYS.forEach((day, index) => {
                 const isSelected = day.id === currentDayId;
                 const baseClasses = "flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap";
-                const activeClasses = isSelected ? "bg-[rgba(16,185,129,0.8)] backdrop-blur-md text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border border-emerald-400" : "bg-white/10 backdrop-blur-md text-slate-300 border border-white/10 hover:bg-white/20";
-                dayPickerHTML += `<button onclick="switchDay('${day.id}')" class="${baseClasses} ${activeClasses} active-btn-marker">Day ${index} (${day.id})</button>`;
+                const activeClasses = isSelected ? "bg-[rgba(16,185,129,0.8)] backdrop-blur-md text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border border-emerald-400 active-day-btn" : "bg-white/10 backdrop-blur-md text-slate-300 border border-white/10 hover:bg-white/20";
+                dayPickerHTML += `<button onclick="switchDay('${day.id}')" class="${baseClasses} ${activeClasses}">Day ${index} (${day.id})</button>`;
             });
             dayPickerHTML += `</div>`;
 
@@ -577,8 +577,8 @@
 
             // Auto scroll to active day button
             setTimeout(() => {
-                const activeBtn = container.querySelector('.active-btn-marker');
-                if (activeBtn && activeBtn.classList.contains('bg-[rgba(16,185,129,0.8)]')) {
+                const activeBtn = container.querySelector('.active-day-btn');
+                if (activeBtn) {
                     activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 }
             }, 10);
