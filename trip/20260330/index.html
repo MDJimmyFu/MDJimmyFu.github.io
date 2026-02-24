@@ -411,6 +411,52 @@
         }
         setInterval(updateClock, 60000);
 
+        // --- 手勢滑動偵測邏輯 (Swipe Navigation) ---
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe(e);
+        }
+
+        function handleSwipe(e) {
+            // 只有在「行程」分頁才啟用左右滑動切換
+            if (currentTab !== 'itinerary') return;
+            
+            // 避免與上方日期選擇按鈕區的橫向滑動發生衝突
+            if (e.target.closest('.snap-x')) return;
+
+            const diffX = touchEndX - touchStartX;
+            const diffY = touchEndY - touchStartY;
+            
+            // 判斷是否為明顯的橫向滑動 (X軸距離大於 50px 且大於 Y軸距離)
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                const currentIndex = TRIP_DAYS.findIndex(d => d.id === currentDayId);
+                
+                if (diffX < 0) {
+                    // 向左滑動 -> 下一天
+                    if (currentIndex < TRIP_DAYS.length - 1) {
+                        switchDay(TRIP_DAYS[currentIndex + 1].id);
+                    }
+                } else {
+                    // 向右滑動 -> 上一天
+                    if (currentIndex > 0) {
+                        switchDay(TRIP_DAYS[currentIndex - 1].id);
+                    }
+                }
+            }
+        }
+        // ------------------------------------------
+
         async function renderItineraryContent() {
             const container = document.getElementById('itinerary-content');
             if(!container) return;
@@ -485,6 +531,14 @@
             
             container.innerHTML = dayPickerHTML + dayHTML;
             refreshIcons();
+
+            // 讓上方的「日期按鈕」自動平滑滾動並置中
+            setTimeout(() => {
+                const activeBtn = container.querySelector('button.bg-slate-800');
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+            }, 10);
 
             // Fetch Date Specific Weather and inject
             const weatherData = await fetchDateWeather(day.queryCity, day.id);
@@ -797,6 +851,11 @@
 
             renderContent();
             refreshIcons();
+
+            // 綁定全域手勢滑動事件
+            const mainArea = document.getElementById('app-main');
+            mainArea.addEventListener('touchstart', handleTouchStart, { passive: true });
+            mainArea.addEventListener('touchend', handleTouchEnd, { passive: true });
         });
     </script>
 </body>
