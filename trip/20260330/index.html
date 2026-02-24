@@ -9,45 +9,97 @@
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            background-color: #f8fafc; /* slate-50 */
+            background-color: #0B132B; /* Dark base for aurora */
+            color: #f8fafc;
         }
         /* Hide scrollbar for horizontal scrolling but keep functionality */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
         
-        /* Aurora Theme Custom Classes */
-        .aurora-header {
-            background: linear-gradient(135deg, #0B132B 0%, #0f303f 50%, #0d2238 100%);
-            position: relative;
+        /* Liquid Glass Custom Classes */
+        .glass-header {
+            background: rgba(11, 19, 43, 0.4);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-nav {
+            background: rgba(11, 19, 43, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .glass-card-inner {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-modal {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(28px);
+            -webkit-backdrop-filter: blur(28px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Animated Aurora Background */
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
             overflow: hidden;
+            background: #060b19;
         }
-        .aurora-header::after {
-            content: '';
+        .blob {
             position: absolute;
-            top: 0; left: -50%; width: 200%; height: 100%;
-            background: radial-gradient(circle at 50% 150%, rgba(52, 211, 153, 0.15) 0%, transparent 50%);
-            pointer-events: none;
+            filter: blur(90px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: blob-float 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .aurora-glow {
-            box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.2);
+        .blob-1 {
+            top: -10%; left: -10%;
+            width: 60vw; height: 60vw;
+            background: radial-gradient(circle, rgba(16,185,129,0.4) 0%, rgba(0,0,0,0) 70%);
         }
-        .weather-card {
-            background: linear-gradient(to right bottom, #1e293b, #0f172a);
-            border: 1px solid rgba(52, 211, 153, 0.2);
+        .blob-2 {
+            bottom: -20%; right: -10%;
+            width: 70vw; height: 70vw;
+            background: radial-gradient(circle, rgba(79,70,229,0.4) 0%, rgba(0,0,0,0) 70%);
+            animation-delay: -5s;
         }
+        .blob-3 {
+            top: 40%; left: 30%;
+            width: 50vw; height: 50vw;
+            background: radial-gradient(circle, rgba(14,165,233,0.3) 0%, rgba(0,0,0,0) 70%);
+            animation-delay: -10s;
+        }
+        @keyframes blob-float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
         .fade-in { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
+            from { opacity: 0; transform: translateY(12px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .shimmer {
-            background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+            background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.05) 75%);
             background-size: 200% 100%;
             animation: loadingShimmer 1.5s infinite;
         }
@@ -57,14 +109,21 @@
         }
     </style>
 </head>
-<body class="text-slate-800 pb-20 antialiased">
+<body class="pb-20 antialiased relative">
+
+    <!-- Fixed Liquid Aurora Background -->
+    <div class="aurora-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
 
     <!-- Header -->
-    <header class="aurora-header text-white p-5 sticky top-0 z-30 shadow-lg border-b border-emerald-900/30">
-        <h1 class="text-xl font-bold flex items-center gap-2 relative z-10">
-            <span class="text-emerald-400">✧</span> 芬蘭極光孝親之旅
+    <header class="glass-header text-white p-5 sticky top-0 z-30">
+        <h1 class="text-xl font-bold flex items-center gap-2 relative z-10 tracking-wide">
+            <span class="text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]">✧</span> 芬蘭極光孝親之旅
         </h1>
-        <p class="text-slate-300 text-xs mt-1.5 font-medium tracking-wide relative z-10">2026/03/29 - 04/08 | 傅先生與父母</p>
+        <p class="text-slate-300 text-xs mt-1.5 font-medium tracking-wider relative z-10">2026/03/29 - 04/08 | 傅先生與父母</p>
     </header>
 
     <!-- Main Content Area -->
@@ -73,34 +132,34 @@
     </main>
 
     <!-- Bottom Navigation -->
-    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-200 pb-safe z-40 shadow-[0_-5px_15px_rgba(0,0,0,0.03)]">
+    <nav class="glass-nav fixed bottom-0 w-full pb-safe z-40">
         <div class="flex justify-around items-center h-16 max-w-md mx-auto md:max-w-2xl px-2">
-            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-emerald-600 transform scale-105">
-                <i data-lucide="map" class="w-6 h-6 stroke-[2.5]"></i>
-                <span class="text-[10px] font-bold tracking-wide">行程</span>
+            <button onclick="switchTab('itinerary')" id="nav-itinerary" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-emerald-400 transform scale-105">
+                <i data-lucide="map" class="w-6 h-6 stroke-[2.5] drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]"></i>
+                <span class="text-[10px] font-bold tracking-widest">行程</span>
             </button>
-            <button onclick="switchTab('hotel')" id="nav-hotel" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+            <button onclick="switchTab('hotel')" id="nav-hotel" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-200">
                 <i data-lucide="hotel" class="w-6 h-6 stroke-2"></i>
-                <span class="text-[10px] font-medium tracking-wide">住宿</span>
+                <span class="text-[10px] font-medium tracking-widest">住宿</span>
             </button>
-            <button onclick="switchTab('transport')" id="nav-transport" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+            <button onclick="switchTab('transport')" id="nav-transport" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-200">
                 <i data-lucide="plane" class="w-6 h-6 stroke-2"></i>
-                <span class="text-[10px] font-medium tracking-wide">交通</span>
+                <span class="text-[10px] font-medium tracking-widest">交通</span>
             </button>
-            <button onclick="switchTab('dining')" id="nav-dining" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+            <button onclick="switchTab('dining')" id="nav-dining" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-200">
                 <i data-lucide="utensils" class="w-6 h-6 stroke-2"></i>
-                <span class="text-[10px] font-medium tracking-wide">飲食</span>
+                <span class="text-[10px] font-medium tracking-widest">飲食</span>
             </button>
-            <button onclick="switchTab('medical')" id="nav-medical" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-600">
+            <button onclick="switchTab('medical')" id="nav-medical" class="nav-btn flex flex-col items-center justify-center w-full h-full space-y-1 transition-all text-slate-400 hover:text-slate-200">
                 <i data-lucide="heart-pulse" class="w-6 h-6 stroke-2"></i>
-                <span class="text-[10px] font-medium tracking-wide">醫療</span>
+                <span class="text-[10px] font-medium tracking-widest">醫療</span>
             </button>
         </div>
     </nav>
 
     <!-- Modal (Hidden by default) -->
-    <div id="poi-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl transform scale-95 transition-transform duration-300" id="poi-modal-content">
+    <div id="poi-modal" class="fixed inset-0 bg-black/40 backdrop-blur-md z-50 hidden items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="glass-modal rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300 text-white" id="poi-modal-content">
             <!-- Modal Content Injected Here -->
         </div>
     </div>
@@ -256,15 +315,14 @@
         function switchTab(tabId) {
             currentTab = tabId;
             
-            // Bug Fix: Safely modify Lucide icons by accessing them correctly or modifying a wrapper.
-            // Using setAttribute on the svg/i element prevents TypeError issues when Lucide mutates DOM.
+            // Handle Icon selection cleanly
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-emerald-600', 'scale-105');
+                btn.classList.remove('text-emerald-400', 'scale-105');
                 btn.classList.add('text-slate-400');
                 const icon = btn.querySelector('svg') || btn.querySelector('i');
                 if (icon) {
                     icon.setAttribute('stroke-width', '2');
-                    icon.classList.remove('stroke-[2.5]');
+                    icon.style.filter = 'none';
                 }
                 const span = btn.querySelector('span');
                 if (span) {
@@ -276,11 +334,11 @@
             const activeBtn = document.getElementById(`nav-${tabId}`);
             if (activeBtn) {
                 activeBtn.classList.remove('text-slate-400');
-                activeBtn.classList.add('text-emerald-600', 'scale-105');
+                activeBtn.classList.add('text-emerald-400', 'scale-105');
                 const activeIcon = activeBtn.querySelector('svg') || activeBtn.querySelector('i');
                 if (activeIcon) {
                     activeIcon.setAttribute('stroke-width', '2.5');
-                    activeIcon.classList.add('stroke-[2.5]');
+                    activeIcon.style.filter = 'drop-shadow(0 0 5px rgba(52,211,153,0.5))';
                 }
                 const activeSpan = activeBtn.querySelector('span');
                 if (activeSpan) {
@@ -299,21 +357,21 @@
 
         function getScheduleIcon(type) {
             switch(type) {
-                case 'medical': return `<i data-lucide="heart-pulse" class="w-4 h-4 text-rose-500 mt-0.5 shrink-0"></i>`;
-                case 'papa': return `<i data-lucide="sun" class="w-4 h-4 text-amber-500 mt-0.5 shrink-0"></i>`;
-                case 'flight': return `<i data-lucide="plane" class="w-4 h-4 text-blue-500 mt-0.5 shrink-0"></i>`;
-                case 'night': return `<i data-lucide="moon" class="w-4 h-4 text-indigo-400 mt-0.5 shrink-0"></i>`;
-                default: return `<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0"></div>`;
+                case 'medical': return `<i data-lucide="heart-pulse" class="w-4 h-4 text-rose-400 mt-0.5 shrink-0 drop-shadow-[0_0_5px_rgba(244,63,94,0.5)]"></i>`;
+                case 'papa': return `<i data-lucide="sun" class="w-4 h-4 text-amber-400 mt-0.5 shrink-0 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]"></i>`;
+                case 'flight': return `<i data-lucide="plane" class="w-4 h-4 text-blue-400 mt-0.5 shrink-0 drop-shadow-[0_0_5px_rgba(96,165,250,0.5)]"></i>`;
+                case 'night': return `<i data-lucide="moon" class="w-4 h-4 text-indigo-300 mt-0.5 shrink-0 drop-shadow-[0_0_5px_rgba(165,180,252,0.5)]"></i>`;
+                default: return `<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shrink-0 shadow-[0_0_5px_rgba(52,211,153,0.8)]"></div>`;
             }
         }
 
         function getScheduleTitleColor(type) {
             switch(type) {
-                case 'medical': return 'text-rose-700';
-                case 'papa': return 'text-amber-700';
-                case 'flight': return 'text-blue-700';
-                case 'night': return 'text-indigo-700';
-                default: return 'text-slate-800';
+                case 'medical': return 'text-rose-400';
+                case 'papa': return 'text-amber-400';
+                case 'flight': return 'text-blue-300';
+                case 'night': return 'text-indigo-300';
+                default: return 'text-slate-100';
             }
         }
 
@@ -321,20 +379,20 @@
             const poi = POI_DATABASE[poiId];
             if (!poi) return '';
             return `
-            <div onclick="openModal('${poiId}')" class="mt-3 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden cursor-pointer hover:shadow-md hover:border-emerald-200 transition-all group">
-                <div class="h-24 bg-slate-800 relative overflow-hidden flex items-center justify-center">
-                    <img src="${poi.imgUrl}" alt="${poi.name}" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
-                    <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/60 to-transparent pointer-events-none"></div>
+            <div onclick="openModal('${poiId}')" class="mt-3 glass-card-inner rounded-xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all group backdrop-blur-md">
+                <div class="h-24 bg-black/40 relative overflow-hidden flex items-center justify-center">
+                    <img src="${poi.imgUrl}" alt="${poi.name}" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                    <div class="absolute inset-0 bg-gradient-to-t from-[#0B132B] to-transparent pointer-events-none opacity-90"></div>
                 </div>
                 <div class="p-3">
-                    <h4 class="font-bold text-slate-800 flex items-center gap-1.5 text-sm">
-                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-600 shrink-0"></i>
+                    <h4 class="font-bold text-slate-100 flex items-center gap-1.5 text-sm">
+                        <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
                         <span class="truncate">${poi.name}</span>
                     </h4>
-                    <p class="text-xs text-slate-500 mt-1 line-clamp-2">${poi.features}</p>
+                    <p class="text-xs text-slate-400 mt-1 line-clamp-2">${poi.features}</p>
                     <div class="mt-2.5 flex justify-end">
-                        <span class="text-[10px] font-bold text-emerald-700 flex items-center bg-emerald-50 px-2 py-1 rounded-md group-hover:bg-emerald-100 transition-colors">
-                            查看詳情導航 <i data-lucide="chevron-right" class="w-3 h-3 ml-0.5"></i>
+                        <span class="text-[10px] font-bold text-emerald-300 flex items-center bg-emerald-500/20 border border-emerald-500/30 px-2 py-1 rounded-md group-hover:bg-emerald-500/30 transition-colors">
+                            查看導航照片 <i data-lucide="chevron-right" class="w-3 h-3 ml-0.5"></i>
                         </span>
                     </div>
                 </div>
@@ -347,31 +405,31 @@
             
             const modalContent = document.getElementById('poi-modal-content');
             modalContent.innerHTML = `
-                <div class="sticky top-0 bg-white/90 backdrop-blur-md px-5 py-4 border-b border-slate-100 flex justify-between items-center z-10">
-                    <h3 class="font-bold text-lg text-slate-800 truncate pr-4">${poi.name}</h3>
-                    <button onclick="closeModal()" class="p-1.5 bg-slate-100 rounded-full hover:bg-slate-200 shrink-0 transition-colors">
-                        <i data-lucide="x" class="w-5 h-5 text-slate-600"></i>
+                <div class="sticky top-0 bg-[rgba(15,23,42,0.6)] backdrop-blur-2xl px-5 py-4 border-b border-white/10 flex justify-between items-center z-10">
+                    <h3 class="font-bold text-lg text-white truncate pr-4 tracking-wide">${poi.name}</h3>
+                    <button onclick="closeModal()" class="p-1.5 bg-white/10 rounded-full hover:bg-white/20 shrink-0 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-slate-200"></i>
                     </button>
                 </div>
                 <div class="p-5 space-y-6">
-                    <div class="aspect-video bg-slate-900 rounded-xl flex items-center justify-center overflow-hidden relative shadow-inner">
+                    <div class="aspect-video bg-black/40 rounded-2xl flex items-center justify-center overflow-hidden relative shadow-inner">
                         <img src="${poi.imgUrl}" alt="${poi.name}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-emerald-900/40 to-transparent pointer-events-none"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#0B132B]/80 to-transparent pointer-events-none"></div>
                     </div>
-                    <a href="${poi.mapsLink}" target="_blank" rel="noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl font-bold transition-colors shadow-lg shadow-emerald-600/20">
+                    <a href="${poi.mapsLink}" target="_blank" rel="noreferrer" class="flex items-center justify-center gap-2 w-full bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 py-3.5 rounded-xl font-bold transition-colors shadow-[0_0_15px_rgba(16,185,129,0.15)]">
                         <i data-lucide="navigation" class="w-5 h-5"></i> 開啟 Google Maps 導航
                     </a>
                     <div>
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-blue-500"></i> 景點 / 設施特色</h4>
-                        <p class="text-sm text-slate-600 leading-relaxed bg-blue-50/50 p-3.5 rounded-xl border border-blue-100/50">${poi.features}</p>
+                        <h4 class="font-bold text-slate-200 mb-2 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5 text-blue-400"></i> 景點 / 設施特色</h4>
+                        <p class="text-sm text-slate-300 leading-relaxed bg-white/5 p-3.5 rounded-xl border border-white/10 backdrop-blur-md">${poi.features}</p>
                     </div>
                     <div>
-                        <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="utensils" class="w-5 h-5 text-amber-500"></i> 必看 / 必玩 / 必吃</h4>
-                        <div class="text-sm text-slate-700 leading-relaxed bg-amber-50/50 p-3.5 rounded-xl border border-amber-100/50 whitespace-pre-line">${poi.mustDo}</div>
+                        <h4 class="font-bold text-slate-200 mb-2 flex items-center gap-2"><i data-lucide="utensils" class="w-5 h-5 text-amber-400"></i> 必看 / 必玩 / 必吃</h4>
+                        <div class="text-sm text-slate-300 leading-relaxed bg-amber-500/10 p-3.5 rounded-xl border border-amber-500/20 backdrop-blur-md whitespace-pre-line">${poi.mustDo}</div>
                     </div>
                     <div>
-                        <h4 class="font-bold text-rose-700 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5"></i> 行程 / 注意事項</h4>
-                        <p class="text-sm text-rose-800 leading-relaxed bg-rose-50 p-3.5 rounded-xl border border-rose-100">${poi.notes}</p>
+                        <h4 class="font-bold text-slate-200 mb-2 flex items-center gap-2"><i data-lucide="alert-triangle" class="w-5 h-5 text-rose-400"></i> 行程 / 注意事項</h4>
+                        <p class="text-sm text-rose-300 leading-relaxed bg-rose-500/10 p-3.5 rounded-xl border border-rose-500/20 backdrop-blur-md">${poi.notes}</p>
                     </div>
                 </div>
             `;
@@ -429,29 +487,18 @@
         }
 
         function handleSwipe(e) {
-            // 只有在「行程」分頁才啟用左右滑動切換
             if (currentTab !== 'itinerary') return;
-            
-            // 避免與上方日期選擇按鈕區的橫向滑動發生衝突
             if (e.target.closest('.snap-x')) return;
 
             const diffX = touchEndX - touchStartX;
             const diffY = touchEndY - touchStartY;
             
-            // 判斷是否為明顯的橫向滑動 (X軸距離大於 50px 且大於 Y軸距離)
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
                 const currentIndex = TRIP_DAYS.findIndex(d => d.id === currentDayId);
-                
                 if (diffX < 0) {
-                    // 向左滑動 -> 下一天
-                    if (currentIndex < TRIP_DAYS.length - 1) {
-                        switchDay(TRIP_DAYS[currentIndex + 1].id);
-                    }
+                    if (currentIndex < TRIP_DAYS.length - 1) switchDay(TRIP_DAYS[currentIndex + 1].id);
                 } else {
-                    // 向右滑動 -> 上一天
-                    if (currentIndex > 0) {
-                        switchDay(TRIP_DAYS[currentIndex - 1].id);
-                    }
+                    if (currentIndex > 0) switchDay(TRIP_DAYS[currentIndex - 1].id);
                 }
             }
         }
@@ -466,8 +513,8 @@
             TRIP_DAYS.forEach((day, index) => {
                 const isSelected = day.id === currentDayId;
                 const baseClasses = "flex-shrink-0 snap-start px-4 py-2 rounded-full text-sm font-bold transition-all whitespace-nowrap";
-                const activeClasses = isSelected ? "bg-slate-800 text-emerald-400 shadow-md ring-2 ring-emerald-400/30" : "bg-white text-slate-500 border border-slate-200 hover:bg-slate-50";
-                dayPickerHTML += `<button onclick="switchDay('${day.id}')" class="${baseClasses} ${activeClasses}">Day ${index} (${day.id})</button>`;
+                const activeClasses = isSelected ? "bg-[rgba(16,185,129,0.8)] backdrop-blur-md text-white shadow-[0_0_15px_rgba(16,185,129,0.5)] border border-emerald-400" : "bg-white/10 backdrop-blur-md text-slate-300 border border-white/10 hover:bg-white/20";
+                dayPickerHTML += `<button onclick="switchDay('${day.id}')" class="${baseClasses} ${activeClasses} active-btn-marker">Day ${index} (${day.id})</button>`;
             });
             dayPickerHTML += `</div>`;
 
@@ -476,21 +523,17 @@
 
             // Render Layout with Weather Skeleton
             let dayHTML = `
-                <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden fade-in">
-                    <!-- Aurora Weather Card -->
-                    <div class="weather-card p-5 relative overflow-hidden">
-                        <!-- Aurora Glow Effect inside card -->
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                        <div class="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                        
+                <section class="glass-card rounded-3xl overflow-hidden fade-in relative">
+                    <!-- Weather Card -->
+                    <div class="p-5 relative overflow-hidden border-b border-white/10 bg-[rgba(255,255,255,0.02)]">
                         <div class="flex justify-between items-center mb-4 relative z-10">
-                            <h2 class="font-bold text-lg text-white tracking-wide">${day.date} <span class="text-sm font-normal text-slate-300 ml-1.5">${day.location}</span></h2>
-                            <span class="text-[10px] bg-slate-800/80 text-emerald-300 px-2 py-1 rounded border border-emerald-500/30 backdrop-blur-sm flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> <span id="weather-badge-text">載入中...</span></span>
+                            <h2 class="font-bold text-lg text-white tracking-wide">${day.date} <span class="text-sm font-normal text-emerald-300 ml-1.5">${day.location}</span></h2>
+                            <span class="text-[10px] bg-white/10 text-emerald-300 px-2 py-1 rounded-md border border-white/10 backdrop-blur-sm flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse drop-shadow-[0_0_3px_rgba(52,211,153,1)]"></span> <span id="weather-badge-text">載入中...</span></span>
                         </div>
                         
-                        <div id="weather-dynamic-box" class="flex gap-4 text-sm bg-slate-800/60 backdrop-blur-md p-3.5 rounded-xl border border-slate-600/50 relative z-10">
+                        <div id="weather-dynamic-box" class="flex gap-4 text-sm bg-black/20 backdrop-blur-md p-4 rounded-xl border border-white/5 relative z-10">
                             <!-- Skeleton Loading -->
-                            <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-600/50 space-y-2">
+                            <div class="flex-1 flex flex-col items-center justify-center border-r border-white/10 space-y-2">
                                 <div class="w-6 h-6 rounded-full shimmer"></div>
                                 <div class="w-12 h-4 rounded shimmer"></div>
                             </div>
@@ -504,7 +547,7 @@
                     </div>
 
                     <!-- Timeline -->
-                    <div class="p-5 space-y-6 bg-white">
+                    <div class="p-5 space-y-6">
             `;
 
             day.schedule.forEach((item, idx) => {
@@ -512,15 +555,15 @@
                 dayHTML += `
                     <div class="flex gap-3.5 relative">
                         <div class="flex flex-col items-center w-12 shrink-0">
-                            <span class="text-[11px] font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">${item.time}</span>
-                            ${!isLast ? '<div class="w-px h-full bg-slate-200 mt-2 absolute top-6 bottom-[-24px]"></div>' : ''}
+                            <span class="text-[11px] font-bold text-slate-200 bg-white/10 backdrop-blur-md border border-white/10 px-1.5 py-0.5 rounded shadow-sm">${item.time}</span>
+                            ${!isLast ? '<div class="w-px h-full bg-white/10 mt-2 absolute top-6 bottom-[-24px]"></div>' : ''}
                         </div>
                         <div class="flex-1 pb-2">
                             <div class="flex items-start gap-1.5">
                                 ${getScheduleIcon(item.type)}
-                                <h3 class="font-bold text-sm leading-snug ${getScheduleTitleColor(item.type)}">${item.title}</h3>
+                                <h3 class="font-bold text-sm leading-snug tracking-wide ${getScheduleTitleColor(item.type)}">${item.title}</h3>
                             </div>
-                            <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">${item.desc}</p>
+                            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed font-light">${item.desc}</p>
                             ${item.poi ? generatePOICard(item.poi) : ''}
                         </div>
                     </div>
@@ -532,10 +575,10 @@
             container.innerHTML = dayPickerHTML + dayHTML;
             refreshIcons();
 
-            // 讓上方的「日期按鈕」自動平滑滾動並置中
+            // Auto scroll to active day button
             setTimeout(() => {
-                const activeBtn = container.querySelector('button.bg-slate-800');
-                if (activeBtn) {
+                const activeBtn = container.querySelector('.active-btn-marker');
+                if (activeBtn && activeBtn.classList.contains('bg-[rgba(16,185,129,0.8)]')) {
                     activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
                 }
             }, 10);
@@ -548,15 +591,15 @@
                 document.getElementById('weather-note').innerText = weatherData.isHistorical ? `*(採用 ${weatherData.histYear} 年同日歷史氣候資料)` : `*(旅行當日氣象預報)`;
 
                 weatherBox.innerHTML = `
-                    <div class="flex-1 flex flex-col items-center justify-center border-r border-slate-600/50">
-                        <i data-lucide="${weatherData.icon}" class="w-7 h-7 ${weatherData.color} mb-1"></i>
+                    <div class="flex-1 flex flex-col items-center justify-center border-r border-white/10">
+                        <i data-lucide="${weatherData.icon}" class="w-8 h-8 ${weatherData.color} mb-1 drop-shadow-md"></i>
                         <span class="font-bold text-white text-base tracking-wider">${weatherData.temp}</span>
                         <span class="text-[11px] text-slate-300 mt-0.5">${cityName} · ${weatherData.desc}</span>
                     </div>
                     <div class="flex-1 flex flex-col justify-center text-xs text-slate-300 space-y-2 pl-3">
-                        <div class="flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-rose-400"></i> 穿著: <span class="font-medium text-white">${day.defaultClothing}</span></div>
-                        <div class="flex items-center gap-1.5"><i data-lucide="sunrise" class="w-3.5 h-3.5 text-amber-400"></i> 日出: <span class="text-white">${weatherData.sunrise}</span></div>
-                        <div class="flex items-center gap-1.5"><i data-lucide="sunset" class="w-3.5 h-3.5 text-indigo-400"></i> 日落: <span class="text-white">${weatherData.sunset}</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="thermometer" class="w-3.5 h-3.5 text-rose-400 drop-shadow-md"></i> 穿著: <span class="font-medium text-white">${day.defaultClothing}</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="sunrise" class="w-3.5 h-3.5 text-amber-400 drop-shadow-md"></i> 日出: <span class="text-white">${weatherData.sunrise}</span></div>
+                        <div class="flex items-center gap-1.5"><i data-lucide="sunset" class="w-3.5 h-3.5 text-indigo-300 drop-shadow-md"></i> 日落: <span class="text-white">${weatherData.sunset}</span></div>
                     </div>
                 `;
                 refreshIcons();
@@ -572,40 +615,40 @@
             } 
             else if (currentTab === 'hotel') {
                 main.innerHTML = `
-                    <div class="space-y-4 fade-in">
-                        <h2 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2"><i data-lucide="hotel" class="text-emerald-600"></i> 住宿資訊</h2>
+                    <div class="space-y-5 fade-in">
+                        <h2 class="text-xl font-bold text-slate-100 mb-5 flex items-center gap-2 tracking-wide"><i data-lucide="hotel" class="text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]"></i> 住宿資訊</h2>
                         
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
-                            <span class="text-[10px] font-bold bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md tracking-wide">3/29 - 3/30 (1晚)</span>
-                            <h3 class="font-bold text-lg mt-3 text-slate-800">台北諾富特華航桃園機場飯店</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">1 張特大床</p>
-                            <div class="mt-4 bg-slate-50 p-3 rounded-lg border border-slate-100 text-sm">
-                                <p class="text-slate-700"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-slate-200 px-1 rounded ml-1">55756870</span></p>
-                                <p class="text-rose-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i> 今晚僅您一人入住。</p>
+                        <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                            <span class="text-[10px] font-bold bg-white/10 text-slate-300 px-2.5 py-1 rounded-md tracking-widest border border-white/10">3/29 - 3/30 (1晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-white tracking-wide">台北諾富特華航桃園機場飯店</h3>
+                            <p class="text-xs text-slate-400 mt-1">1 張特大床</p>
+                            <div class="mt-4 glass-card-inner p-3.5 rounded-xl text-sm">
+                                <p class="text-slate-300"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded ml-1">55756870</span></p>
+                                <p class="text-rose-400 mt-2 font-medium flex gap-1.5 items-start"><i data-lucide="alert-triangle" class="w-4 h-4 shrink-0 drop-shadow-md"></i> 今晚僅您一人入住。</p>
                             </div>
-                            <button onclick="openModal('novotel')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                            <button onclick="openModal('novotel')" class="mt-4 w-full py-3 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold rounded-xl transition-colors border border-white/10 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
-                            <span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md tracking-wide">3/31 - 4/3 (3晚)</span>
-                            <h3 class="font-bold text-lg mt-3 text-slate-800">APUKKA Resort <span class="text-sm font-normal text-slate-500">(極光村)</span></h3>
-                            <p class="text-xs text-slate-500 mt-0.5">羅瓦涅米郊區</p>
-                            <div class="mt-4 bg-blue-50/30 p-3 rounded-lg border border-blue-100/50 text-sm">
-                                <p class="text-slate-700"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-blue-100 text-blue-800 px-1 rounded ml-1">UCVLKBY</span></p>
-                                <p class="text-emerald-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i> 含早餐、機場接送、兩次極光行程。</p>
+                        <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                            <span class="text-[10px] font-bold bg-blue-500/20 border border-blue-500/30 text-blue-300 px-2.5 py-1 rounded-md tracking-widest">3/31 - 4/3 (3晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-white tracking-wide">APUKKA Resort <span class="text-sm font-normal text-slate-400">(極光村)</span></h3>
+                            <p class="text-xs text-slate-400 mt-1">羅瓦涅米郊區</p>
+                            <div class="mt-4 glass-card-inner p-3.5 rounded-xl text-sm border-blue-500/20">
+                                <p class="text-slate-300"><strong>狀態:</strong> 已訂妥 <span class="font-mono text-xs bg-blue-500/20 text-blue-300 border border-blue-500/30 px-1.5 py-0.5 rounded ml-1">UCVLKBY</span></p>
+                                <p class="text-emerald-400 mt-2 font-medium flex gap-1.5 items-start drop-shadow-md"><i data-lucide="sparkles" class="w-4 h-4 shrink-0"></i> 含早餐、機場接送、兩次極光行程。</p>
                             </div>
-                            <button onclick="openModal('apukka')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                            <button onclick="openModal('apukka')" class="mt-4 w-full py-3 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold rounded-xl transition-colors border border-white/10 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors">
-                            <span class="text-[10px] font-bold bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md tracking-wide">4/3 - 4/7 (4晚)</span>
-                            <h3 class="font-bold text-lg mt-3 text-slate-800">Hilton Helsinki Strand</h3>
-                            <p class="text-xs text-slate-500 mt-0.5">赫爾辛基 Hakaniemi 海傍</p>
-                            <div class="mt-4 bg-indigo-50/30 p-3 rounded-lg border border-indigo-100/50 text-sm">
-                                <p class="text-slate-700"><strong>狀態:</strong> 待確認</p>
-                                <p class="text-indigo-600 mt-1.5 font-medium flex gap-1 items-start"><i data-lucide="gem" class="w-4 h-4 shrink-0"></i> 享鑽石卡酒廊、早餐。4/7 記得延遲退房。</p>
+                        <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                            <span class="text-[10px] font-bold bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 px-2.5 py-1 rounded-md tracking-widest">4/3 - 4/7 (4晚)</span>
+                            <h3 class="font-bold text-lg mt-3 text-white tracking-wide">Hilton Helsinki Strand</h3>
+                            <p class="text-xs text-slate-400 mt-1">赫爾辛基 Hakaniemi 海傍</p>
+                            <div class="mt-4 glass-card-inner p-3.5 rounded-xl text-sm border-indigo-500/20">
+                                <p class="text-slate-300"><strong>狀態:</strong> 待確認</p>
+                                <p class="text-indigo-300 mt-2 font-medium flex gap-1.5 items-start"><i data-lucide="gem" class="w-4 h-4 shrink-0 drop-shadow-md"></i> 享鑽石卡酒廊、早餐。4/7 記得延遲退房。</p>
                             </div>
-                            <button onclick="openModal('hilton_strand')" class="mt-3 w-full py-2.5 bg-emerald-50/50 hover:bg-emerald-50 text-emerald-700 text-xs font-bold rounded-xl transition-colors border border-emerald-100 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
+                            <button onclick="openModal('hilton_strand')" class="mt-4 w-full py-3 bg-white/5 hover:bg-white/10 text-slate-200 text-xs font-bold rounded-xl transition-colors border border-white/10 flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看飯店照片</button>
                         </div>
                     </div>
                 `;
@@ -614,103 +657,103 @@
                 const initTime = new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
                 main.innerHTML = `
                     <div class="space-y-6 fade-in">
-                        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="plane" class="text-emerald-600"></i> 航班與機場動態</h2>
+                        <h2 class="text-xl font-bold text-slate-100 mb-2 flex items-center gap-2 tracking-wide"><i data-lucide="plane" class="text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]"></i> 航班與機場動態</h2>
                         
-                        <div class="weather-card rounded-2xl overflow-hidden shadow-lg">
-                            <div class="bg-slate-900/50 p-3.5 flex justify-between items-center text-xs text-emerald-300 border-b border-emerald-900/50 backdrop-blur-md">
-                                <span class="flex items-center gap-1.5 font-medium tracking-wide"><i data-lucide="clock" class="w-3.5 h-3.5"></i> 即時航班時刻表</span>
-                                <span class="font-mono" id="sim-clock">${initTime}</span>
+                        <div class="glass-card rounded-3xl overflow-hidden">
+                            <div class="bg-black/30 p-4 flex justify-between items-center text-xs text-emerald-400 border-b border-white/5 backdrop-blur-md">
+                                <span class="flex items-center gap-1.5 font-bold tracking-widest"><i data-lucide="clock" class="w-4 h-4"></i> 即時航班時刻表</span>
+                                <span class="font-mono text-white bg-black/30 px-2 py-1 rounded-md border border-white/10 shadow-inner" id="sim-clock">${initTime}</span>
                             </div>
-                            <div class="p-5 space-y-5 text-white">
+                            <div class="p-5 space-y-5 text-slate-200">
                                 <!-- Outbound Flights -->
-                                <div class="border-l-2 border-emerald-500 pl-4 relative">
-                                    <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-emerald-500"></div>
-                                    <div class="text-xs text-emerald-400 font-bold mb-2 tracking-wide">去程航班 3/30 (一)</div>
-                                    <div class="flex justify-between items-center mb-3">
+                                <div class="border-l-2 border-amber-400 pl-4 relative">
+                                    <div class="absolute -left-[5px] top-0 w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"></div>
+                                    <div class="text-xs text-amber-400 font-bold mb-3 tracking-widest uppercase">去程航班 3/30 (一)</div>
+                                    <div class="flex justify-between items-center mb-4">
                                         <div>
-                                            <div class="font-mono text-lg font-bold text-slate-100">JL5040</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">TPE <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> NRT</div>
+                                            <div class="font-mono text-lg font-bold text-white">JL5040</div>
+                                            <div class="text-xs text-slate-400 mt-1">TPE <i data-lucide="arrow-right" class="w-3 h-3 inline text-amber-400/50"></i> NRT</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">16:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> 20:30</div>
-                                            <div class="text-[10px] text-emerald-400 mt-0.5 bg-emerald-900/30 inline-block px-1.5 rounded">On Time</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">16:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-amber-400/50"></i> 20:30</div>
+                                            <div class="text-[10px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 border border-emerald-500/20 inline-block px-2 py-0.5 rounded shadow-sm">On Time</div>
                                         </div>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <div class="font-mono text-lg font-bold text-slate-100">JL6801</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">NRT <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> HEL</div>
+                                            <div class="font-mono text-lg font-bold text-white">JL6801</div>
+                                            <div class="text-xs text-slate-400 mt-1">NRT <i data-lucide="arrow-right" class="w-3 h-3 inline text-amber-400/50"></i> HEL</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">23:05 <i data-lucide="arrow-right" class="w-3 h-3 inline text-emerald-500/50"></i> 05:55<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
-                                            <div class="text-[10px] text-emerald-400 mt-0.5 bg-emerald-900/30 inline-block px-1.5 rounded">機上過夜</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">23:05 <i data-lucide="arrow-right" class="w-3 h-3 inline text-amber-400/50"></i> 05:55<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
+                                            <div class="text-[10px] font-bold text-emerald-400 mt-1 bg-emerald-500/10 border border-emerald-500/20 inline-block px-2 py-0.5 rounded shadow-sm">機上過夜</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Domestic -->
-                                <div class="border-l-2 border-blue-400 pl-4 pt-3 border-t border-slate-700/50 relative">
-                                    <div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-blue-400"></div>
-                                    <div class="text-xs text-blue-300 font-bold mb-2 tracking-wide">芬蘭國內線 3/31 & 4/3</div>
-                                    <div class="flex justify-between items-center mb-3">
+                                <div class="border-l-2 border-blue-400 pl-4 pt-4 border-t border-white/5 relative">
+                                    <div class="absolute -left-[5px] top-5 w-2 h-2 rounded-full bg-blue-400 shadow-[0_0_8px_rgba(96,165,250,0.8)]"></div>
+                                    <div class="text-xs text-blue-400 font-bold mb-3 tracking-widest uppercase">芬蘭國內線 3/31 & 4/3</div>
+                                    <div class="flex justify-between items-center mb-4">
                                         <div>
-                                            <div class="font-mono text-base font-bold text-slate-100">AY0533</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> RVN</div>
+                                            <div class="font-mono text-base font-bold text-white">AY0533</div>
+                                            <div class="text-xs text-slate-400 mt-1">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> RVN</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">11:55 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 13:20</div>
-                                            <div class="text-[10px] bg-blue-900/30 text-blue-300 inline-block px-1.5 rounded mt-0.5">3/31</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">11:55 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 13:20</div>
+                                            <div class="text-[10px] font-bold bg-blue-500/10 border border-blue-500/20 text-blue-300 inline-block px-2 py-0.5 rounded mt-1">3/31</div>
                                         </div>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <div class="font-mono text-base font-bold text-slate-100">AY0536</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">RVN <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> HEL</div>
+                                            <div class="font-mono text-base font-bold text-white">AY0536</div>
+                                            <div class="text-xs text-slate-400 mt-1">RVN <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> HEL</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">18:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 19:40</div>
-                                            <div class="text-[10px] bg-blue-900/30 text-blue-300 inline-block px-1.5 rounded mt-0.5">4/3</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">18:25 <i data-lucide="arrow-right" class="w-3 h-3 inline text-blue-400/50"></i> 19:40</div>
+                                            <div class="text-[10px] font-bold bg-blue-500/10 border border-blue-500/20 text-blue-300 inline-block px-2 py-0.5 rounded mt-1">4/3</div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Return -->
-                                <div class="border-l-2 border-indigo-400 pl-4 pt-3 border-t border-slate-700/50 relative">
-                                    <div class="absolute -left-[5px] top-4 w-2 h-2 rounded-full bg-indigo-400"></div>
-                                    <div class="text-xs text-indigo-300 font-bold mb-2 tracking-wide">回程航班 4/7-4/8</div>
-                                    <div class="flex justify-between items-center mb-3">
+                                <div class="border-l-2 border-indigo-400 pl-4 pt-4 border-t border-white/5 relative">
+                                    <div class="absolute -left-[5px] top-5 w-2 h-2 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]"></div>
+                                    <div class="text-xs text-indigo-400 font-bold mb-3 tracking-widest uppercase">回程航班 4/7-4/8</div>
+                                    <div class="flex justify-between items-center mb-4">
                                         <div>
-                                            <div class="font-mono text-base font-bold text-slate-100">JL048</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> HND</div>
+                                            <div class="font-mono text-base font-bold text-white">JL048</div>
+                                            <div class="text-xs text-slate-400 mt-1">HEL <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> HND</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">17:30 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 14:20<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
-                                            <div class="text-[10px] bg-indigo-900/30 text-indigo-300 inline-block px-1.5 rounded mt-0.5">4/7</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">17:30 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 14:20<span class="text-[10px] text-slate-400 ml-1">(+1)</span></div>
+                                            <div class="text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 inline-block px-2 py-0.5 rounded mt-1">4/7</div>
                                         </div>
                                     </div>
                                     <div class="flex justify-between items-center">
                                         <div>
-                                            <div class="font-mono text-base font-bold text-slate-100">JL099</div>
-                                            <div class="text-[11px] text-slate-400 mt-0.5">HND <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> TSA</div>
+                                            <div class="font-mono text-base font-bold text-white">JL099</div>
+                                            <div class="text-xs text-slate-400 mt-1">HND <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> TSA</div>
                                         </div>
                                         <div class="text-right">
-                                            <div class="text-sm font-bold tracking-wider">18:10 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 21:00</div>
-                                            <div class="text-[10px] bg-indigo-900/30 text-indigo-300 inline-block px-1.5 rounded mt-0.5">4/8</div>
+                                            <div class="text-sm font-bold tracking-wider text-white">18:10 <i data-lucide="arrow-right" class="w-3 h-3 inline text-indigo-400/50"></i> 21:00</div>
+                                            <div class="text-[10px] font-bold bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 inline-block px-2 py-0.5 rounded mt-1">4/8</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-                            <h3 class="font-bold text-slate-800 mb-3 flex items-center gap-2 text-sm"><i data-lucide="navigation" class="w-4 h-4 text-emerald-600"></i> 機場照片與接送導航</h3>
-                            <div class="grid grid-cols-2 gap-2.5">
-                                <button onclick="openModal('tpe_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">桃園機場 (TPE) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
-                                <button onclick="openModal('tsa_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">松山機場 (TSA) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
-                                <button onclick="openModal('nrt_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">成田機場 (NRT) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
-                                <button onclick="openModal('hnd_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">羽田機場 (HND) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
-                                <button onclick="openModal('hel_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">赫爾辛基 (HEL) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
-                                <button onclick="openModal('rvn_airport')" class="bg-slate-50 text-slate-700 text-xs font-bold py-2.5 px-3 rounded-xl border border-slate-200 flex items-center justify-between hover:bg-emerald-50 hover:border-emerald-200 transition-colors">羅瓦涅米 (RVN) <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                        <div class="glass-card p-5 rounded-3xl">
+                            <h3 class="font-bold text-slate-100 mb-4 flex items-center gap-2 text-sm tracking-wide"><i data-lucide="navigation" class="w-4 h-4 text-emerald-400 drop-shadow-md"></i> 機場照片與接送導航</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="openModal('tpe_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">桃園機場 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('tsa_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">松山機場 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('nrt_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">成田機場 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('hnd_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">羽田機場 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('hel_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">赫爾辛基 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
+                                <button onclick="openModal('rvn_airport')" class="bg-white/5 text-slate-200 text-xs font-bold py-3 px-3 rounded-xl border border-white/10 flex items-center justify-between hover:bg-white/10 hover:border-white/20 transition-all shadow-sm">羅瓦涅米 <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-400"></i></button>
                             </div>
                         </div>
                     </div>
@@ -719,69 +762,69 @@
             else if (currentTab === 'dining') {
                 main.innerHTML = `
                     <div class="space-y-6 fade-in">
-                        <h2 class="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2"><i data-lucide="utensils" class="text-emerald-600"></i> 美食與素食指南</h2>
+                        <h2 class="text-xl font-bold text-slate-100 mb-2 flex items-center gap-2 tracking-wide"><i data-lucide="utensils" class="text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]"></i> 美食與素食指南</h2>
                         
-                        <div class="bg-amber-50/80 p-4 rounded-xl border border-amber-200/50 mb-4 flex items-start gap-3">
-                            <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
-                            <p class="text-sm text-amber-900 leading-relaxed"><strong class="font-bold">爸爸專屬：</strong>赫爾辛基/羅瓦涅米嚴選素食與中式熱食，確保長輩胃腸溫暖舒適。</p>
+                        <div class="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 mb-5 flex items-start gap-3 backdrop-blur-sm shadow-inner">
+                            <i data-lucide="info" class="w-5 h-5 text-amber-400 shrink-0 mt-0.5 drop-shadow-md"></i>
+                            <p class="text-sm text-amber-100 leading-relaxed font-light"><strong class="font-bold text-amber-400 tracking-wide">爸爸專屬：</strong>赫爾辛基/羅瓦涅米嚴選素食與中式熱食，確保長輩胃腸溫暖舒適。</p>
                         </div>
 
                         <div class="space-y-4">
-                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
-                                <h3 class="font-bold text-lg text-slate-800 mb-1">Golden Bowl Dim Sum</h3>
-                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 羅瓦涅米 聖誕老人村內</p>
-                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 提供獨立 Vegetarian Menu！素豆腐湯麵、炒豆腐蔬菜、素餃子。雪地中喝熱湯首選。(推薦 Day 4 午餐)</p>
-                                <button onclick="openModal('golden_bowl')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                                <h3 class="font-bold text-lg text-white mb-1 tracking-wide">Golden Bowl Dim Sum</h3>
+                                <p class="text-xs text-slate-400 mb-3 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-500"></i> 羅瓦涅米 聖誕老人村內</p>
+                                <p class="text-sm text-slate-300 mb-4 leading-relaxed font-light"><strong class="text-emerald-400 font-bold">素食推薦：</strong> 提供獨立 Vegetarian Menu！素豆腐湯麵、炒豆腐蔬菜、素餃子。雪地中喝熱湯首選。(推薦 Day 4 午餐)</p>
+                                <button onclick="openModal('golden_bowl')" class="w-full text-xs bg-white/5 hover:bg-white/10 text-slate-200 py-3 rounded-xl font-bold border border-white/10 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
                             </div>
 
-                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
-                                <h3 class="font-bold text-lg text-slate-800 mb-1">大中華餐廳 <span class="text-sm font-normal text-slate-500">(Da Zhong Hua)</span></h3>
-                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 羅瓦涅米 市中心</p>
-                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 道地的中式炒青菜、家常豆腐熱炒。(推薦 Day 3 陪病空檔)</p>
-                                <button onclick="openModal('da_zhong_hua')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                                <h3 class="font-bold text-lg text-white mb-1 tracking-wide">大中華餐廳 <span class="text-sm font-normal text-slate-400">(Da Zhong Hua)</span></h3>
+                                <p class="text-xs text-slate-400 mb-3 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-500"></i> 羅瓦涅米 市中心</p>
+                                <p class="text-sm text-slate-300 mb-4 leading-relaxed font-light"><strong class="text-emerald-400 font-bold">素食推薦：</strong> 道地的中式炒青菜、家常豆腐熱炒。(推薦 Day 3 陪病空檔)</p>
+                                <button onclick="openModal('da_zhong_hua')" class="w-full text-xs bg-white/5 hover:bg-white/10 text-slate-200 py-3 rounded-xl font-bold border border-white/10 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
                             </div>
 
-                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
-                                <h3 class="font-bold text-lg text-slate-800 mb-1">美林中餐廳 <span class="text-sm font-normal text-slate-500">(Mei Lin)</span></h3>
-                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 赫爾辛基 市中心</p>
-                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 知名四川餐廳，有「純素專屬菜單」。必點素麻婆豆腐、魚香茄子。(推薦 Day 8 晚餐)</p>
-                                <button onclick="openModal('mei_lin')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                                <h3 class="font-bold text-lg text-white mb-1 tracking-wide">美林中餐廳 <span class="text-sm font-normal text-slate-400">(Mei Lin)</span></h3>
+                                <p class="text-xs text-slate-400 mb-3 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-500"></i> 赫爾辛基 市中心</p>
+                                <p class="text-sm text-slate-300 mb-4 leading-relaxed font-light"><strong class="text-emerald-400 font-bold">素食推薦：</strong> 知名四川餐廳，有「純素專屬菜單」。必點素麻婆豆腐、魚香茄子。(推薦 Day 8 晚餐)</p>
+                                <button onclick="openModal('mei_lin')" class="w-full text-xs bg-white/5 hover:bg-white/10 text-slate-200 py-3 rounded-xl font-bold border border-white/10 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
                             </div>
 
-                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 relative hover:border-emerald-300 transition-colors group">
-                                <h3 class="font-bold text-lg text-slate-800 mb-1">Sen Chay <span class="text-sm font-normal text-slate-500">(越南料理)</span></h3>
-                                <p class="text-xs text-slate-500 mb-3 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> 赫爾辛基 Hakaniemi</p>
-                                <p class="text-sm text-slate-600 mb-4 leading-relaxed"><strong class="text-emerald-600">素食推薦：</strong> 100% 全素餐廳。越式全素河粉湯、素春捲，溫胃首選。(推薦 Day 6 陪病空檔)</p>
-                                <button onclick="openModal('sen_chay')" class="w-full text-xs bg-slate-50 text-slate-700 py-2.5 rounded-xl font-bold border border-slate-200 group-hover:bg-emerald-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
+                            <div class="glass-card p-5 rounded-3xl relative hover:bg-white/10 transition-colors group">
+                                <h3 class="font-bold text-lg text-white mb-1 tracking-wide">Sen Chay <span class="text-sm font-normal text-slate-400">(越南料理)</span></h3>
+                                <p class="text-xs text-slate-400 mb-3 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-500"></i> 赫爾辛基 Hakaniemi</p>
+                                <p class="text-sm text-slate-300 mb-4 leading-relaxed font-light"><strong class="text-emerald-400 font-bold">素食推薦：</strong> 100% 全素餐廳。越式全素河粉湯、素春捲，溫胃首選。(推薦 Day 6 陪病空檔)</p>
+                                <button onclick="openModal('sen_chay')" class="w-full text-xs bg-white/5 hover:bg-white/10 text-slate-200 py-3 rounded-xl font-bold border border-white/10 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看餐廳照片</button>
                             </div>
                         </div>
 
-                        <div class="mt-8 mb-4 flex items-center gap-2">
-                            <div class="h-px bg-slate-200 flex-1"></div>
-                            <h3 class="font-bold text-slate-500 text-xs tracking-widest"><i data-lucide="coffee" class="w-3.5 h-3.5 inline mb-0.5"></i> 其他在地必吃美食</h3>
-                            <div class="h-px bg-slate-200 flex-1"></div>
+                        <div class="mt-8 mb-5 flex items-center gap-3">
+                            <div class="h-px bg-white/20 flex-1"></div>
+                            <h3 class="font-bold text-slate-300 text-xs tracking-[0.2em] uppercase flex items-center gap-1.5"><i data-lucide="coffee" class="w-4 h-4 text-slate-400"></i> 其他必吃美食</h3>
+                            <div class="h-px bg-white/20 flex-1"></div>
                         </div>
                         
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('santa_village')">
-                                <strong class="text-slate-800 text-sm">Santa's Salmon</strong>
-                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">聖誕老人村</p>
-                                <p class="text-slate-600 text-xs leading-relaxed">炭火現烤新鮮鮭魚，極度推薦。</p>
+                        <div class="grid grid-cols-2 gap-3 pb-4">
+                            <div class="glass-card p-4 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-emerald-400/50 transition-all" onclick="openModal('santa_village')">
+                                <strong class="text-white text-sm tracking-wide">Santa's Salmon</strong>
+                                <p class="text-rose-400 text-[10px] mt-1 mb-2 font-bold">聖誕老人村</p>
+                                <p class="text-slate-300 text-xs leading-relaxed font-light">炭火現烤新鮮鮭魚，極度推薦。</p>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('sibelius')">
-                                <strong class="text-slate-800 text-sm">Cafe Regatta</strong>
-                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">西貝流士公園旁</p>
-                                <p class="text-slate-600 text-xs leading-relaxed">芬蘭必吃國民甜點「肉桂捲」。</p>
+                            <div class="glass-card p-4 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-emerald-400/50 transition-all" onclick="openModal('sibelius')">
+                                <strong class="text-white text-sm tracking-wide">Cafe Regatta</strong>
+                                <p class="text-amber-400 text-[10px] mt-1 mb-2 font-bold">西貝流士公園旁</p>
+                                <p class="text-slate-300 text-xs leading-relaxed font-light">芬蘭必吃國民甜點「肉桂捲」。</p>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('old_market')">
-                                <strong class="text-slate-800 text-sm">Soppakeittiö</strong>
-                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">老農貿市場</p>
-                                <p class="text-slate-600 text-xs leading-relaxed">濃郁在地海鮮湯，沾麵包超滿足。</p>
+                            <div class="glass-card p-4 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-emerald-400/50 transition-all" onclick="openModal('old_market')">
+                                <strong class="text-white text-sm tracking-wide">Soppakeittiö</strong>
+                                <p class="text-blue-400 text-[10px] mt-1 mb-2 font-bold">老農貿市場</p>
+                                <p class="text-slate-300 text-xs leading-relaxed font-light">濃郁在地海鮮湯，沾麵包超滿足。</p>
                             </div>
-                            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm cursor-pointer hover:border-emerald-300 transition-colors" onclick="openModal('k_supermarket')">
-                                <strong class="text-slate-800 text-sm">Fazer 巧克力</strong>
-                                <p class="text-slate-400 text-[10px] mt-0.5 mb-1.5">各大當地超市</p>
-                                <p class="text-slate-600 text-xs leading-relaxed">芬蘭國寶，藍色包裝原味必買。</p>
+                            <div class="glass-card p-4 rounded-2xl cursor-pointer hover:bg-white/10 hover:border-emerald-400/50 transition-all" onclick="openModal('k_supermarket')">
+                                <strong class="text-white text-sm tracking-wide">Fazer 巧克力</strong>
+                                <p class="text-indigo-400 text-[10px] mt-1 mb-2 font-bold">各大當地超市</p>
+                                <p class="text-slate-300 text-xs leading-relaxed font-light">芬蘭國寶，藍色包裝原味必買。</p>
                             </div>
                         </div>
                     </div>
@@ -789,46 +832,46 @@
             }
             else if (currentTab === 'medical') {
                 main.innerHTML = `
-                    <div class="space-y-4 fade-in">
-                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2"><i data-lucide="heart-pulse" class="text-rose-600"></i> 醫療洗腎專區</h2>
+                    <div class="space-y-5 fade-in">
+                        <h2 class="text-xl font-bold text-slate-100 mb-5 flex items-center gap-2 tracking-wide"><i data-lucide="heart-pulse" class="text-rose-500 drop-shadow-[0_0_5px_rgba(244,63,94,0.6)]"></i> 醫療洗腎專區</h2>
                         
-                        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm relative overflow-hidden group">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                            <h3 class="font-bold text-slate-800 text-lg">Lapland Central Hospital</h3>
-                            <p class="text-xs font-bold text-rose-600 mt-1 tracking-wide">📍 羅瓦涅米中央醫院</p>
-                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 mt-4 text-sm text-slate-700 space-y-2.5">
-                                <p class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> <strong>4/1 (三) 早上 08:30</strong></p>
-                                <p class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span>從 Apukka Resort 出發約 20 分鐘。<br/><span class="text-rose-600 font-bold block mt-1">⚠️ 務必於 07:45 出發，前晚請飯店叫車。</span></span></p>
+                        <div class="glass-card p-5 rounded-3xl relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-rose-500 to-rose-700 shadow-[0_0_10px_rgba(244,63,94,0.8)]"></div>
+                            <h3 class="font-bold text-white text-lg tracking-wide pl-2">Lapland Central Hospital</h3>
+                            <p class="text-xs font-bold text-rose-400 mt-1 tracking-wider pl-2 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> 羅瓦涅米中央醫院</p>
+                            <div class="glass-card-inner p-4 rounded-2xl mt-4 text-sm text-slate-300 space-y-3 font-light">
+                                <p class="flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400"></i> <strong class="text-white">4/1 (三) 早上 08:30</strong></p>
+                                <p class="flex items-start gap-2"><i data-lucide="navigation" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span>從 Apukka Resort 出發約 20 分鐘。<br/><span class="text-rose-400 font-bold block mt-1.5 bg-rose-500/10 border border-rose-500/20 px-2.5 py-1.5 rounded-lg drop-shadow-md">⚠️ 務必於 07:45 出發，前晚請飯店叫車。</span></span></p>
                             </div>
-                            <button onclick="openModal('lapland_hospital')" class="mt-4 w-full text-xs bg-white text-rose-700 py-2.5 rounded-xl font-bold border border-rose-200 group-hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看醫院外觀照片</button>
+                            <button onclick="openModal('lapland_hospital')" class="mt-4 w-full text-xs bg-white/5 text-rose-300 py-3 rounded-xl font-bold border border-rose-500/30 hover:bg-rose-500/20 transition-all flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看醫院外觀照片</button>
                         </div>
 
-                        <div class="bg-white p-5 rounded-2xl border border-rose-100 shadow-sm relative overflow-hidden group">
-                            <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
-                            <h3 class="font-bold text-slate-800 text-lg">Renalis Suomi Pitäjänmäki</h3>
-                            <p class="text-xs font-bold text-rose-600 mt-1 tracking-wide">📍 赫爾辛基西北區診所</p>
-                            <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-100 mt-4 text-sm text-slate-700 space-y-2.5">
-                                <p class="flex items-start gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span><strong>4/4 (六)</strong> - <span class="text-amber-600 font-bold">週末需確認報到時間</span><br><strong>4/6 (一)</strong> - 依預約時間</span></p>
-                                <p class="flex items-start gap-2"><i data-lucide="map-pin" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> 從 Hilton Strand 出發約 20 分鐘。建議使用 App 叫車。</p>
+                        <div class="glass-card p-5 rounded-3xl relative overflow-hidden group">
+                            <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-rose-500 to-rose-700 shadow-[0_0_10px_rgba(244,63,94,0.8)]"></div>
+                            <h3 class="font-bold text-white text-lg tracking-wide pl-2">Renalis Suomi Pitäjänmäki</h3>
+                            <p class="text-xs font-bold text-rose-400 mt-1 tracking-wider pl-2 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> 赫爾辛基西北區診所</p>
+                            <div class="glass-card-inner p-4 rounded-2xl mt-4 text-sm text-slate-300 space-y-3 font-light">
+                                <p class="flex items-start gap-2"><i data-lucide="calendar" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> <span><strong class="text-white">4/4 (六)</strong> - <span class="text-amber-400 font-bold">週末需確認報到時間</span><br><strong class="text-white mt-1 block">4/6 (一)</strong> - 依預約時間</span></p>
+                                <p class="flex items-start gap-2"><i data-lucide="navigation" class="w-4 h-4 text-slate-400 shrink-0 mt-0.5"></i> 從 Hilton Strand 出發約 20 分鐘。建議使用 App 叫車。</p>
                             </div>
-                            <button onclick="openModal('renalis_clinic')" class="mt-4 w-full text-xs bg-white text-rose-700 py-2.5 rounded-xl font-bold border border-rose-200 group-hover:bg-rose-50 transition-colors flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看診所外觀照片</button>
+                            <button onclick="openModal('renalis_clinic')" class="mt-4 w-full text-xs bg-white/5 text-rose-300 py-3 rounded-xl font-bold border border-rose-500/30 hover:bg-rose-500/20 transition-all flex items-center justify-center gap-1.5"><i data-lucide="image" class="w-4 h-4"></i> 查看診所外觀照片</button>
                         </div>
 
-                        <div class="bg-slate-800 p-5 rounded-2xl shadow-sm mt-6 relative overflow-hidden">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-rose-900/20 to-transparent"></div>
-                            <h3 class="font-bold text-white mb-4 flex items-center gap-2 relative z-10"><i data-lucide="alert-triangle" class="w-5 h-5 text-rose-400"></i> 醫療與孝親守則</h3>
-                            <ul class="text-sm text-slate-300 space-y-4 relative z-10">
+                        <div class="glass-card p-6 rounded-3xl mt-8 relative overflow-hidden">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-rose-900/30 to-transparent"></div>
+                            <h3 class="font-bold text-white mb-5 flex items-center gap-2 relative z-10 tracking-wide"><i data-lucide="alert-triangle" class="w-5 h-5 text-rose-400 drop-shadow-[0_0_5px_rgba(244,63,94,0.6)]"></i> 醫療與孝親守則</h3>
+                            <ul class="text-sm text-slate-200 space-y-4 relative z-10 font-light">
                                 <li class="flex items-start gap-3">
-                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">1</span>
-                                    <p class="leading-relaxed"><strong class="text-white">備妥英文文件：</strong>隨身攜帶台灣主治醫師開立的英文病歷、透析處方箋與用藥清單。</p>
+                                    <span class="w-6 h-6 bg-white/10 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-white/20 backdrop-blur-md shadow-sm">1</span>
+                                    <p class="leading-relaxed"><strong class="text-white font-bold tracking-wide">備妥英文文件：</strong>隨身攜帶台灣主治醫師開立的英文病歷、透析處方箋與用藥清單。</p>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">2</span>
-                                    <p class="leading-relaxed"><strong class="text-white">保暖防寒：</strong>洗腎患者極度怕冷，進出醫院需穿戴防風外套、帽子、手套與羊毛襪。</p>
+                                    <span class="w-6 h-6 bg-white/10 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-white/20 backdrop-blur-md shadow-sm">2</span>
+                                    <p class="leading-relaxed"><strong class="text-white font-bold tracking-wide">保暖防寒：</strong>洗腎患者極度怕冷，進出醫院需穿戴防風外套、帽子、手套與羊毛襪。</p>
                                 </li>
                                 <li class="flex items-start gap-3">
-                                    <span class="w-6 h-6 bg-slate-700 text-white rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-slate-600">3</span>
-                                    <p class="leading-relaxed"><strong class="text-rose-300">行程絕對彈性：</strong>洗腎後容易疲倦、血壓波動。排定的行程皆可隨時取消，以媽媽回飯店躺平休息為第一優先。</p>
+                                    <span class="w-6 h-6 bg-white/10 text-rose-300 rounded-full flex items-center justify-center font-bold shrink-0 text-xs border border-rose-500/30 backdrop-blur-md shadow-[0_0_8px_rgba(244,63,94,0.3)]">3</span>
+                                    <p class="leading-relaxed"><strong class="text-rose-300 font-bold tracking-wide drop-shadow-sm">行程絕對彈性：</strong>洗腎後容易疲倦、血壓波動。排定的行程皆可隨時取消，以媽媽回飯店躺平休息為第一優先。</p>
                                 </li>
                             </ul>
                         </div>
