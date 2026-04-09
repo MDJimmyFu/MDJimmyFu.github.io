@@ -1,0 +1,1686 @@
+{
+  "timestamp": "2026-04-01T15:20:59.998Z",
+  "version": "1.0",
+  "companies": [
+    {
+      "id": "mjjzaccpd2kht8tq8of",
+      "name": "康邁",
+      "bank": "國泰世華",
+      "payday": 5
+    },
+    {
+      "id": "mjjzaccprlamno3cwda",
+      "name": "三美",
+      "bank": "第一銀行",
+      "payday": 5
+    },
+    {
+      "id": "mjjzaccp91ifqzqpb57",
+      "name": "宏安",
+      "bank": "華南銀行",
+      "payday": 5
+    },
+    {
+      "id": "mjjzaccpc38eyoqon3",
+      "name": "季灃",
+      "bank": "第一銀行",
+      "payday": 5
+    },
+    {
+      "id": "mjjzaccppyt9fgzp2wn",
+      "name": "優實",
+      "bank": "中國信託",
+      "payday": 10
+    },
+    {
+      "id": "mjjzaccp3wnwql2rqx1",
+      "name": "實青",
+      "bank": "彰化銀行",
+      "payday": 10
+    },
+    {
+      "id": "mjjzaccp91r2u2d24r",
+      "name": "富爾達",
+      "bank": "第一銀行",
+      "payday": 15
+    },
+    {
+      "id": "mjjzaccpi7ta1r5e6ob",
+      "name": "福安",
+      "bank": "兆豐銀行",
+      "payday": 20
+    },
+    {
+      "id": "mjjzaccpvyx6gzjw1yc",
+      "name": "聖美麗",
+      "bank": "台灣銀行",
+      "payday": 25
+    },
+    {
+      "id": "mjjzaccpiipors1u0ve",
+      "name": "柏樂",
+      "bank": "中國信託",
+      "payday": 30
+    },
+    {
+      "id": "mjjzaccpxoxp006n9p9",
+      "name": "盛順",
+      "bank": "第一銀行",
+      "payday": 30
+    },
+    {
+      "id": "mjjzaccpgp1qgr5uysj",
+      "name": "敏盛",
+      "bank": "王道銀行",
+      "payday": 30
+    },
+    {
+      "id": "mjjzaccphjlzbfoj5t",
+      "name": "南門",
+      "bank": "國泰世華",
+      "payday": 15
+    },
+    {
+      "id": "mjjzaccpi7lblrbgngb",
+      "name": "恆樂",
+      "bank": "合作金庫",
+      "payday": 10
+    },
+    {
+      "id": "mjjzaccpnk4quztkj7",
+      "name": "永煦",
+      "bank": "華南銀行",
+      "payday": "1"
+    },
+    {
+      "id": "mjk03e2wsupeh2vm3h",
+      "name": "樂欣",
+      "bank": "華南銀行",
+      "payday": "10"
+    },
+    {
+      "id": "mjk2cuscnuvxloz1wq",
+      "name": "冠緁",
+      "bank": "國泰世華",
+      "payday": "10"
+    }
+  ],
+  "entries": {
+    "2025-06-02": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-03": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "3",
+        "salary": "7200"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-04": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-06-05": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-06": {
+      "am": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-09": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-10": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-11": {
+      "am": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-06-12": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-13": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-06-16": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "9500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-17": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-18": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjk03e2wsupeh2vm3h",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-06-19": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-20": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-06-23": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-24": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-25": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-26": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-27": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-06-30": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-01": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-02": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-07-03": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-04": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccprlamno3cwda",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-07-07": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-08": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-09": {
+      "am": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpnk4quztkj7",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-07-11": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-14": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-15": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-16": {
+      "am": {
+        "companyId": "mjk2cuscnuvxloz1wq",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-07-17": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-18": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-07-22": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-23": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-07-24": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-25": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-28": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-29": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-07-30": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-07-31": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-01": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-08-04": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-05": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-06": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "night": null
+    },
+    "2025-08-07": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-08": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-08-11": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-12": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-13": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjk2cuscnuvxloz1wq",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "night": null
+    },
+    "2025-08-14": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-15": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-08-18": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-19": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-20": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-08-21": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-22": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-08-25": {
+      "am": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-08-26": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-04": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-05": {
+      "am": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-09-08": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-09": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-10": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-09-11": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-12": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": {
+        "companyId": "mjk03e2wsupeh2vm3h",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-09-15": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-16": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-17": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpnk4quztkj7",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-09-19": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-22": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-23": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-24": {
+      "am": {
+        "companyId": "mjjzaccprlamno3cwda",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-25": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-09-26": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-01": {
+      "am": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-10-02": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-03": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-10-07": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-08": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-10-09": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-13": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-14": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-15": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "night": null
+    },
+    "2025-10-16": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-17": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-10-20": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-22": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-10-23": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-27": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-28": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-29": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-10-30": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-10-31": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-03": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-04": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-05": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-11-06": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-07": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "night": null
+    },
+    "2025-11-10": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-12": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-11-13": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-14": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-11-17": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-19": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpnk4quztkj7",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-11-20": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-21": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-11-24": {
+      "am": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-25": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-26": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-11-27": {
+      "am": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-11-28": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-12-01": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-02": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-03": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-12-04": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-05": {
+      "am": {
+        "companyId": "mjk03e2wsupeh2vm3h",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-12-08": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-09": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-10": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "night": null
+    },
+    "2025-12-11": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-12": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-12-15": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-16": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-17": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2025-12-18": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-19": {
+      "am": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp91r2u2d24r",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2025-12-24": {
+      "am": {
+        "companyId": "mjk03e2wsupeh2vm3h",
+        "hours": "2",
+        "salary": "7000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-26": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "4",
+        "salary": "12000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-29": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-30": {
+      "am": {
+        "companyId": "mjjzaccpgp1qgr5uysj",
+        "hours": "3",
+        "salary": "7500"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2025-12-31": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2026-01-02": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-05": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-07": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "3",
+        "salary": "8000"
+      },
+      "night": null
+    },
+    "2026-01-08": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-09": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2026-01-12": {
+      "am": {
+        "companyId": "mjjzaccp91ifqzqpb57",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-13": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-14": {
+      "am": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-15": {
+      "am": {
+        "companyId": "mjjzaccpi7lblrbgngb",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-16": {
+      "am": {
+        "companyId": "mjjzaccpi7ta1r5e6ob",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccpvyx6gzjw1yc",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    },
+    "2026-01-20": {
+      "am": {
+        "companyId": "mjjzaccphjlzbfoj5t",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": null,
+      "night": null
+    },
+    "2026-01-21": {
+      "am": {
+        "companyId": "mjjzaccppyt9fgzp2wn",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccp3wnwql2rqx1",
+        "hours": "3",
+        "salary": "9000"
+      },
+      "night": null
+    },
+    "2026-01-23": {
+      "am": {
+        "companyId": "mjjzaccpd2kht8tq8of",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "pm": {
+        "companyId": "mjjzaccprlamno3cwda",
+        "hours": "2",
+        "salary": "6000"
+      },
+      "night": null
+    }
+  },
+  "receivedStatus": {
+    "2025-06-mjjzaccpi7ta1r5e6ob": true,
+    "2025-06-mjjzaccphjlzbfoj5t": true,
+    "2025-06-mjjzaccpd2kht8tq8of": true,
+    "2025-06-mjjzaccp91ifqzqpb57": true,
+    "2025-06-mjk03e2wsupeh2vm3h": true,
+    "2025-06-mjjzaccppyt9fgzp2wn": true,
+    "2025-06-mjjzaccp3wnwql2rqx1": true,
+    "2025-06-mjjzaccp91r2u2d24r": true,
+    "2025-06-mjjzaccpgp1qgr5uysj": true,
+    "2025-06-mjjzaccpvyx6gzjw1yc": true,
+    "2025-07-mjjzaccppyt9fgzp2wn": true,
+    "2025-07-mjjzaccpgp1qgr5uysj": true,
+    "2025-07-mjjzaccpvyx6gzjw1yc": true,
+    "2025-07-mjjzaccpi7ta1r5e6ob": true,
+    "2025-07-mjk2cuscnuvxloz1wq": true,
+    "2025-07-mjjzaccphjlzbfoj5t": true,
+    "2025-07-mjjzaccpd2kht8tq8of": true,
+    "2025-07-mjjzaccprlamno3cwda": true,
+    "2025-07-mjjzaccp91r2u2d24r": true,
+    "2025-07-mjjzaccpnk4quztkj7": true,
+    "2025-07-mjjzaccp91ifqzqpb57": true,
+    "2025-07-mjjzaccp3wnwql2rqx1": true,
+    "2025-08-mjjzaccppyt9fgzp2wn": true,
+    "2025-08-mjjzaccpgp1qgr5uysj": true,
+    "2025-08-mjjzaccpvyx6gzjw1yc": true,
+    "2025-08-mjjzaccpi7ta1r5e6ob": true,
+    "2025-08-mjjzaccpd2kht8tq8of": true,
+    "2025-08-mjk2cuscnuvxloz1wq": true,
+    "2025-08-mjjzaccphjlzbfoj5t": true,
+    "2025-08-mjjzaccp91r2u2d24r": true,
+    "2025-08-mjjzaccp91ifqzqpb57": true,
+    "2025-08-mjjzaccp3wnwql2rqx1": true,
+    "2025-09-mjjzaccppyt9fgzp2wn": true,
+    "2025-09-mjjzaccpgp1qgr5uysj": true,
+    "2025-09-mjjzaccpvyx6gzjw1yc": true,
+    "2025-09-mjjzaccpd2kht8tq8of": true,
+    "2025-09-mjjzaccphjlzbfoj5t": true,
+    "2025-09-mjjzaccpi7ta1r5e6ob": true,
+    "2025-09-mjjzaccp91r2u2d24r": true,
+    "2025-09-mjjzaccprlamno3cwda": true,
+    "2025-09-mjk03e2wsupeh2vm3h": true,
+    "2025-09-mjjzaccpnk4quztkj7": true,
+    "2025-09-mjjzaccp91ifqzqpb57": true,
+    "2025-09-mjjzaccp3wnwql2rqx1": true,
+    "2025-10-mjjzaccpgp1qgr5uysj": true,
+    "2025-10-mjjzaccpvyx6gzjw1yc": true,
+    "2025-10-mjjzaccpi7ta1r5e6ob": true,
+    "2025-10-mjjzaccpd2kht8tq8of": true,
+    "2025-10-mjjzaccphjlzbfoj5t": true,
+    "2025-10-mjjzaccp91r2u2d24r": true,
+    "2025-10-mjjzaccp91ifqzqpb57": true,
+    "2025-10-mjjzaccp3wnwql2rqx1": true,
+    "2025-11-mjjzaccppyt9fgzp2wn": true,
+    "2025-11-mjjzaccpi7ta1r5e6ob": true,
+    "2025-11-mjjzaccpd2kht8tq8of": true,
+    "2025-11-mjjzaccphjlzbfoj5t": true,
+    "2025-11-mjjzaccp91r2u2d24r": true,
+    "2025-11-mjjzaccp91ifqzqpb57": true,
+    "2025-11-mjjzaccpnk4quztkj7": true,
+    "2025-11-mjjzaccp3wnwql2rqx1": true
+  }
+}

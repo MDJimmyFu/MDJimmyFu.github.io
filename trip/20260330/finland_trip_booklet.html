@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>芬蘭極光家族之旅 行程小書</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Noto+Serif+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF;
+  --surface:#F8FBFD;
+  --text:#263238;
+  --muted:#78909C;
+  --accent:#26C6DA;
+  --accent2:#AB47BC;
+  --accent-lt:#E0F7FA;
+  --accent2-lt:#F3E5F5;
+  --warn:#E65100;
+  --warn-lt:#FFF3E0;
+  --red:#C62828;
+  --red-lt:#FFEBEE;
+  --border:rgba(38,198,218,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Lora','Noto Serif TC',serif;
+  color:var(--text);
+  background:#DDE3E8;
+  font-size:8.5pt;
+  line-height:1.7;
+  -webkit-print-color-adjust:exact;
+  print-color-adjust:exact;
+}
+@page{size:A4;margin:0}
+.page{
+  width:210mm;
+  height:297mm;
+  position:relative;
+  overflow:hidden;
+  background:var(--bg);
+  page-break-after:always;
+  break-after:page;
+  break-inside:avoid;
+  display:block;
+  margin:0 auto 8px;
+}
+.page:last-of-type{page-break-after:auto;break-after:auto}
+.blob{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  opacity:0.35;
+}
+
+/* ─── COVER ─── */
+.cover{background:#FFFFFF}
+.cover-inner{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  z-index:2;padding:16mm 18mm;
+}
+.cover-deco-arcs{position:absolute;top:0;right:0;width:100mm;height:100mm;z-index:1;overflow:hidden;pointer-events:none}
+.arc{position:absolute;border-radius:50%;top:0;right:0;transform:translate(30%,-30%)}
+.arc-1{width:70mm;height:70mm;border:1px solid rgba(38,198,218,0.28)}
+.arc-2{width:98mm;height:98mm;border:1px solid rgba(38,198,218,0.16)}
+.arc-3{width:126mm;height:126mm;border:1px solid rgba(171,71,188,0.12)}
+.arc-4{width:154mm;height:154mm;border:1px solid rgba(38,198,218,0.08)}
+.cover-bottom-arc{position:absolute;bottom:0;left:0;width:60mm;height:60mm;z-index:1;overflow:hidden;pointer-events:none}
+.arc-bl{position:absolute;border-radius:50%;bottom:0;left:0;transform:translate(-30%,30%)}
+.arc-bl-1{width:55mm;height:55mm;border:1px solid rgba(171,71,188,0.18)}
+.arc-bl-2{width:80mm;height:80mm;border:1px solid rgba(171,71,188,0.1)}
+.cover-eyebrow{
+  font-family:'Montserrat',sans-serif;
+  font-size:6pt;color:var(--accent);font-weight:600;
+  letter-spacing:4px;text-transform:uppercase;margin-bottom:8mm;
+}
+.cover-title{
+  font-family:'Lora',serif;
+  font-size:28pt;font-weight:700;color:var(--text);
+  line-height:1.15;margin-bottom:2mm;text-align:center;
+}
+.cover-sub{
+  font-family:'Lora',serif;
+  font-size:12pt;font-weight:400;color:var(--muted);
+  letter-spacing:5px;margin-bottom:9mm;
+}
+.cover-bar{
+  width:36mm;height:1.5px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  margin:0 auto 9mm;
+}
+.cover-dates{
+  font-family:'Montserrat',sans-serif;
+  font-size:10pt;font-weight:300;color:var(--text);margin-bottom:2mm;letter-spacing:2px;
+}
+.cover-nights{
+  font-family:'Montserrat',sans-serif;
+  font-size:8pt;color:var(--muted);margin-bottom:10mm;letter-spacing:1px;
+}
+.cover-members{
+  display:grid;grid-template-columns:1fr 1fr;gap:3mm 14mm;
+  text-align:left;padding-top:6mm;
+  border-top:1px solid rgba(38,198,218,0.2);width:100%;max-width:130mm;
+}
+.cover-member{display:flex;flex-direction:column;gap:0.8mm}
+.cover-member .name{font-family:'Lora',serif;font-weight:700;font-size:9pt;color:var(--text)}
+.cover-member .role{font-family:'Montserrat',sans-serif;font-size:7pt;color:var(--muted)}
+.cover-tagline{margin-top:9mm;font-family:'Montserrat',sans-serif;font-size:6.5pt;color:var(--muted);letter-spacing:1.5px;text-align:center}
+
+/* ─── CONTENT WRAPPER ─── */
+.content{position:relative;z-index:1;padding:12mm 14mm 16mm}
+
+/* ─── PAGE HEADER BAND ─── */
+.page-band{
+  border-top:2px solid var(--accent);
+  padding:4mm 0 4.5mm 0;
+  margin-bottom:6mm;
+}
+.page-band .pblabel{
+  font-family:'Montserrat',sans-serif;
+  font-size:6pt;color:var(--accent);font-weight:600;
+  letter-spacing:3px;text-transform:uppercase;margin-bottom:1.5mm;
+}
+.page-band h1{
+  font-family:'Lora',serif;
+  font-size:14pt;font-weight:400;color:var(--text);line-height:1.2;
+}
+.page-band p{font-family:'Montserrat',sans-serif;font-size:8pt;color:var(--muted);margin-top:1mm}
+
+/* ─── DAY HEADER ─── */
+.day-header{display:flex;align-items:center;gap:4mm;margin-bottom:6mm}
+.day-num{
+  background:var(--text);color:#fff;
+  border-radius:8px;padding:2.5mm 5mm;
+  font-family:'Montserrat',sans-serif;font-size:7.5pt;font-weight:600;
+  white-space:nowrap;line-height:1.2;text-align:center;
+}
+.day-num .dn{font-size:11pt;display:block}
+.day-title{font-family:'Lora',serif;font-size:13pt;font-weight:400;color:var(--text);flex:1;line-height:1.3}
+.day-date{font-family:'Montserrat',sans-serif;font-size:7.5pt;color:var(--muted)}
+.day-location{font-family:'Montserrat',sans-serif;font-size:7pt;color:var(--muted);margin-top:0.5mm}
+
+/* ─── CARD ─── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:6px;
+  padding:4mm 5mm;
+  margin-bottom:4mm;
+  page-break-inside:avoid;
+  break-inside:avoid;
+}
+.card-head{
+  font-family:'Montserrat',sans-serif;
+  font-size:8pt;font-weight:600;color:var(--accent);
+  margin-bottom:2.5mm;padding-bottom:2mm;
+  border-bottom:1px solid rgba(38,198,218,0.15);
+  display:flex;align-items:center;gap:2mm;
+}
+.card-head .icon{font-size:10pt}
+
+/* ─── TABLES ─── */
+table{width:100%;border-collapse:collapse;font-size:7.8pt;margin-bottom:0}
+thead tr{background:rgba(38,198,218,0.06)}
+th{
+  text-align:left;padding:2mm 3mm;
+  color:var(--accent);
+  font-family:'Montserrat',sans-serif;font-weight:600;font-size:7pt;
+  letter-spacing:0.3px;
+  border-bottom:1.5px solid rgba(38,198,218,0.2);white-space:nowrap;
+}
+td{padding:2mm 3mm;border-bottom:1px solid rgba(38,50,56,0.06);vertical-align:top;line-height:1.6}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(38,198,218,0.04)}
+.tbl-time{font-family:'Montserrat',sans-serif;font-weight:600;color:var(--accent);white-space:nowrap;width:20mm;font-size:7.5pt}
+.tbl-c1{white-space:nowrap;width:24mm}
+
+/* ─── ALERTS ─── */
+.alert{border-radius:5px;padding:2.5mm 3.5mm;margin-bottom:3mm;font-size:7.8pt;line-height:1.55;page-break-inside:avoid;break-inside:avoid}
+.alert-w{background:var(--warn-lt);border-left:3px solid var(--warn)}
+.alert-i{background:var(--accent-lt);border-left:3px solid var(--accent)}
+.alert-r{background:var(--red-lt);border-left:3px solid var(--red);color:var(--red)}
+.alert strong{font-weight:600}
+.alert em{font-style:normal;color:var(--warn);font-weight:600}
+
+/* ─── ATTRACTION ─── */
+.attn{
+  background:var(--bg);
+  border-radius:6px;
+  padding:3mm 4mm;
+  margin-bottom:3mm;
+  border:1px solid var(--border);
+  border-top:2px solid var(--accent2);
+  page-break-inside:avoid;break-inside:avoid;
+}
+.attn-head{font-family:'Lora',serif;font-size:9pt;font-weight:700;color:var(--text);margin-bottom:1mm;line-height:1.3}
+.attn-meta{font-family:'Montserrat',sans-serif;font-size:7pt;color:var(--muted);margin-bottom:1.5mm;display:flex;gap:4mm;flex-wrap:wrap}
+.attn-meta span{display:flex;align-items:center;gap:1mm}
+.attn p{font-size:7.8pt;line-height:1.55}
+.attn ul{padding-left:0;margin-top:1.5mm}
+.attn ul li{font-size:7.8pt;line-height:1.55;margin-bottom:0.8mm;list-style:none;padding-left:4mm;position:relative}
+.attn ul li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-size:7pt;top:1px}
+
+/* ─── TAGS ─── */
+.tag{display:inline-block;padding:0.5mm 2mm;border-radius:3px;font-family:'Montserrat',sans-serif;font-size:6.5pt;font-weight:600;margin-right:1mm}
+.tag-b{background:var(--accent-lt);color:var(--accent)}
+.tag-w{background:var(--warn-lt);color:var(--warn)}
+.tag-r{background:var(--red-lt);color:var(--red)}
+.tag-g{background:#E8F5E9;color:#2E7D32}
+
+/* ─── MISC ─── */
+.divider{height:1px;background:rgba(38,198,218,0.18);margin:4mm 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm;page-break-inside:avoid;break-inside:avoid}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3mm;page-break-inside:avoid;break-inside:avoid}
+.section-title{
+  font-family:'Montserrat',sans-serif;font-size:7.5pt;font-weight:600;
+  color:var(--text);margin-bottom:2.5mm;
+  display:flex;align-items:center;gap:2mm;letter-spacing:0.3px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:rgba(38,198,218,0.2)}
+.muted{color:var(--muted)}
+.accent{color:var(--accent);font-weight:600}
+.warn{color:var(--warn);font-weight:600}
+.small{font-size:7.5pt}
+.page-foot{
+  position:absolute;bottom:7mm;left:14mm;right:14mm;
+  display:flex;justify-content:space-between;align-items:center;
+  font-family:'Montserrat',sans-serif;font-size:6.5pt;color:var(--muted);
+  border-top:1px solid rgba(38,198,218,0.15);padding-top:2mm;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 0 ─ COVER
+═══════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-deco-arcs">
+    <div class="arc arc-1"></div>
+    <div class="arc arc-2"></div>
+    <div class="arc arc-3"></div>
+    <div class="arc arc-4"></div>
+  </div>
+  <div class="cover-bottom-arc">
+    <div class="arc-bl arc-bl-1"></div>
+    <div class="arc-bl arc-bl-2"></div>
+  </div>
+  <div class="cover-inner">
+    <div class="cover-eyebrow">Finland Family Journey · 2026</div>
+    <div class="cover-title">芬蘭極光<br>家族之旅</div>
+    <div class="cover-sub">行程小書</div>
+    <div class="cover-bar"></div>
+    <div class="cover-dates">2026 · 03 · 29 — 04 · 08</div>
+    <div class="cover-nights">11 天 10 夜 &nbsp;·&nbsp; 羅瓦尼米 &nbsp;×&nbsp; 赫爾辛基</div>
+    <div class="cover-members">
+      <div class="cover-member"><span class="name">傅俊銜 Jimmy</span><span class="role">主辦 · 訂位 DDQ5E4</span></div>
+      <div class="cover-member"><span class="name">陳穎思</span><span class="role">太太 · 訂位 FPBJ9T</span></div>
+      <div class="cover-member"><span class="name">傅寶瑞</span><span class="role">爸爸 · 素食 · DDQ5E4</span></div>
+      <div class="cover-member"><span class="name">楊麗卿</span><span class="role">媽媽 · 洗腎 · DDQ5E4</span></div>
+    </div>
+    <div class="cover-tagline">Aurora Borealis &nbsp;·&nbsp; Arctic Circle &nbsp;·&nbsp; Helsinki Design District</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 1 ─ 旅客 & 航班
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:150mm;height:120mm;background:radial-gradient(ellipse,rgba(38,198,218,0.10) 0%,transparent 70%);top:-20mm;right:-20mm"></div>
+  <div class="blob" style="width:100mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.07) 0%,transparent 70%);bottom:20mm;left:-10mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Overview</div><h1>旅客與航班總覽</h1></div>
+
+    <div class="section-title"><span>👥</span> 旅客資料</div>
+    <div class="card" style="margin-bottom:5mm">
+      <table>
+        <thead><tr><th>姓名</th><th>身份</th><th>訂位代號</th><th>返回機場</th></tr></thead>
+        <tbody>
+          <tr><td><strong>傅俊銜（Jimmy）</strong></td><td>主辦</td><td class="accent">DDQ5E4</td><td>台北松山 TSA</td></tr>
+          <tr><td><strong>陳穎思</strong></td><td>太太</td><td class="accent">FPBJ9T</td><td>台北桃園 TPE</td></tr>
+          <tr><td><strong>傅寶瑞</strong></td><td>爸爸（素食）</td><td class="accent">DDQ5E4</td><td>台北松山 TSA</td></tr>
+          <tr><td><strong>楊麗卿</strong></td><td>媽媽（洗腎）</td><td class="accent">DDQ5E4</td><td>台北松山 TSA</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span>✈️</span> 航班總覽</div>
+    <div class="card" style="margin-bottom:4mm">
+      <table>
+        <thead><tr><th>日期</th><th>航班</th><th>旅客</th><th>出發</th><th>→</th><th>抵達</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td>3/30</td><td><strong>JL5040</strong></td><td>全員</td><td>桃園T2 <strong>16:25</strong></td><td>→</td><td>成田T2 <strong>20:50</strong></td><td>華航運營</td></tr>
+          <tr><td>3/30</td><td><strong>JL6801</strong></td><td>全員</td><td>成田T2 <strong>23:05</strong></td><td>→</td><td>赫爾辛基 <strong>05:55+1</strong></td><td>Finnair · 機上過夜</td></tr>
+          <tr><td>3/31</td><td><strong>AY0533</strong></td><td>全員</td><td>HEL <strong>12:20</strong></td><td>→</td><td>RVN <strong>13:35</strong></td><td><span class="tag tag-w">⚠ 最晚報到 11:35</span></td></tr>
+          <tr><td>4/3</td><td><strong>AY0536</strong></td><td>全員</td><td>RVN <strong>17:55</strong></td><td>→</td><td>HEL <strong>19:10</strong></td><td><span class="tag tag-w">⚠ 最晚報到 17:10</span></td></tr>
+          <tr><td>4/7</td><td><strong>JL6800</strong></td><td><span class="tag tag-r">陳穎思</span></td><td>HEL <strong>17:45</strong></td><td>→</td><td>成田T2 <strong>13:05+1</strong></td><td>Finnair 運營</td></tr>
+          <tr><td>4/7</td><td><strong>JL0048</strong></td><td>Jimmy · 爸爸 · 媽媽</td><td>HEL <strong>17:55</strong></td><td>→</td><td>羽田T3 <strong>13:55+1</strong></td><td>JAL 運營</td></tr>
+          <tr><td>4/8</td><td><strong>JL0809</strong></td><td><span class="tag tag-r">陳穎思</span></td><td>成田T2 <strong>18:05</strong></td><td>→</td><td>桃園T2 <strong>20:45</strong></td><td></td></tr>
+          <tr><td>4/8</td><td><strong>JL0099</strong></td><td>Jimmy · 爸爸 · 媽媽</td><td>羽田T3 <strong>18:25</strong></td><td>→</td><td>松山T1 <strong>20:50</strong></td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="alert alert-r">
+      <strong>⚠ 重要：返程分開搭機</strong> 陳穎思（太太）走不同班次，經東京成田返台桃園；Jimmy、爸爸、媽媽經東京羽田返台松山。4/7 在赫爾辛基機場需分開排隊報到，太太需提前 10 分鐘出發前往 JL6800 報到櫃台。
+    </div>
+
+    <div class="section-title" style="margin-top:4mm"><span>🏨</span> 住宿總覽</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>飯店</th><th>期間</th><th>訂單</th><th>備註</th></tr></thead>
+        <tbody>
+          <tr><td><strong>諾富特台桃園機場酒店</strong></td><td>3/29–3/30（1晚）</td><td>55756870</td><td>僅 Jimmy 入住</td></tr>
+          <tr><td><strong>Apukka Resort</strong>（羅瓦尼米）</td><td>3/31–4/3（3晚）</td><td>UCVLKBY</td><td>含早餐・接送・2次活動</td></tr>
+          <tr><td><strong>Hilton Helsinki Strand</strong></td><td>4/3–4/7（4晚）</td><td>3425467611</td><td>Twin海景·鑽石卡行政廊·4/7延遲退房</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>01</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 2 ─ 醫療 & 行李
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.09) 0%,transparent 70%);top:10mm;right:-15mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Medical & Luggage</div><h1>醫療安排 ∙ 行李 ∙ 重要提醒</h1></div>
+
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🏥</span> 醫療排程</div>
+        <div class="card">
+          <table>
+            <thead><tr><th>日期</th><th>地點</th><th>注意</th></tr></thead>
+            <tbody>
+              <tr><td>3/30 早</td><td>台北（出發前）</td><td>班機 16:25，時間充裕</td></tr>
+              <tr><td><strong>4/1</strong></td><td><strong>Lapland Central Hospital</strong><br><span class="small muted">Porokatu 32, 96400 Rovaniemi</span><br><span class="small muted">☎ +358 40 192 5242 · 聯絡人：Jaakko</span></td><td><strong>08:30</strong><br>前晚代叫計程車</td></tr>
+              <tr><td><strong>4/4</strong></td><td><strong>Renalis Suomi</strong><br><span class="small muted">Takomotie 7, 00380 Helsinki</span><br><span class="small muted">☎ +358 50 475 1821</span><br><span class="small muted">聯絡人：Sirkku Sayeed-Väisänen</span></td><td><strong>07:45</strong></td></tr>
+              <tr><td><strong>4/6</strong></td><td><strong>Renalis Suomi</strong><br><span class="small muted">Takomotie 7, 00380 Helsinki</span><br><span class="small muted">☎ +358 50 475 1821</span><br><span class="small muted">聯絡人：Sirkku Sayeed-Väisänen</span></td><td><strong>07:45</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>🧳</span> 行李額度</div>
+        <div class="card">
+          <table>
+            <thead><tr><th>航程</th><th>托運</th><th>隨身</th></tr></thead>
+            <tbody>
+              <tr><td>JAL 國際線</td><td><strong>3 件</strong><br><span class="small muted">每件 23 kg</span></td><td>1+1</td></tr>
+              <tr><td>Finnair 國內線<br><span class="small muted">HEL↔RVN</span></td><td><strong>1 件</strong><br><span class="small muted">23 kg</span></td><td>1+1</td></tr>
+            </tbody>
+          </table>
+          <div class="alert alert-w" style="margin-top:3mm;margin-bottom:0">超過 1 件托運行李於 HEL 機場須重新辦理，預留時間。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>💊</span> 媽媽（洗腎患者）特別注意事項</div>
+    <div class="card">
+      <div class="grid2">
+        <ul class="attn" style="list-style:none;padding:0;margin:0;background:transparent;border:none">
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:2mm;line-height:1.5"><span style="position:absolute;left:0;color:var(--red)">●</span><strong>嚴禁使用桑拿</strong>——高溫大量出汗造成脫水及電解質失衡，危及生命</li>
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:2mm;line-height:1.5"><span style="position:absolute;left:0;color:var(--red)">●</span>洗腎後請護理站協助叫車，<strong>立即返回飯店</strong>，不在外吹風</li>
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:2mm;line-height:1.5"><span style="position:absolute;left:0;color:var(--warn)">●</span>攜帶<strong>中英文雙語病歷</strong>及藥物清單</li>
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:0;line-height:1.5"><span style="position:absolute;left:0;color:var(--warn)">●</span>飲水量依診所指示嚴格控制</li>
+        </ul>
+        <ul class="attn" style="list-style:none;padding:0;margin:0;background:transparent;border:none">
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:2mm;line-height:1.5"><span style="position:absolute;left:0;color:var(--accent)">●</span>低溫使體溫調節能力更差，外出必戴帽子手套</li>
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:2mm;line-height:1.5"><span style="position:absolute;left:0;color:var(--accent)">●</span>避免大量食用高鉀食材（香蕉、橘子、深色蔬菜）</li>
+          <li style="font-size:7.8pt;padding-left:4mm;position:relative;margin-bottom:0;line-height:1.5"><span style="position:absolute;left:0;color:var(--accent)">●</span>洗腎後請護理站協助叫車，勿在外等車吹風</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>🎒</span> 媽媽保暖裝備清單</div>
+    <div class="card">
+      <div class="grid3">
+        <div style="font-size:7.8pt"><strong style="color:var(--accent);display:block;margin-bottom:1.5mm">必備</strong>
+          <div style="margin-bottom:1mm">▸ 羊毛內層衣褲（禁棉質）</div>
+          <div style="margin-bottom:1mm">▸ 羽絨中層外套</div>
+          <div>▸ 防風防水大衣</div>
+        </div>
+        <div style="font-size:7.8pt"><strong style="color:var(--accent);display:block;margin-bottom:1.5mm">腳部</strong>
+          <div style="margin-bottom:1mm">▸ 防水保暖防滑靴</div>
+          <div style="margin-bottom:1mm">▸ 羊毛厚襪（多帶幾雙）</div>
+          <div>▸ 暖暖包（口袋備用）</div>
+        </div>
+        <div style="font-size:7.8pt"><strong style="color:var(--accent);display:block;margin-bottom:1.5mm">頭頸</strong>
+          <div style="margin-bottom:1mm">▸ 覆蓋耳朵的羊毛帽</div>
+          <div style="margin-bottom:1mm">▸ 圍巾或頸圍</div>
+          <div>▸ 防風手套（備兩雙）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>📱</span> 必備 App</div>
+    <div class="card" style="margin-bottom:0;padding:2mm 3mm">
+      <table style="font-size:7.5pt;width:100%;border-collapse:collapse">
+        <tbody>
+          <tr>
+            <td style="padding:1.5mm 2mm 1.5mm 0;width:28%;vertical-align:top"><strong>🚌 HSL App</strong></td>
+            <td style="padding:1.5mm 2mm 1.5mm 0;width:44%;vertical-align:top;color:var(--muted)">赫爾辛基交通購票，比機器便宜</td>
+            <td style="padding:1.5mm 0 1.5mm 2mm;width:28%;vertical-align:top"><strong>🚕 Taksi Helsinki</strong></td>
+          </tr>
+          <tr style="border-top:1px solid var(--border)">
+            <td style="padding:1.5mm 2mm 1.5mm 0;vertical-align:top"><strong>🌌 Aurora Alert</strong></td>
+            <td style="padding:1.5mm 2mm 1.5mm 0;vertical-align:top;color:var(--muted)">Kp 即時推送，抵達即設 Kp≥3 通知</td>
+            <td style="padding:1.5mm 0 1.5mm 2mm;vertical-align:top"><strong>🗺 Google Maps</strong></td>
+          </tr>
+          <tr style="border-top:1px solid var(--border)">
+            <td style="padding:1.5mm 2mm 1.5mm 0;vertical-align:top"><strong>🌐 Google 翻譯</strong></td>
+            <td style="padding:1.5mm 2mm 1.5mm 0;vertical-align:top;color:var(--muted)">拍照翻譯芬蘭語菜單</td>
+            <td style="padding:1.5mm 0 1.5mm 2mm;vertical-align:top"><strong>💳 Wise / Revolut</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>02</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 3 ─ Day 1–2 出發
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:120mm;height:90mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-10mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">1</span>Day</div>
+      <div><div class="day-title">桃園 — 出發前夜</div><div class="day-date">2026 / 03 / 29（日）</div><div class="day-location">📍 桃園機場酒店</div></div>
+    </div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">下午</td><td>飯店免費機場接駁，確認班次</td></tr>
+          <tr><td class="tbl-time">15:00</td><td>入住 <strong>諾富特台桃園機場酒店</strong>（訂單：55756870）</td></tr>
+          <tr><td class="tbl-time">晚上</td><td>養足精神，準備長途旅程。今晚僅 Jimmy 一人，隔日父母 14:00 於機場會合</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="day-header">
+      <div class="day-num"><span class="dn">2</span>Day</div>
+      <div><div class="day-title">台北 → 東京成田 → 飛行中</div><div class="day-date">2026 / 03 / 30（一）</div><div class="day-location">📍 桃園機場 → 成田機場 → 機上</div></div>
+    </div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">早上</td><td>媽媽於台北完成洗腎（班機 16:25，時間充裕）</td></tr>
+          <tr><td class="tbl-time"><strong>14:00</strong></td><td><strong>桃園機場 T2 集合</strong>，辦理 JAL 報到與托運手續（辦理 JL5040）</td></tr>
+          <tr><td class="tbl-time">16:25</td><td>✈️ <strong>JL5040</strong> 桃園 T2 → 東京成田 T2，抵達 20:50（華航營運）</td></tr>
+          <tr><td class="tbl-time">轉機中</td><td>成田機場免稅購物 🛒 白色戀人、Royce 生巧克力<br><span class="small muted">轉機時間約 2 小時 15 分，抵達即申請輪椅服務協助媽媽，需重新通過安檢</span></td></tr>
+          <tr><td class="tbl-time">23:05</td><td>✈️ <strong>JL6801</strong> 成田 T2 → 赫爾辛基（機上過夜），翌日 05:55 抵達</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="grid2" style="margin-top:0">
+      <div class="alert alert-i">備好頸枕、毯子，夜間飛行長輩需特別照顧。建議上機後立即調整手錶為芬蘭時間（台灣 −5 小時）。</div>
+      <div class="alert alert-w"><em>⚠ 注意</em> 轉機需重新通過安檢，提醒長輩隨身液體規定（≤100ml，放入透明密封袋）。</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title"><span>🛒</span> 成田機場推薦購買</div>
+    <div class="card">
+      <div class="grid3">
+        <div style="font-size:7.8pt"><strong style="color:var(--accent)">白色戀人</strong><br>北海道奶油餅乾夾心，鐵盒裝送禮首選</div>
+        <div style="font-size:7.8pt"><strong style="color:var(--accent)">Royce 生巧克力</strong><br>需冷藏，注意後段行程保存</div>
+        <div style="font-size:7.8pt"><strong style="color:var(--accent)">日式零食補充</strong><br>飛機餐補充，長輩易消化零食</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>03</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 4 ─ Day 3 抵達羅瓦尼米
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:160mm;height:120mm;background:radial-gradient(ellipse,rgba(38,198,218,0.11) 0%,transparent 70%);top:-20mm;left:-20mm"></div>
+  <div class="blob" style="width:100mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.06) 0%,transparent 70%);bottom:30mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">3</span>Day</div>
+      <div><div class="day-title">赫爾辛基 → 羅瓦尼米 — 抵達拉普蘭</div><div class="day-date">2026 / 03 / 31（二）</div><div class="day-location">📍 HEL → RVN → Apukka Resort</div></div>
+    </div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">05:55</td><td>抵達赫爾辛基萬塔機場（HEL）</td></tr>
+          <tr><td class="tbl-time">06:00–11:00</td><td>機場內享用早餐、讓長輩充分休息 🛒 Moomin 嚕嚕米、肉桂卷在此購買</td></tr>
+          <tr><td class="tbl-time" style="color:var(--warn)"><strong>11:35</strong></td><td><span class="tag tag-w">⚠ 最晚報到</span> AY0533 最晚報到時間</td></tr>
+          <tr><td class="tbl-time">12:20</td><td>✈️ <strong>AY0533</strong> 赫爾辛基 → 羅瓦尼米（飛行約 75 分鐘）</td></tr>
+          <tr><td class="tbl-time">13:35</td><td>抵達羅瓦尼米機場（RVN）——聖誕老人的官方機場！行李轉盤有野生動物佈景</td></tr>
+          <tr><td class="tbl-time">13:40</td><td>🚗 <strong>Apukka Resort 專車接機</strong></td></tr>
+          <tr><td class="tbl-time">14:30</td><td>🏨 入住 <strong>Apukka Resort</strong>（訂單：UCVLKBY）整理行李、休息，借用防寒連身衣</td></tr>
+          <tr><td class="tbl-time"><strong>17:00</strong></td><td>❄️ <strong>Arctic SnowHotel 冰雪旅館參觀</strong>（費用約 €35/人，含導覽）</td></tr>
+          <tr><td class="tbl-time">18:30</td><td>返回度假村晚餐，晚上等待極光 APP 即時通知</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="attn">
+      <div class="attn-head">❄️ Arctic SnowHotel 冰雪旅館</div>
+      <div class="attn-meta">
+        <span>⏱ 1–1.5 小時</span>
+        <span>💶 約 €35/人</span>
+        <span class="tag tag-w" style="font-size:7pt">⚠ 3/31 本季最後一天</span>
+      </div>
+      <p>每年秋季以純天然雪塊和冰塊手工打造，室內溫度 <strong>−5°C</strong>，3/31 為當季最後開放日，旅館即將隨春天融化消失。此刻看到的，是本季最後的冰雕藝術。</p>
+      <ul>
+        <li>冰雕藝術客房：每間由不同藝術家設計，在LED燈光下呈現透明藍白之美</li>
+        <li>冰酒吧（Ice Bar）：整個吧台與杯子都是冰製成，供應 Arctic Berry 雞尾酒</li>
+        <li>冰雪教堂 + 冰雕藝術走廊</li>
+      </ul>
+    </div>
+    <div class="alert alert-i">媽媽若剛抵達體力較弱，可視體力選擇休息或一同前往。進入前穿著旅館提供的保暖連身衣。</div>
+
+    <div class="section-title" style="margin-top:3mm"><span>✨</span> 極光初體驗準備</div>
+    <div class="card">
+      <div class="grid2">
+        <div style="font-size:7.8pt">
+          <strong style="color:var(--accent)">今晚的任務</strong><br>
+          下載 Aurora Alert Realtime App，設定 Kp ≥ 3 推送通知。入夜後（21:00起）關注通知，App 有警報時立即著裝出門。
+        </div>
+        <div style="font-size:7.8pt">
+          <strong style="color:var(--accent)">相機設定備忘</strong><br>
+          ISO 1600–3200 ｜快門 5–15 秒<br>
+          光圈 f/2.8 ｜手動對焦無限遠<br>
+          <span class="warn">腳架必備，手持必模糊</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>04</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 5 ─ Day 4 洗腎 + 馴鹿
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.09) 0%,transparent 70%);top:10mm;right:-15mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">4</span>Day</div>
+      <div><div class="day-title">羅瓦尼米 — 洗腎日 + 馴鹿雪橇</div><div class="day-date">2026 / 04 / 01（三）</div><div class="day-location">📍 醫院 → 市區 → Apukka Resort</div></div>
+    </div>
+    <div class="alert alert-i"><strong>📋 今日備注：</strong>08:30 媽媽前往 Lapland Central Hospital 洗腎，約至 12:00 完成（Porokatu 32，計程車前晚代叫）。</div>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:20mm">時間</th><th>行程</th></tr></thead>
+        <tbody>
+          <tr><td class="tbl-time">07:45</td><td>計程車出發（前晚飯店代叫）</td></tr>
+          <tr><td class="tbl-time">08:30–11:00</td><td>🏛️ <strong>Arktikum 北極中心博物館</strong></td></tr>
+          <tr><td class="tbl-time">11:00–12:00</td><td>🚶 <strong>Kemijoki 結冰河畔散步</strong>（博物館旁步行即達）</td></tr>
+          <tr><td class="tbl-time">12:00</td><td>🍜 <strong>大中華餐廳</strong>午餐</td></tr>
+          <tr><td class="tbl-time">下午</td><td>🛒 <strong>K-Supermarket</strong>：新鮮草莓藍莓、Fazer 巧克力</td></tr>
+          <tr><td class="tbl-time">下午</td><td>🧖 Apukka 傳統桑拿（選配）</td></tr>
+          <tr><td class="tbl-time">19:00</td><td>🦌 <strong>馴鹿雪橇夜間行程</strong>（約 3 小時）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="attn">
+          <div class="attn-head">🏛️ Arktikum 北極中心博物館</div>
+          <div class="attn-meta"><span>⏱ 2–3 小時</span><span>💶 €14/人</span></div>
+          <p>1992 年開幕，建築師 Mikael Lundsten 設計，172 公尺半地下玻璃長廊南北延伸，冬至正午陽光沿廊透入。展示北極科學、薩米原住民文化，及二戰終戰史。</p>
+          <ul>
+            <li><strong>焦土政策（1944）</strong>：德軍撤退時縱火，燒毀羅瓦尼米 90% 建築，後由阿爾瓦·阿爾托重新規劃城市——呈馴鹿頭角形狀</li>
+            <li><strong>薩米文化</strong>：薩米語有 400 個描述馴鹿的詞彙；約伊克（Joik）是歐洲最古老的口頭音樂傳統</li>
+            <li><strong>北極光劇場</strong>：高解析度投影廳呈現極光成因，入場即有</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="attn">
+          <div class="attn-head">🦌 馴鹿雪橇夜間行程</div>
+          <div class="attn-meta"><span>⏱ 約 3 小時</span><span>💶 €60–100/人</span></div>
+          <p>穿越積雪松林，傳統木製雪橇（Ahkio）行進 2–4 公里，抵達薩米圓錐帳篷（Kota）篝火。薩米人放牧馴鹿已逾 1,000 年，北極圈春季遷徙路線綿延數百公里。</p>
+          <ul>
+            <li>享用馴鹿肉湯或傳統麵包 Lappish flatbread（<strong>爸爸出發前告知素食</strong>，可準備蔬菜湯）</li>
+            <li>篝火旁等待極光——遠離城市光害，這是行程中目擊機率最高的夜晚之一</li>
+            <li>馴鹿是唯一<strong>雌雄均長角</strong>的鹿科動物；紅鼻子魯道夫並非神話——低溫下鼻腔充血確實呈紅色</li>
+            <li>導覽結束後若極光在場，停留拍攝；包車返程，不趕時間</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span>🍜</span> 大中華餐廳午餐</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>用餐者</th><th>推薦菜色</th></tr></thead>
+        <tbody>
+          <tr><td>素食選項</td><td>炒青菜、家常豆腐</td></tr>
+          <tr><td>其他人</td><td>水煮牛、宮保雞丁</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-i">超市買回的草莓藍莓切好給媽媽補充維他命。馴鹿雪橇行程穿著度假村提供的連身防寒衣。</div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>05</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 6 ─ Day 5 聖誕老人村
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:150mm;height:110mm;background:radial-gradient(ellipse,rgba(38,198,218,0.09) 0%,transparent 70%);top:-15mm;right:-20mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">5</span>Day</div>
+      <div><div class="day-title">羅瓦尼米 — 聖誕老人村</div><div class="day-date">2026 / 04 / 02（四）</div><div class="day-location">📍 聖誕老人村 & Apukka Resort</div></div>
+    </div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">09:00</td><td>搭車約 10 分鐘前往 <strong>聖誕老人村</strong></td></tr>
+          <tr><td class="tbl-time">09:30</td><td>⭐ <strong>私人面見聖誕老人</strong>（強烈推薦，需提前官網預約，約 €30–50/人）</td></tr>
+          <tr><td class="tbl-time">10:30</td><td>📍 <strong>北極圈穿越線</strong>拍照，索取北極圈穿越證書</td></tr>
+          <tr><td class="tbl-time">11:00</td><td>✉️ <strong>聖誕老人郵局</strong>寄明信片，蓋北極圈特製郵戳</td></tr>
+          <tr><td class="tbl-time">12:00</td><td>🍜 <strong>Golden Bowl</strong> 午餐</td></tr>
+          <tr><td class="tbl-time">下午</td><td>聖誕老人村自由逛，各類雪地體驗</td></tr>
+          <tr><td class="tbl-time">17:00</td><td>返回度假村休息</td></tr>
+          <tr><td class="tbl-time">19:00</td><td>🚂 <strong>雪地列車極光篝火之旅</strong>（約 3 小時）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="attn">
+          <div class="attn-head">🎅 聖誕老人村</div>
+          <div class="attn-meta"><span>⏱ 3–5 小時</span><span>💶 各體驗另計</span></div>
+          <p>1984 年為接待美國第一夫人艾蓮諾·羅斯福而建，每年吸引 <strong>50 萬</strong>遊客。官方地址：Santa Claus, FI-96930 Arctic Circle。</p>
+          <ul>
+            <li><strong>私人面見聖誕老人</strong>：溫暖木屋一對一對話合照，20 餘種語言溝通</li>
+            <li><strong>北極圈穿越線</strong>：北緯 66°33'，每年向北移動 14–15 公尺</li>
+            <li><strong>郵局</strong>：每年處理全球 150 國 50 萬封信件，郵戳「Arctic Circle」</li>
+          </ul>
+        </div>
+        <div class="alert alert-i" style="margin-top:0">芬蘭語聖誕老人「Joulupukki」字面意思是「聖誕<strong>山羊</strong>」，源自古代北歐山羊精靈。</div>
+      </div>
+      <div>
+        <div class="attn">
+          <div class="attn-head">🚂 雪地列車極光篝火之旅</div>
+          <div class="attn-meta"><span>⏱ 約 3 小時</span></div>
+          <p>雪地摩托車牽引的多節雪橇車廂，適合長者與家庭，不需自行操控。穿越積雪 60–100 公分的北極針葉林，白樺樹與松樹覆雪，宛如童話場景。</p>
+          <ul>
+            <li>篝火旁烘烤芬蘭香腸、熱可可、肉桂卷（爸爸告知素食）</li>
+            <li>靜候極光，導遊解說極光知識</li>
+            <li>2026 正值太陽極大期，活動特別活躍</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title"><span>🍜</span> Golden Bowl 午餐</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>用餐者</th><th>推薦菜色</th></tr></thead>
+        <tbody>
+          <tr><td>素食選項</td><td>素豆腐湯麵、素餃子</td></tr>
+          <tr><td>其他人</td><td>港式點心、熱湯麵</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-w"><em>⚠ 提醒</em> 私人面見聖誕老人需提前在官網預約。園區多處平地無障礙，長椅與咖啡廳密集，媽媽隨時可入內休息。</div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>06</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 7 ─ Day 6 轉赫爾辛基
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:140mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:20mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">6</span>Day</div>
+      <div><div class="day-title">羅瓦尼米 → 赫爾辛基 — 告別拉普蘭</div><div class="day-date">2026 / 04 / 03（五）</div><div class="day-location">📍 Apukka → RVN → HEL → Hilton Strand</div></div>
+    </div>
+    <div class="alert alert-r"><strong>⚠ 今日有嚴格時間限制！</strong> AY0536 最晚報到 17:10，所有活動必須 <strong>16:15 結束</strong>。</div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">早上</td><td>飯店早餐，享受最後一個拉普蘭早晨</td></tr>
+          <tr><td class="tbl-time">11:00</td><td>辦理退房，行李寄放大廳</td></tr>
+          <tr><td class="tbl-time">中午</td><td>🍽️ <strong>Apukka Aitta 餐廳</strong>告別午餐（確認素食選項）</td></tr>
+          <tr><td class="tbl-time">13:00–16:15</td><td>🐕 <strong>哈士奇營地</strong> → 🎣 <strong>冰釣</strong> → 🌊 <strong>結冰湖面漫步</strong></td></tr>
+          <tr><td class="tbl-time" style="color:var(--warn)"><strong>16:15</strong></td><td><span class="tag tag-w">⚠ 停止活動</span> 準備出發，不可延誤</td></tr>
+          <tr><td class="tbl-time">16:30</td><td>🚗 度假村免費送機專車前往 RVN 機場</td></tr>
+          <tr><td class="tbl-time" style="color:var(--warn)"><strong>17:10</strong></td><td><span class="tag tag-w">⚠ 絕對截止</span> AY0536 最晚報到時間</td></tr>
+          <tr><td class="tbl-time">17:55</td><td>✈️ <strong>AY0536</strong> 羅瓦尼米 → 赫爾辛基</td></tr>
+          <tr><td class="tbl-time">19:10</td><td>抵達赫爾辛基</td></tr>
+          <tr><td class="tbl-time">20:30</td><td>🏨 入住 <strong>Hilton Helsinki Strand</strong>（訂單：3425467611）</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div class="attn">
+        <div class="attn-head">🐕 哈士奇雪橇</div>
+        <div class="attn-meta"><span>⏱ 1–1.5 小時</span></div>
+        <p>西伯利亞哈士奇馴化史超過 3,000 年，雙層毛皮可在 −50°C 保護身體。1925 年阿拉斯加白喉疫情，領頭犬 <strong>Balto</strong> 率隊在暴風雪中完成最後 85 公里藥品接力，銅像至今矗立紐約中央公園。每年 3 月阿拉斯加 <strong>Iditarod</strong> 雪橇賽（1,600 km）是哈士奇最高榮耀。</p>
+        <ul>
+          <li>4–8 隻哈士奇牽引，穿越 2–8 公里雪徑；可嘗試自駕雪橇（教練隨行）</li>
+          <li>出發前的<strong>集體嚎叫</strong>是最震撼的感官體驗——聲音大到讓媽媽捂耳</li>
+          <li>行程後可近距離愛撫哈士奇，拍合照</li>
+        </ul>
+      </div>
+      <div class="attn">
+        <div class="attn-head">🎣 冰釣 + 結冰湖面漫步</div>
+        <div class="attn-meta"><span>⏱ 1–1.5 小時</span></div>
+        <p>芬蘭法律「全民自然權（Jokamiehenoikeus）」：任何人可在公共水域<strong>免費冰釣</strong>。電動冰鑽鑽穿 40–60 公分冰層，垂釣歐洲鱸魚、梭魚。</p>
+        <ul>
+          <li>湖面可辨認北極狐、松鼠、麋鹿足跡</li>
+          <li>聆聽冰層因溫差產生的低沉「轟鳴聲」</li>
+        </ul>
+      </div>
+    </div>
+    <div class="alert alert-i">媽媽若體力不足，可在大廳火爐旁喝熱可可看雪景，完全無壓力。</div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>07</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 8 ─ Day 7 赫爾辛基洗腎+市中心
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:120mm;height:100mm;background:radial-gradient(ellipse,rgba(38,198,218,0.10) 0%,transparent 70%);top:-10mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">7</span>Day</div>
+      <div><div class="day-title">赫爾辛基 — 洗腎日 + 市中心巡禮</div><div class="day-date">2026 / 04 / 04（六）</div><div class="day-location">📍 赫爾辛基市中心</div></div>
+    </div>
+    <div class="alert alert-i"><strong>📋 今日備注：</strong>07:45 媽媽前往 Renalis Suomi 洗腎（Takomotie 7，週六開診已確認）。</div>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:20mm">時間</th><th>行程</th></tr></thead>
+        <tbody>
+          <tr><td class="tbl-time">上午</td><td>🚉 中央車站 → 📚 <strong>Oodi 圖書館</strong> → 🏛️ Amos Rex 外觀 → ⛪ <strong>大教堂 + 參議院廣場</strong></td></tr>
+          <tr><td class="tbl-time">下午</td><td>🎵 <strong>西貝流士公園</strong> + <strong>Café Regatta 肉桂卷</strong></td></tr>
+          <tr><td class="tbl-time">傍晚</td><td>🎨 <strong>Ateneum 藝術博物館</strong></td></tr>
+          <tr><td class="tbl-time">晚上</td><td>🍷 鑽石卡行政廊 Happy Hour</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="attn">
+          <div class="attn-head">📚 Oodi 中央圖書館</div>
+          <div class="attn-meta"><span>⏱ 1–1.5 小時</span><span>💶 完全免費</span></div>
+          <p>2018 年芬蘭獨立 101 週年開幕，ALA Architects 設計，白色波浪木頂如展翅的書頁。耗資 €9,800 萬，2019 年獲<strong>全球最佳公共圖書館獎</strong>，開幕首年訪客 290 萬人次——超過芬蘭全國人口一半。</p>
+          <ul>
+            <li>一樓：免費 3D 列印、縫紉機、錄音室、VR 體驗區——芬蘭的「公民起居室」</li>
+            <li>三樓：10 萬冊藏書陳列，大片玻璃俯瞰議會大廈，構圖完美</li>
+          </ul>
+        </div>
+        <div class="attn">
+          <div class="attn-head">⛪ 赫爾辛基大教堂 + 參議院廣場</div>
+          <div class="attn-meta"><span>⏱ 30–40 分鐘</span><span>💶 免費</span></div>
+          <p>1830–1852 年由德國建築師 Carl Ludwig Engel 設計，白色新古典主義，<strong>綠色大圓頂</strong>高 80 公尺，廣場台階有 22 級——廣場設計本身即為建築作品。四面圍繞政府宮、赫爾辛基大學、最高法院，是芬蘭最多人拍照的地標。</p>
+<p style="margin-top:1.5mm;font-size:7.5pt">廣場中央亞歷山大二世銅像（這位沙皇給了芬蘭較多自治空間）；從 Oodi 步行 10 分鐘。</p>
+        </div>
+      </div>
+      <div>
+        <div class="attn">
+          <div class="attn-head">🎵 西貝流士紀念碑 + Café Regatta</div>
+          <div class="attn-meta"><span>⏱ 45–60 分鐘</span><span>💶 免費</span></div>
+          <p>雕塑家 Eila Hiltunen 作品，600 根不鏽鋼管焊接，高 8.5 公尺，重 24 公噸，海風吹拂時發出管風琴低鳴聲。西貝流士（1865–1957）的《芬蘭頌》是芬蘭精神圖騰——沙俄統治時期被<strong>明令禁演</strong>，作曲家曾以〈即興曲〉等假名偽裝演出，鼓舞民族獨立意志。</p>
+          <ul>
+            <li>紀念碑旁另有西貝流士半身銅像，構圖好拍</li>
+            <li>Café Regatta（1887 年小木屋）：赫爾辛基最具特色的肉桂卷咖啡廳，冬季有爐火，媽媽可在室內等候</li>
+          </ul>
+        </div>
+        <div class="attn">
+          <div class="attn-head">🎨 Ateneum 藝術博物館</div>
+          <div class="attn-meta"><span>⏱ 2–2.5 小時</span><span>💶 €17–22</span><span class="tag tag-w">週一休館</span></div>
+          <p>1887 年成立，芬蘭最重要藝術博物館。加倫-卡雷拉的《卡勒瓦拉》系列是芬蘭民族認同視覺象徵；艾雷娜·夏芬貝克自畫像 2019 年拍出 €900 萬。另有梵谷、林布蘭、塞尚收藏。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>08</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 9 ─ Day 8 港灣/波爾沃
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:0;right:-15mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">8</span>Day</div>
+      <div><div class="day-title">赫爾辛基 — 港灣日 ∕ 波爾沃（二選一）</div><div class="day-date">2026 / 04 / 05（日）</div></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🅐</span> 方案 A：赫爾辛基港灣日</div>
+        <div class="card">
+          <table class="timetable">
+            <tbody>
+              <tr><td class="tbl-time">09:30</td><td>🌿 <strong>凱薩尼米植物園</strong></td></tr>
+              <tr><td class="tbl-time">11:00</td><td>🏛️ <strong>城市博物館</strong>（免費）</td></tr>
+              <tr><td class="tbl-time">11:30</td><td>⛪ <strong>紅教堂（烏斯別斯基）</strong><span class="small muted">（需爬台階）</span></td></tr>
+              <tr><td class="tbl-time">12:00</td><td>🛒 <strong>Kauppatori 港口市集</strong></td></tr>
+              <tr><td class="tbl-time">13:00</td><td>🍜 <strong>老市場大廳</strong>午餐</td></tr>
+              <tr><td class="tbl-time">14:30</td><td>海港木棧道漫步</td></tr>
+              <tr><td class="tbl-time">15:00</td><td>🚢 <strong>渡輪前往芬蘭堡</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>🅑</span> 方案 B：波爾沃一日遊</div>
+        <div class="card">
+          <table class="timetable">
+            <tbody>
+              <tr><td class="tbl-time">09:00</td><td>Kamppi 長途巴士出發（約 55 分，€10/人）</td></tr>
+              <tr><td class="tbl-time">10:00</td><td>抵達波爾沃，舊城區漫步</td></tr>
+              <tr><td class="tbl-time">11:00</td><td>⛪ <strong>波爾沃大教堂</strong>（15 世紀）</td></tr>
+              <tr><td class="tbl-time">11:30</td><td>🏠 <strong>Runeberg 故居博物館</strong>（芬蘭國詩人）</td></tr>
+              <tr><td class="tbl-time">12:30</td><td>午餐 + <strong>Runeberg 蛋糕</strong>（波爾沃必吃）</td></tr>
+              <tr><td class="tbl-time">14:00</td><td>🟥 河畔紅色倉庫拍照 + 🍫 <strong>Brunberg 巧克力</strong></td></tr>
+              <tr><td class="tbl-time">16:00</td><td>搭巴士返回赫爾辛基</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2" style="margin-top:2mm">
+      <div>
+        <div class="attn">
+          <div class="attn-head">🏰 芬蘭堡（方案 A）</div>
+          <div class="attn-meta"><span>⏱ 3–4 小時</span><span>UNESCO 世界文化遺產</span></div>
+          <p>瑞典語名 Sveaborg（「瑞典要塞」），1748 年啟建，耗費近百年。1808 年俄瑞戰爭，司令 Carl Olof Cronstedt 以要塞「糧食耗盡」為由未戰而降，移交整整 7,500 名守軍，成為芬蘭史上最大的軍事爭議——是叛國還是務實？至今仍有討論。1991 年列入 UNESCO。</p>
+          <ul>
+            <li>島上仍有約 <strong>800 名居民</strong>定居，設有開放式監獄（囚犯在此學習技能，可與遊客共處）</li>
+            <li><strong>Vesikko 潛水艇</strong>：1933 年建造，現存唯一二戰芬蘭潛艇，可入艙參觀</li>
+            <li>渡輪從市場廣場 15 分鐘，票價含在 HSL 日票內；末班船留意時刻表</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="attn">
+          <div class="attn-head">⛪ 烏斯別斯基大教堂（紅教堂）</div>
+          <div class="attn-meta"><span>⏱ 30–45 分鐘</span><span>💶 免費</span></div>
+          <p>建於 1862–1868 年，<strong>西歐現存最大東正教教堂</strong>。深紅色磚砌，13 座金色洋蔥頂，部分紅磚來自拆除的俄羅斯軍事要塞。與白色路德教大教堂構成赫爾辛基最著名的東西方宗教建築對比。</p>
+        </div>
+        <div class="alert alert-w" style="margin-top:0">波爾沃舊城為鵝卵石路面，媽媽穿防滑鞋步調放慢即可。Brunberg 巧克力是絕佳伴手禮，比機場便宜。芬蘭堡注意末班渡輪時間。</div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>🍜</span> 老市場大廳午餐（方案 A）</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>用餐者</th><th>推薦</th></tr></thead>
+        <tbody>
+          <tr><td>素食選項</td><td>新鮮莓果、熱麵包、蔬菜湯</td></tr>
+          <tr><td>其他人</td><td>Soppakeittiö 海鮮湯、煙燻鮭魚</td></tr>
+          <tr><td>所有人</td><td>Robert's Coffee 在地咖啡</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>09</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 10 ─ Day 9 洗腎+岩石教堂
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:120mm;height:90mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-10mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">9</span>Day</div>
+      <div><div class="day-title">赫爾辛基 — 洗腎日 + 市場 + 岩石教堂</div><div class="day-date">2026 / 04 / 06（一）</div><div class="day-location">📍 Hakaniemi → Kallio → 岩石教堂</div></div>
+    </div>
+    <div class="alert alert-i"><strong>📋 今日備注：</strong>07:45 媽媽前往 Renalis Suomi 洗腎（Takomotie 7）。</div>
+    <div class="card">
+      <table>
+        <thead><tr><th style="width:20mm">時間</th><th>行程</th></tr></thead>
+        <tbody>
+          <tr><td class="tbl-time">上午</td><td>🛒 <strong>Hakaniemi 室內市場</strong> → 🚶 <strong>Kallio 街區</strong>（步行 5 分鐘）</td></tr>
+          <tr><td class="tbl-time">中午</td><td>🍜 <strong>Sen Chay</strong>（純素越南料理）</td></tr>
+          <tr><td class="tbl-time">下午</td><td>⛏️ <strong>岩石教堂（Temppeliaukio）</strong></td></tr>
+          <tr><td class="tbl-time">傍晚</td><td>🍫 <strong>Fazer 旗艦咖啡廳</strong>伴手禮 → 🛒 <strong>Stockmann 百貨地下超市</strong>採購</td></tr>
+          <tr><td class="tbl-time">晚餐</td><td>🍽️ 素食：<strong>Mei Lin 四川素食</strong>／葷食：<strong>Sea Horse</strong> 或 <strong>Farang</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="attn">
+          <div class="attn-head">⛏️ 岩石教堂（Temppeliaukio）</div>
+          <div class="attn-meta"><span>⏱ 30–45 分鐘</span><span>💶 €5/人</span></div>
+          <p>1969 年完工，建築師 Timo 與 Tuomo Suomalainen 兄弟設計。整座教堂直接<strong>炸鑿入花崗岩基盤</strong>，深入地下 13 公尺，岩壁完全保持原始爆破質感。180 根放射狀銅樑支撐頂部環形玻璃天窗，陽光隨時間移動形成神祕光影。</p>
+          <ul>
+            <li><strong>音響</strong>：天然岩壁形成完美混響，是赫爾辛基最受歡迎室內音樂會場地，芬蘭廣播管弦樂團曾在此錄音</li>
+            <li><strong>冷戰遺跡</strong>：設計之初雙重用途——和平時期教堂、戰時可容納 6,000 人的核子避難所，室內全年恆溫 15–18°C</li>
+            <li>計程車可直達門口，入口有緩坡，媽媽輪椅或緩步均可</li>
+          </ul>
+        </div>
+        <div class="attn">
+          <div class="attn-head">🛒 Hakaniemi 市場 + Kallio 街區</div>
+          <div class="attn-meta"><span>⏱ 1.5–2 小時</span></div>
+          <p>Hakaniemi 市場建於 1914 年，2023 年翻新重開，一樓傳統魚肉乳酪，二樓 Marimekko 相關商品。步行 5 分鐘進入 Kallio——赫爾辛基最有個性的年輕街區，獨立咖啡廳、選物店密集。</p>
+        </div>
+      </div>
+      <div>
+        <div class="attn">
+          <div class="attn-head">🍜 Sen Chay 純素越南料理</div>
+          <p>100% 全素越南料理，純素河粉、豆腐春捲，清淡溫胃。夫妻也可一同享用，不需分開用餐。</p>
+        </div>
+        <div class="section-title" style="margin-top:3mm"><span>🍽️</span> 晚餐選擇</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td><strong>Mei Lin 四川素食</strong></td><td>爸爸 + 媽媽（視體力）<br>素麻婆豆腐、魚香茄子、炒青江菜</td></tr>
+              <tr><td><strong>Sea Horse</strong></td><td>夫妻（午已素食）<br>芬蘭老字號傳統肉食</td></tr>
+              <tr><td><strong>Farang</strong></td><td>夫妻替代選項<br>亞洲融合料理，有肉有魚</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>10</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 11 ─ Day 10–11 返程
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(38,198,218,0.10) 0%,transparent 70%);top:10mm;right:-10mm"></div>
+  <div class="content">
+    <div class="day-header">
+      <div class="day-num"><span class="dn">10</span>Day</div>
+      <div><div class="day-title">赫爾辛基 → 東京 — 返程出發</div><div class="day-date">2026 / 04 / 07（二）</div></div>
+    </div>
+    <div class="card">
+      <table class="timetable">
+        <tbody>
+          <tr><td class="tbl-time">早上</td><td>睡到自然醒，享用飯店行政廊北歐早餐</td></tr>
+          <tr><td class="tbl-time">上午</td><td>🌳 步行至 <strong>Esplanadi 公園</strong>晨間散步，旁邊咖啡廳讓爸媽對赫爾辛基留下溫暖最後印象</td></tr>
+          <tr><td class="tbl-time">13:30</td><td>🏨 延遲退房（鑽石卡福利），行李集中</td></tr>
+          <tr><td class="tbl-time">14:00</td><td>🚕 計程車前往 HEL 機場（4 人含行李，建議 Taksi Helsinki 共乘，約 €45–50）</td></tr>
+          <tr><td class="tbl-time">機場</td><td>🛒 機場免稅：Moomin 嚕嚕米、芬蘭設計品、最後補買 Fazer 巧克力</td></tr>
+          <tr><td class="tbl-time" style="color:var(--red)"><strong>陳穎思</strong></td><td>✈️ <strong>JL6800 17:45</strong> 出發 → 東京成田 T2（比其他人早 10 分鐘）</td></tr>
+          <tr><td class="tbl-time">Jimmy/爸爸/媽媽</td><td>✈️ <strong>JL0048 17:55</strong> 出發 → 東京羽田 T3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-r"><strong>⚠ 太太提早分開</strong> 陳穎思走 JL6800，需提前 10 分鐘分開排隊前往自己的報到櫃台，確認好各自登機門後再道別。</div>
+
+    <div class="divider"></div>
+
+    <div class="day-header">
+      <div class="day-num"><span class="dn">11</span>Day</div>
+      <div><div class="day-title">東京 → 台北 — 平安返家</div><div class="day-date">2026 / 04 / 08（三）</div></div>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>旅客</th><th>抵達</th><th>轉機時間</th><th>返台航班</th><th>抵台</th></tr></thead>
+        <tbody>
+          <tr><td><strong>陳穎思</strong></td><td>成田 T2 <strong>13:05</strong></td><td>至 18:05（約 5 小時）</td><td>JL0809 → 桃園 T2</td><td><strong>20:45</strong></td></tr>
+          <tr><td><strong>傅俊銜・楊麗卿・傅寶瑞</strong></td><td>羽田 T3 <strong>13:55</strong></td><td>至 18:25（約 4.5 小時）</td><td>JL0099 → 松山 T1</td><td><strong>20:50</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="alert alert-i">轉機中：江戶小路（羽田 T3 / 成田 T2 均有）帶長輩坐下吃日式拉麵、天婦羅丼。免稅採購和菓子、精美日本伴手禮。讓長輩在接機大廳室內等候，勿在外吹風。</div>
+
+    <div class="card" style="background:linear-gradient(135deg,rgba(38,198,218,0.04),rgba(171,71,188,0.04));border-color:rgba(0,172,193,0.2)">
+      <div style="text-align:center;padding:3mm">
+        <div style="font-size:16pt;margin-bottom:2mm">✦</div>
+        <div style="font-size:10pt;font-weight:600;color:var(--accent);margin-bottom:1.5mm">平安返家！</div>
+        <div style="font-size:8pt;color:var(--muted)">帶著北極圈的極光、聖誕老人村的溫暖、赫爾辛基的海風<br>一段屬於我們共同的珍貴回憶，永遠珍貴的芬蘭家族之旅。</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>11</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 12 ─ 餐廳 & 購物
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:120mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.09) 0%,transparent 70%);top:20mm;right:-10mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Food & Shopping</div><h1>餐廳總整理 ∙ 購物採買清單</h1></div>
+
+    <div class="section-title"><span>🍜</span> 羅瓦尼米餐廳</div>
+    <div class="card" style="margin-bottom:4mm">
+      <table>
+        <thead><tr><th>餐廳</th><th>日期</th><th>素食選項</th><th>其他人</th></tr></thead>
+        <tbody>
+          <tr><td><strong>大中華餐廳</strong></td><td>4/1 午</td><td>炒青菜、家常豆腐</td><td>水煮牛、宮保雞丁</td></tr>
+          <tr><td><strong>Golden Bowl</strong></td><td>4/2 午</td><td>素豆腐湯麵、素餃子</td><td>港式點心</td></tr>
+          <tr><td><strong>Apukka Aitta</strong></td><td>4/3 午</td><td>確認素食選項</td><td>芬蘭式料理</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span>🍽️</span> 赫爾辛基餐廳</div>
+    <div class="card" style="margin-bottom:5mm">
+      <table>
+        <thead><tr><th>餐廳</th><th>日期</th><th>素食選項</th><th>其他人</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Café Regatta</strong></td><td>4/4 下午</td><td>✅ 肉桂卷</td><td>✅ 同</td></tr>
+          <tr><td><strong>老市場大廳</strong></td><td>4/5 午</td><td>蔬菜湯、莓果</td><td>海鮮湯、煙燻鮭魚</td></tr>
+          <tr><td><strong>Sen Chay</strong></td><td>4/6 午</td><td>✅ 100% 純素河粉</td><td>✅ 夫妻同行（素河粉亦可）</td></tr>
+          <tr><td><strong>Mei Lin 四川素食</strong></td><td>4/6 晚</td><td>✅ 素麻婆豆腐</td><td>夫妻另選 Sea Horse/Farang</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span>🛒</span> 購物採買清單</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>地點</th><th>時間</th><th>推薦品項</th></tr></thead>
+        <tbody>
+          <tr><td>成田機場免稅</td><td>3/30 轉機</td><td>白色戀人、Royce 生巧克力</td></tr>
+          <tr><td>赫爾辛基機場（HEL）</td><td>3/31 等機時</td><td>Moomin 嚕嚕米周邊、肉桂卷</td></tr>
+          <tr><td><strong>K-Supermarket</strong></td><td>4/1 下午</td><td>新鮮草莓藍莓、Fazer 巧克力</td></tr>
+          <tr><td>Brunberg（波爾沃）</td><td>4/5 方案B</td><td>百年老店巧克力，最佳伴手禮</td></tr>
+          <tr><td><strong>Fazer 旗艦咖啡廳</strong></td><td>4/6 傍晚</td><td>精緻禮盒裝，比超市送禮更有質感</td></tr>
+          <tr><td><strong>Stockmann 百貨地下</strong></td><td>4/6 傍晚</td><td>芬蘭起司、果醬、巧克力</td></tr>
+          <tr><td>赫爾辛基機場免稅</td><td>4/7 出發</td><td>Moomin、芬蘭設計品、最後補買 Fazer</td></tr>
+          <tr><td>羽田/成田機場</td><td>4/8 轉機</td><td>和菓子、日本精美伴手禮</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>12</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 13 ─ 葷食餐廳推薦 & 當地小點甜點
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:110mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-10mm;right:-10mm"></div>
+  <div class="blob" style="width:90mm;height:90mm;background:radial-gradient(ellipse,rgba(171,71,188,0.07) 0%,transparent 70%);bottom:20mm;left:-5mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Restaurants & Local Bites</div><h1>葷食餐廳推薦 ∙ 當地小點甜點</h1></div>
+
+    <div class="section-title"><span>🦌</span> 羅瓦尼米 — 葷食推薦</div>
+    <div class="card" style="margin-bottom:4mm">
+      <table>
+        <thead><tr><th>餐廳</th><th>特色</th><th>必點</th><th>地址</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Nili</strong> <span class="tag tag-b">⭐推薦</span></td><td>拉普蘭傳統料理，馴鹿、麋鹿、野味</td><td>炙燒馴鹿菲力、野生麋鹿排、雲莓甜點</td><td class="small muted">Valtakatu 20</td></tr>
+          <tr><td><strong>Sky Kitchen & Bar</strong></td><td>城市最高旋轉全景餐廳，景觀絕佳</td><td>燒烤馴鹿、當季湖魚、北極莓醬汁</td><td class="small muted">Koskikatu 23</td></tr>
+          <tr><td><strong>Monte Rosa</strong></td><td>義式風格芬蘭料理，氣氛輕鬆</td><td>薄餅、海鮮義大利麵、馴鹿披薩</td><td class="small muted">Koskikatu 9</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span>🍽️</span> 赫爾辛基 — 葷食推薦</div>
+    <div class="card" style="margin-bottom:4mm">
+      <table>
+        <thead><tr><th>餐廳</th><th>特色</th><th>必點</th><th>地址</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ravintola Nokka</strong> <span class="tag tag-b">⭐推薦</span></td><td>米其林推薦，使用本地食材的新芬蘭料理</td><td>熱燻白鮭、馴鹿嫩肩、季節甜點</td><td class="small muted">Kanavaranta 7F</td></tr>
+          <tr><td><strong>Sea Horse</strong></td><td>1934年老店，地道赫爾辛基家常菜</td><td>油炸波羅的海鯡魚（muikku）</td><td class="small muted">Kapteeninkatu 11</td></tr>
+          <tr><td><strong>Juuri</strong></td><td>芬蘭小皿料理 Sapas，創意十足</td><td>12道精緻小皿套餐，配芬蘭啤酒</td><td class="small muted">Korkeavuorenkatu 27</td></tr>
+          <tr><td><strong>Farang</strong></td><td>亞洲融合 Fine Dining，北歐最佳</td><td>月亮蝦餅、炭烤肋排、泰式咖哩</td><td class="small muted">Ainonkatu 3</td></tr>
+          <tr><td><strong>Kolme Kruunua</strong></td><td>傳統芬蘭家庭式老酒館，1952年創業</td><td>燉牛肉、蘑菇奶油湯、黑麥麵包</td><td class="small muted">Liisankatu 5</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid2" style="margin-bottom:0">
+      <div>
+        <div class="section-title"><span>🍮</span> 羅瓦尼米小點甜點</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td><strong>Poronkäristys</strong></td><td>炒馴鹿薄肉片佐馬鈴薯泥，芬蘭傳統家常菜</td></tr>
+              <tr><td><strong>Leipäjuusto + Lakka</strong></td><td>烤乳酪搭配雲莓醬，必試拉普蘭特色</td></tr>
+              <tr><td><strong>雲莓甜點</strong></td><td>Lakka（雲莓）慕斯、果醬、酒釀，北極圈珍品</td></tr>
+              <tr><td><strong>Korvapuusti</strong></td><td>芬蘭肉桂卷，比 Starbucks 更鬆軟扎實</td></tr>
+              <tr><td><strong>煙燻鮭魚</strong></td><td>市場現烤，配酸奶油和黑麥脆餅</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>🍫</span> 赫爾辛基小點甜點</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td><strong>Karjalanpiirakka</strong></td><td>卡累利阿派（米餡薄餅），配蛋奶油 munavoi</td></tr>
+              <tr><td><strong>Munkki</strong></td><td>芬蘭炸甜甜圈，撒糖粉，咖啡廳必配</td></tr>
+              <tr><td><strong>Runeberg 蛋糕</strong></td><td>詩人蛋糕，杏仁＋覆盆子，限量甜點</td></tr>
+              <tr><td><strong>Salmiakki</strong></td><td>鹽甘草糖，芬蘭國民零食，口味極特殊</td></tr>
+              <tr><td><strong>藍莓派</strong></td><td>新鮮野生藍莓，配香草奶油，超市即買</td></tr>
+              <tr><td><strong>Fazer 藍巧克力</strong></td><td>百年品牌，藍色包裝牛奶巧克力，最佳伴手禮</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>13</span></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PAGE 14 ─ 交通 & 注意事項
+═══════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(38,198,218,0.09) 0%,transparent 70%);top:-10mm;right:-15mm"></div>
+  <div class="blob" style="width:90mm;height:90mm;background:radial-gradient(ellipse,rgba(171,71,188,0.07) 0%,transparent 70%);bottom:30mm;left:-5mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Transport & Reminders</div><h1>交通票券 ∙ 注意事項速查</h1></div>
+
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🚌</span> 赫爾辛基交通建議</div>
+        <div class="card">
+          <table>
+            <thead><tr><th>對象</th><th>方案</th><th>費用</th></tr></thead>
+            <tbody>
+              <tr><td>媽媽</td><td>HSL App 單程票（按需）</td><td>約 €15–20</td></tr>
+              <tr><td>爸爸</td><td>HSL 3 日 AB 日票</td><td>約 €22–24</td></tr>
+              <tr><td>夫妻（每人）</td><td>Helsinki Card 72hr<br><span class="small muted">若去 3 個以上付費景點</span></td><td>約 €87</td></tr>
+              <tr><td>4/7 機場</td><td>Taksi Helsinki 計程車</td><td>約 €45–50</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2.5mm;font-size:7.5pt;color:var(--muted)"><strong style="color:var(--accent)">Helsinki Card 含免費入場：</strong>Ateneum · Kiasma · 岩石教堂 · 芬蘭堡渡輪 · 國家博物館 · 全景觀光巴士</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>📞</span> 緊急聯絡</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td><strong>緊急求救</strong></td><td class="accent"><strong>112</strong></td></tr>
+              <tr><td>Lapland Central Hospital<br><span class="small muted">Jaakko</span></td><td><strong>+358 40 192 5242</strong></td></tr>
+              <tr><td>Renalis Suomi (HEL)<br><span class="small muted">Sirkku Sayeed-Väisänen</span></td><td><strong>+358 50 475 1821</strong></td></tr>
+              <tr><td>Apukka Resort</td><td>+358 16 341 4300</td></tr>
+              <tr><td>Hilton Helsinki Strand</td><td>+358 9 39351</td></tr>
+              <tr><td>台灣外交部緊急</td><td>+886 800-085-095</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>⚠️</span> 行程注意事項速查</div>
+    <div class="card">
+      <table>
+        <thead><tr><th>事項</th><th>截止</th><th>說明</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Snow Hotel 預約</strong></td><td><span class="tag tag-r">立即</span></td><td>3/31 當季最後一天，立即官網預約</td></tr>
+          <tr><td><strong>私人面見聖誕老人</strong></td><td><span class="tag tag-w">出發前</span></td><td>官網預約，€30–50/人</td></tr>
+          <tr><td><strong>Renalis 週六開診</strong></td><td><span class="tag tag-g">已確認</span></td><td>4/4（六）& 4/6（一）07:45，Takomotie 7</td></tr>
+          <tr><td><strong>AY0536 最晚報到</strong></td><td><span class="tag tag-r">4/3 17:10</span></td><td>活動必須 16:15 停止，16:30 出發機場</td></tr>
+          <tr><td><strong>芬蘭堡末班渡輪</strong></td><td>4/5 日落前</td><td>注意當日末班渡輪時間，避免被困島上</td></tr>
+          <tr><td><strong>陳穎思 JL6800</strong></td><td><span class="tag tag-r">4/7 17:45</span></td><td>比其他人早 10 分鐘，分開排隊報到</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section-title" style="margin-top:3mm"><span>🌌</span> 極光速查</div>
+    <div class="card">
+      <div class="grid2">
+        <div style="font-size:7.8pt">
+          <strong style="color:var(--accent)">Kp 指數對照</strong>
+          <table style="margin-top:1.5mm">
+            <tbody>
+              <tr><td>Kp 1–2</td><td>微弱弧形，淡綠色</td></tr>
+              <tr><td>Kp 3–4</td><td>清晰可見，有動態</td></tr>
+              <tr><td>Kp 5–6</td><td>光幕起舞，顏色豐富</td></tr>
+              <tr><td>Kp 7–9</td><td>皇冠極光，極震撼</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="font-size:7.8pt">
+          <strong style="color:var(--accent)">2026 年特別說明</strong><br>
+          <p style="margin-top:1.5mm;line-height:1.6">正值第 25 太陽週期<strong>極大期</strong>，太陽活動特別活躍，極光出現頻率比平均高 20–40%。羅瓦尼米年均可見極光約 <strong>150 晚</strong>，3/31–4/3 每週約 3–5 晚有機會。</p>
+          <p style="margin-top:1.5mm;color:var(--muted)">芬蘭語：Revontulet（火狐之火）</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>14</span></div>
+</div>
+
+
+<!-- ═══ PAGE 15 ─ 認識芬蘭 & 行前必備 ═══ -->
+<div class="page">
+  <div class="blob" style="width:140mm;height:110mm;background:radial-gradient(ellipse,rgba(38,198,218,0.08) 0%,transparent 70%);top:-15mm;right:-15mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Background</div><h1>認識芬蘭 ∙ 行前必備知識</h1></div>
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🇫🇮</span> 基本國情</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <tbody>
+              <tr><td style="width:18mm;font-weight:600;color:var(--accent)">首都</td><td>赫爾辛基（Helsinki）</td><td style="width:18mm;font-weight:600;color:var(--accent)">人口</td><td>約 555 萬人</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">面積</td><td>338,145 km²（台灣 ×9.4）</td><td style="font-weight:600;color:var(--accent)">語言</td><td>芬蘭語 + 瑞典語</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">時區</td><td>UTC+3（夏令，-5h 台灣）</td><td style="font-weight:600;color:var(--accent)">貨幣</td><td>歐元（€）</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">電壓</td><td>230V / Type C/F 插頭</td><td style="font-weight:600;color:var(--accent)">自來水</td><td>直接可飲 ✅</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">小費</td><td colspan="3">不強制，服務費已含；英語溝通完全無障礙</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-title"><span>📜</span> 歷史速覽</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td style="width:22mm;color:var(--muted);font-size:7pt">1249–1809</td><td>瑞典王國統治 560 年；赫爾辛基 1550 年建城</td></tr>
+              <tr><td style="color:var(--muted);font-size:7pt">1809–1917</td><td>俄羅斯帝國自治大公國；1835 年《卡勒瓦拉》民族史詩出版</td></tr>
+              <tr><td style="color:var(--muted);font-size:7pt">1917–1918</td><td>12/6 宣布獨立，隨即爆發內戰（約 3.7 萬人死亡）</td></tr>
+              <tr><td style="color:var(--muted);font-size:7pt">1939–1944</td><td>冬季戰爭：以寡擊眾 105 天，奠定「Sisu」精神</td></tr>
+              <tr><td style="color:var(--muted);font-size:7pt">現代</td><td>1995 入歐盟；2023 加入 NATO；連續 7 年「最幸福國家」</td></tr>
+              <tr><td style="color:var(--muted);font-size:7pt">羅瓦尼米</td><td>1944 德軍焦土燒毀 90%，建築師阿爾托重建為<strong>馴鹿頭形狀</strong>城市</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>🌡️</span> 氣候 & 穿衣</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <thead><tr><th>城市</th><th>氣溫</th><th>注意</th></tr></thead>
+            <tbody>
+              <tr><td><strong>羅瓦尼米</strong> 3/31–4/3</td><td>-5°C～+2°C</td><td>積雪 60–100cm，體感極寒</td></tr>
+              <tr><td><strong>赫爾辛基</strong> 4/3–4/7</td><td>+2°C～+9°C</td><td>海風大，體感近 0°C</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2.5mm;font-size:7.5pt"><strong style="color:var(--accent)">洋蔥三層：</strong>第一層美麗諾羊毛（❌禁純棉）→ 第二層羽絨/抓絨 → 第三層 Gore-Tex 防水防風。必備：防水保暖靴 · 覆耳帽 · 防風手套 · 暖暖包 · 護唇膏</div>
+        </div>
+        <div class="section-title"><span>💶</span> 消費 & 語言</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <tbody>
+              <tr><td>咖啡</td><td>€3–5</td><td>午餐</td><td>€12–18</td><td>晚餐</td><td>€20–35</td></tr>
+              <tr><td>地鐵/電車</td><td>€2.95</td><td>計程車 5km</td><td>€15–20</td><td>ATM手續費</td><td>€2–5</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2.5mm;font-size:7.5pt">
+            <strong style="color:var(--accent)">常用芬蘭語：</strong>
+            你好 <strong>Hei</strong>（嘿）· 謝謝 <strong>Kiitos</strong>（奇多斯）· 對不起 <strong>Anteeksi</strong> · 再見 <strong>Näkemiin</strong><br>
+            廁所在哪 → <strong>Missä on vessa?</strong>（芬蘭語無性別代詞，他/她皆為「hän」）
+          </div>
+        </div>
+        <div class="section-title"><span>✈️</span> 行前確認</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td style="width:18mm;font-weight:600;color:var(--warn)">ETIAS</td><td>2026 年台灣護照需線上申請歐盟電子旅遊授權（費用約 €7），出發前確認</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">旅平險</td><td>✅ 富邦產險申根旅平險（全員已投保）</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">SIM 卡</td><td>建議出發前購 Airalo 電子 SIM（每人各自有網路較安全）</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">緊急</td><td><strong>112</strong>：警察/救護/消防，不需 SIM 卡即可撥打</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>15</span></div>
+</div>
+
+<!-- ═══ PAGE 16 ─ 北極光完整指南 ═══ -->
+<div class="page">
+  <div class="blob" style="width:160mm;height:130mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-20mm;right:-20mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Aurora Borealis</div><h1>北極光完整指南</h1></div>
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🔬</span> 形成原理 & 顏色</div>
+        <div class="card" style="margin-bottom:3mm">
+          <p style="font-size:7.8pt;line-height:1.6;margin-bottom:2mm">太陽風（帶電粒子）沿地球磁場線進入大氣，與氣體碰撞激發能量，以光呈現——原理如霓虹燈管。</p>
+          <table>
+            <thead><tr><th>顏色</th><th>海拔</th><th>氣體</th><th>頻率</th></tr></thead>
+            <tbody>
+              <tr><td>🟢 綠色</td><td>100–150km</td><td>氧原子</td><td>最常見</td></tr>
+              <tr><td>🔴 紅色</td><td>200km+</td><td>氧原子</td><td>強活動時</td></tr>
+              <tr><td>🔵 藍紫色</td><td>60–100km</td><td>氮分子</td><td>強烈極光</td></tr>
+              <tr><td>🩷 粉紅色</td><td>低層大氣</td><td>氮分子</td><td>大型事件</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-title"><span>📊</span> Kp 指數速查</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <thead><tr><th>Kp</th><th>強度</th><th>羅瓦尼米可見效果</th></tr></thead>
+            <tbody>
+              <tr><td>1–2</td><td>微弱</td><td>淡綠色弧形</td></tr>
+              <tr><td>3–4</td><td>中等</td><td>清晰可見，有動態</td></tr>
+              <tr><td>5–6</td><td>強</td><td>光幕起舞，顏色豐富</td></tr>
+              <tr><td>7–9</td><td>極強</td><td>震撼皇冠極光</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2mm;font-size:7.5pt;color:var(--muted)">推薦 App：<strong style="color:var(--accent)">Aurora Alert Realtime</strong> / spaceweatherlive.com</div>
+        </div>
+        <div class="section-title"><span>🦊</span> 極光傳說</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td style="width:16mm;font-weight:600;color:var(--accent)">芬蘭</td><td><strong>Revontulet</strong>（火狐之火）——魔法狐狸尾巴拂雪，火花飛上天空</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">薩米</td><td>祖先靈魂在天空舞蹈；對著極光吹口哨會招來厄運</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">日本</td><td>極光下受孕的孩子非常幸運，許多夫婦專程赴北歐</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>⭐</span> 2026 年絕佳機會</div>
+        <div class="card" style="margin-bottom:3mm">
+          <p style="font-size:7.8pt;line-height:1.6;margin-bottom:2mm">現正值<strong>第 25 太陽週期極大期</strong>，極光可見時數比平均多 <strong>20–40%</strong>。羅瓦尼米年均可見約 <strong>150 晚</strong>，3–4 月每週約 3–5 晚有機會。</p>
+          <table>
+            <tbody>
+              <tr><td style="width:22mm">最佳時段</td><td>晚上 21:00–01:00（本地時間）</td></tr>
+              <tr><td>必要條件</td><td>① 黑暗（無月/無光汙染）② 晴天 ③ Kp ≥ 2</td></tr>
+              <tr><td>極光形狀</td><td>弧形 → 帶狀 → 光幕（最壯觀）→ 皇冠形（你正在光帶正下方）</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-title"><span>📷</span> 拍攝設定</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <thead><tr><th>設定</th><th>建議值</th><th>設定</th><th>建議值</th></tr></thead>
+            <tbody>
+              <tr><td>光圈</td><td>f/1.8–2.8</td><td>快門</td><td>5–15 秒</td></tr>
+              <tr><td>ISO</td><td>1600–3200</td><td>對焦</td><td>手動至無限遠</td></tr>
+              <tr><td>白平衡</td><td>手動 3500K</td><td>格式</td><td>RAW</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2mm;font-size:7.5pt;color:var(--muted)">⚠ 三腳架必備 · 備用電池 2–3 顆（低溫快耗電）· 手機用 Pro/夜間模式同樣需固定支撐</div>
+        </div>
+        <div class="section-title"><span>🎯</span> 觀賞小技巧</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td style="width:20mm;font-weight:600;color:var(--accent)">構圖</td><td>前景納入樹木/雪地，地平線在畫面下 1/3</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">眼睛</td><td>出門後 10–15 分鐘才能完全適應黑暗，肉眼效果遠比剛出門好</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">保暖</td><td>靜止不動比行走更快感覺寒冷，等待時穿戴所有保暖裝備</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>16</span></div>
+</div>
+
+<!-- ═══ PAGE 17 ─ 羅瓦尼米景點深度 I ═══ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:110mm;background:radial-gradient(ellipse,rgba(38,198,218,0.09) 0%,transparent 70%);top:-15mm;right:-15mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Rovaniemi · Deep Dive I</div><h1>羅瓦尼米景點深度介紹（一）</h1></div>
+
+    <div class="attn" style="margin-bottom:5mm">
+      <div class="attn-head">❄️ Arctic SnowHotel 冰雪旅館</div>
+      <div class="attn-meta"><span>⏱ 1–1.5 小時</span><span>💶 €35/人（含導覽）</span><span class="tag tag-r">3/31 本季最後開放日</span></div>
+      <p>全球第一座現代冰雪旅館誕生於 1990 年代的瑞典，隨後在北歐各地遍地開花。每年秋天（約 11 月）從零開始建造——需要 <strong>700 噸</strong>天然雪塊與冰塊、建築師與冰雕藝術家共同創作、耗時 2–3 個月完工。雪牆厚達 1–1.5 公尺，具有絕佳隔熱效果，使室內恆溫維持在 <strong>-5°C</strong>（比戶外的 -20°C 溫暖許多）——就像原住民的 igloo，靠人體體溫即可使室內達到 0°C 以上。</p>
+      <p style="margin-top:2mm">3/31 是本季最後開放日，旅館隨後將隨春天緩緩融化消失。你們所見到的，是這整棟建築在世界上存在的 <strong>最後幾個小時</strong>。每年都是全新的建築，明年的 SnowHotel 會由不同藝術家重新設計——它不是一座你可以再訪的地方，它是一個瞬間。</p>
+      <ul>
+        <li><strong>藝術客房</strong>：每間客房由不同藝術家設計，主題涵蓋北極動物、薩米神話、幾何抽象。在特製 LED 燈光下，冰雕細節呈現夢幻藍白透明之美；確實有旅客購買「過夜體驗」，睡在鋪有馴鹿皮的冰床上，以睡袋保溫</li>
+        <li><strong>冰酒吧（Ice Bar）</strong>：整個吧台、裝飾、甚至杯子都是冰雕成——喝飲料時手指會被冰杯慢慢降溫，必點 Arctic Berry 雞尾酒，使用北極漿果調製</li>
+        <li><strong>冰雪婚禮教堂</strong>：旅館設有小型冰製教堂，每週舉行婚禮儀式，主禮牧師穿著連身保暖衣主持——這是全球最獨特的婚禮場地之一</li>
+        <li><strong>科學小知識</strong>：雪的密度約為水的 1/3，70% 是空氣——正是這些空氣讓雪成為天然隔熱材料，北極熊的毛色也是中空透明、利用同樣原理導熱</li>
+      </ul>
+    </div>
+
+    <div class="attn" style="margin-bottom:0">
+      <div class="attn-head">🏛️ Arktikum 北極中心博物館</div>
+      <div class="attn-meta"><span>⏱ 2–3 小時</span><span>💶 €14/人</span><span>📍 Pohjoisranta 4</span></div>
+      <p>1992 年開幕，建築師 Mikael Lundsten 設計，最大特色是長達 <strong>172 公尺</strong>的半地下玻璃長廊，向北延伸直入凱米河岸邊。設計呼應北極「在地下尋找溫暖」的概念。玻璃長廊在冬至時幾乎無陽光透入，夏至時 24 小時通透——季節的戲劇性光影變化是建築本身的展覽。</p>
+      <ul>
+        <li><strong>北極光劇場</strong>：館內最不可錯過的體驗——高解析度環形投影廳重現極光的震撼，配合精心設計的音效，是在台灣完全無法複製的感官體驗</li>
+        <li><strong>薩米文化展區</strong>：薩米人是北歐最古老的原住民族，分布於芬蘭、瑞典、挪威、俄羅斯北部，總人口約 8 萬（芬蘭境內約 1 萬）。他們的語言有超過 <strong>400 個詞彙</strong>描述不同年齡、性別、體型與性格的馴鹿——語言本身就是生存智慧的結晶</li>
+        <li><strong>約伊克音樂（Joik）</strong>：歐洲現存最古老的口頭音樂傳統。約伊克不是「唱關於某件事的歌」，而是「成為那件事」——你唱狼時，你就是狼。這種哲學與西方音樂截然不同，令人深思</li>
+        <li><strong>1944 焦土政策</strong>：二戰末期，德軍撤退時對整個拉普蘭實施焦土政策，燒毀羅瓦尼米市區 <strong>90%</strong> 的建築。戰後，芬蘭傳奇建築師<strong>阿爾瓦爾·阿爾托（Alvar Aalto）</strong>獲邀重建整座城市，他將城市平面規劃成<strong>馴鹿頭角的形狀</strong>——從空中俯瞰羅瓦尼米，仍可見到這個設計</li>
+      </ul>
+      <div class="alert alert-i" style="margin-top:2mm">💡 館內設有中文語音導覽（部分展廳），博物館旁即為凱米河岸，參觀後步行不到 200 公尺即可踏上冰封河面。</div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>17</span></div>
+</div>
+
+<!-- ═══ PAGE 18 ─ 羅瓦尼米景點深度 II ═══ -->
+<div class="page">
+  <div class="blob" style="width:140mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-10mm;right:-10mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Rovaniemi · Deep Dive II</div><h1>羅瓦尼米景點深度介紹（二）</h1></div>
+
+    <div class="attn" style="margin-bottom:5mm">
+      <div class="attn-head">🎅 聖誕老人村（Santa Claus Village）</div>
+      <div class="attn-meta"><span>⏱ 3–5 小時</span><span>📍 北緯 66°33′ 北極圈線上</span><span>💶 進入免費，各體驗另計</span></div>
+      <p>這裡的起源是一個充滿溫度的故事。<strong>1950 年 6 月</strong>，美國第一夫人<strong>艾蓮諾·羅斯福</strong>訪問歐洲，臨時決定繞道羅瓦尼米，想親眼見見北極圈的樣貌。芬蘭人在 <strong>24 小時內</strong>緊急搭建了一個木屋接待她，木屋正好就建在北極圈線上。這個「應急木屋」後來被保留，逐漸發展，1985 年正式命名為聖誕老人村，今日年吸引 <strong>50 萬以上</strong>遊客。</p>
+      <ul>
+        <li><strong>北極圈線的意義</strong>：北緯 66°33'——每年至少一天太陽不升（冬至），一天太陽不落（夏至）。由於地球自轉軸的周期性擺動，北極圈每年向北移動約 <strong>14–15 公尺</strong>，大約 2.3 萬年後才會回到現在的位置</li>
+        <li><strong>私人面見聖誕老人</strong>：在溫暖木屋內，聖誕老人用 20 餘種語言一對一接見訪客。對父母輩而言，這是一種情感上難以言喻的體驗——在真正的北極圈，坐在「聖誕老人」面前合影</li>
+        <li><strong>聖誕老人郵局</strong>：每年處理來自全球 150 多國、超過 50 萬封信件。從這裡寄出的明信片蓋有「Arctic Circle」特製郵戳，寄回台灣約 2–3 週收到——是獨一無二的旅遊紀念</li>
+        <li><strong>Joulupukki 的字源</strong>：芬蘭語中聖誕老人叫「Joulupukki」，字面意思是「<strong>聖誕山羊</strong>」！源自古北歐傳說中冬至前後挨家挨戶索取食物的山羊精靈，後來文化演變才成為慈祥老人的形象，但「山羊」這個名字就這樣留了下來</li>
+        <li><strong>北極圈穿越證書</strong>：在官方地點跨越北緯 66°33' 線，可索取官方穿越證書，上有個人姓名與穿越時間，蓋北極圈正式印章</li>
+      </ul>
+    </div>
+
+    <div class="attn" style="margin-bottom:0">
+      <div class="attn-head">🐕 哈士奇雪橇 ∙ 🦌 馴鹿雪橇 ∙ 🎣 冰釣</div>
+      <div class="attn-meta"><span>📅 4/1 晚上（馴鹿）& 4/3（哈士奇 + 冰釣）</span></div>
+      <p><strong>哈士奇</strong>：西伯利亞哈士奇馴化史超過 3,000 年，起源於西伯利亞楚科奇人，雙層毛皮可在 <strong>-50°C</strong> 正常工作，每日工作時消耗近萬大卡——幾乎是人類的四倍。1925 年阿拉斯加白喉疫情，全鎮 1,400 人面臨死亡危機，海路冰封、飛機引擎在低溫失效。20 支雪橇狗隊接力奔跑 1,000 公里，領頭犬 <strong>Balto</strong> 率隊完成最後 85 公里衝刺，送達抗毒素、拯救全鎮。牠的銅像今日仍矗立在<strong>紐約中央公園</strong>（1995 年動畫《雪地靈犬》改編自此）。</p>
+      <ul>
+        <li><strong>哈士奇體驗</strong>：4–8 隻哈士奇牽引雪橇，穿越 2–8 公里雪徑；出發前的<strong>集體高亢嚎叫</strong>是最震撼的感官記憶——聲音之大足以讓人捂耳；行程結束後可近距離愛撫、合照</li>
+        <li><strong>馴鹿雪橇</strong>：傳統薩米木製雪橇（Ahkio），穿越積雪 60–100cm 的針葉林，抵達圓錐帳篷（Kota）篝火。馴鹿是地球上唯一<strong>雌雄均長角</strong>的鹿科動物，也是進行最長陸地遷徙的哺乳類之一（部分種群每年遷徙超 5,000 公里）</li>
+        <li><strong>篝火等極光</strong>：馴鹿行程夜間在帳篷旁靜候，遠離城市光害，是行程中目擊極光機率最高的夜晚之一</li>
+        <li><strong>冰釣 + 全民自然權</strong>：芬蘭法律「Jokamiehenoikeus（全民自然權）」規定任何人均可在公共水域免費冰釣、在他人土地自由行走、採摘莓果——自然不屬於個人，是所有人共享的</li>
+      </ul>
+      <div class="alert alert-i" style="margin-top:2mm">💡 凱米河（Kemijoki）是芬蘭最長河流（552km），冬季冰層厚 50–80cm。3 月底河冰邊緣開始出現細裂縫——你們親眼見到的是北極春天融冰的第一個訊號。</div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>18</span></div>
+</div>
+
+<!-- ═══ PAGE 19 ─ 赫爾辛基景點深度 I ═══ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(38,198,218,0.09) 0%,transparent 70%);top:-10mm;right:-15mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Helsinki · Deep Dive I</div><h1>赫爾辛基景點深度介紹（一）</h1></div>
+
+    <div class="attn" style="margin-bottom:5mm">
+      <div class="attn-head">📚 Oodi 赫爾辛基中央圖書館</div>
+      <div class="attn-meta"><span>⏱ 1–1.5 小時</span><span>💶 完全免費</span><span>🕙 開放至 22:00</span></div>
+      <p>「Oodi」在芬蘭語意為「頌歌」——這是一首獻給赫爾辛基市民的頌歌。2018 年 12 月 5 日，芬蘭獨立 <strong>101 週年前夕</strong>開幕。由芬蘭建築事務所 ALA Architects 設計，白色波浪木質頂板如展翅的書頁，外覆不鏽鋼板與落地玻璃，靈感來自芬蘭蜿蜒的海岸線。建造費用 <strong>€9,800 萬</strong>（約新台幣 36 億），2019 年榮獲 <strong>全球最佳公共圖書館獎</strong>。</p>
+      <p style="margin-top:2mm">開幕首年訪客超過 <strong>290 萬人次</strong>——幾乎等於芬蘭全國人口的一半。在北歐，圖書館被視為民主的基礎設施，就像道路與自來水，是每個公民的基本權利。</p>
+      <ul>
+        <li><strong>一樓「公民起居室」</strong>：免費 3D 列印機、雷射切割機、錄音室、播客製作室、電玩遊戲室、縫紉機、音樂練習室——所有設備完全免費，無需預約</li>
+        <li><strong>三樓懸掛書牆</strong>：10 萬冊藏書陳列於懸掛式木製書架，大片落地玻璃正對<strong>議會大廈</strong>，構圖完美；在這裡可以免費借閱烏克麗麗、吉他、望遠鏡、Switch 遊戲機，甚至電動工具</li>
+        <li><strong>哲學意義</strong>：Oodi 讓每一個市民——不論貧富、學歷、種族——都能使用頂尖設備、創作音樂、學習技能。這是芬蘭教育哲學在建築上的完美實踐</li>
+      </ul>
+    </div>
+
+    <div class="attn" style="margin-bottom:0">
+      <div class="attn-head">⛪ 赫爾辛基大教堂 ∙ 參議院廣場</div>
+      <div class="attn-meta"><span>⏱ 30–45 分鐘</span><span>💶 免費</span><span>📍 Unioninkatu 29</span></div>
+      <p>1830–1852 年由德國建築師<strong>卡爾·路德維希·恩格爾（Carl Ludwig Engel）</strong>設計，他同時規劃了整個參議院廣場——廣場本身就是建築作品。白色新古典主義，因銅氧化而呈現獨特<strong>孔雀綠大圓頂</strong>，高度達 80 公尺，周圍有 4 個小穹頂拱衛。教堂前有 <strong>106 級台階</strong>，站在台階頂端俯瞰廣場，是赫爾辛基最著名的拍照角度，也是電影中常出現的芬蘭首都象徵。</p>
+      <ul>
+        <li><strong>廣場四周</strong>：赫爾辛基大學主樓（1832）、政府宮（1822）、最高法院、大學圖書館——四座建築圍繞廣場，均出自同一建築師之手，構成芬蘭國家權力最完整的建築群</li>
+        <li><strong>亞歷山大二世銅像（1894）</strong>：廣場正中央的沙皇銅像在芬蘭獲得相對正面評價，因為他在位期間讓芬蘭維持了較大的自治空間，保留芬蘭語言和路德教；廣場的石板路是 19 世紀鋪設，腳踩的是帝國時代的歷史</li>
+        <li><strong>旁邊的 Amos Rex</strong>：地面廣場有奇特的弧形玻璃天窗突起——這是地下展覽廳的採光設計留在地面的「痕跡」，廣場本身成為一件雕塑；無展覽時赫爾辛基人會爬上玻璃丘曬太陽</li>
+        <li><strong>教堂內部</strong>：路德教風格，簡約莊嚴，以白色為主，穹頂下有大型管風琴；可免費入內，禮拜外時間均開放參觀</li>
+      </ul>
+      <div class="alert alert-i" style="margin-top:2mm">💡 從 Oodi 圖書館步行 10 分鐘即可到達大教堂，是赫爾辛基上午最自然的「建築雙連遊」路線。廣場周邊石板路平坦，媽媽步行無障礙。</div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>19</span></div>
+</div>
+
+<!-- ═══ PAGE 20 ─ 赫爾辛基景點深度 II ═══ -->
+<div class="page">
+  <div class="blob" style="width:140mm;height:110mm;background:radial-gradient(ellipse,rgba(171,71,188,0.08) 0%,transparent 70%);top:-15mm;right:-10mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Helsinki · Deep Dive II</div><h1>赫爾辛基景點深度介紹（二）</h1></div>
+
+    <div class="attn" style="margin-bottom:5mm">
+      <div class="attn-head">🎵 西貝流士紀念碑 ∙ Café Regatta</div>
+      <div class="attn-meta"><span>⏱ 45–60 分鐘</span><span>💶 免費</span><span>📍 Sibeliuspuisto</span></div>
+      <p><strong>讓·西貝流士（Jean Sibelius，1865–1957）</strong>是芬蘭最偉大的作曲家，在芬蘭人心中的地位如同貝多芬之於德國、蕭邦之於波蘭。他的音樂，尤其是《芬蘭頌》（Finlandia，1899），在沙俄強力壓制芬蘭民族意識的年代，成為一種無聲的抵抗宣言——俄國沙皇認為此曲「過於危險」，下令在芬蘭<strong>明令禁止演奏</strong>。為了繼續演奏，芬蘭人不得不以「瑞典語幻想曲」、「即興曲」等假名偽裝，讓它在音樂廳秘密流傳，鼓舞民族獨立的意志。</p>
+      <ul>
+        <li><strong>「愛諾拉的沉默」</strong>：1904 年西貝流士移居鄉村別墅「愛諾拉（Ainola）」，1927 年之後長達 <strong>30 年幾乎停止創作</strong>，直到 1957 年辭世。沒有人知道原因——是創作枯竭？是對自身要求的無法達標？還是他認為已說完所有需要說的？「愛諾拉的沉默」是音樂史上最著名的謎題之一</li>
+        <li><strong>紀念碑</strong>：雕塑家<strong>艾拉·希爾圖寧（Eila Hiltunen）</strong>花費 <strong>8 年</strong>設計製作（1967 年完工），由 600 根不鏽鋼管焊接組成，高 8.5 公尺，重 24 公噸。管徑從細到粗排列，模仿管弦樂器的音域；海風吹拂時，空心鋼管發出低沉鳴響，彷彿整座紀念碑在演奏西貝流士的樂章</li>
+        <li><strong>西貝流士半身銅像</strong>：紀念碑旁另有一尊寫實風格的半身銅像，是更傳統的紀念方式；兩座紀念碑相距不到 50 公尺，構成有趣的對比——抽象 vs. 具象，音樂 vs. 人像</li>
+        <li><strong>Café Regatta（1887）</strong>：公園旁海邊的一座鮮紅色舊漁人小屋咖啡廳，是赫爾辛基最有氣氛的肉桂卷聖地。芬蘭肉桂卷（Korvapuusti）使用<strong>小荳蔻</strong>調味，比瑞典版更香更有層次，配上珍珠糖粒；面海木椅、波羅的海光線、剛出爐的肉桂卷——這就是赫爾辛基最地道的在地體驗，爸媽均完全適合</li>
+      </ul>
+    </div>
+
+    <div class="attn" style="margin-bottom:0">
+      <div class="attn-head">🎨 Ateneum 國家藝術博物館</div>
+      <div class="attn-meta"><span>⏱ 2–2.5 小時</span><span>💶 €17–22</span><span class="tag tag-w">週一休館</span><span>📍 中央車站正對面</span></div>
+      <p>1887 年由建築師 Theodor Höijer 設計，文藝復興式立面，是芬蘭最重要的藝術博物館，館藏超過 <strong>2 萬件</strong>作品，橫跨 18 世紀至今日。位於中央車站正對面，是赫爾辛基文化核心地帶最具象徵意義的建築。</p>
+      <ul>
+        <li><strong>阿克塞里·加倫-卡雷拉（Akseli Gallen-Kallela，1865–1931）</strong>：芬蘭最重要的視覺藝術家。一生以繪畫方式描繪民族史詩《卡勒瓦拉》中的神話故事——《艾諾的命運》、《庫勒沃詛咒》等鉅作，成為芬蘭民族認同最重要的視覺符號，其對芬蘭藝術的意義等同於《卡勒瓦拉》對芬蘭文學的意義</li>
+        <li><strong>艾雷娜·夏芬貝克（Helene Schjerfbeck，1862–1946）</strong>：芬蘭最著名的女性畫家，以自畫像系列著稱，風格在寫實與抽象之間，充滿心理深度與對時間流逝的沉思。2019 年她的一幅自畫像在倫敦拍賣以超過 <strong>€900 萬</strong>成交，創下芬蘭藝術史拍賣紀錄</li>
+        <li><strong>國際名作</strong>：館內同時收藏梵谷、林布蘭、哥雅、塞尚、夏卡爾的重要作品；是歐洲中小型藝術博物館中館藏質量相當高的一館</li>
+        <li><strong>爸爸參觀建議</strong>：館內座椅充足，可自由選擇停留節奏。《卡勒瓦拉》系列畫作視覺震撼，即使對西方藝術不熟悉也極具吸引力。若某展廳興趣較低，可在館內咖啡廳休息</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>20</span></div>
+</div>
+
+<!-- ═══ PAGE 21 ─ 赫爾辛基景點深度 III ═══ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(38,198,218,0.08) 0%,transparent 70%);top:-10mm;right:-15mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Helsinki · Deep Dive III</div><h1>赫爾辛基景點深度介紹（三）</h1></div>
+
+    <div class="attn" style="margin-bottom:5mm">
+      <div class="attn-head">🏰 芬蘭堡 Suomenlinna（UNESCO 世界文化遺產）</div>
+      <div class="attn-meta"><span>⏱ 3–4 小時</span><span>💶 渡輪含 HSL 票 · 博物館 €8 · 潛艇 €6</span></div>
+      <p>瑞典語名 <strong>Sveaborg（「瑞典要塞」）</strong>，1748 年由瑞典帝國統治下的芬蘭開始建造，目的是防禦俄羅斯帝國的海上入侵。工程歷時數十年，耗盡瑞典國庫，動員了當時芬蘭將近 <strong>1/6 的人口</strong>從事建造——它是 18 世紀北歐最龐大的建設工程之一。1991 年列入 <strong>UNESCO 世界文化遺產</strong>，島上至今仍有約 <strong>800 名居民</strong>長期定居（有幼稚園、小學、超市、圖書館），是全球少數仍有人居住的 UNESCO 遺產地。</p>
+      <ul>
+        <li><strong>1808 年的歷史爭議</strong>：芬俄戰爭期間，耗資百年建造的要塞在守將 <strong>Carl Olof Cronstedt</strong> 的決定下<strong>未戰而降</strong>，將整座要塞與 7,500 名守軍全部拱手交給俄軍。事後 Cronstedt 被軍事法庭缺席判決叛國罪。至今仍有爭議：有人認為他評估情勢後認為抵抗無益而做了務實選擇，也有人視之為不可原諒的懦弱。這是芬蘭歷史最難以釋懷的一頁</li>
+        <li><strong>開放式監獄</strong>：島上設有一座「半開放式監獄（Half-way House）」，囚犯在此學習職業技能（如木工、餐廳工作），可在島上自由行走，甚至在島上餐廳擔任服務生，與毫不知情的觀光客共處</li>
+        <li><strong>Vesikko 潛水艇</strong>：1933 年建造，現存唯一完整保存的二戰芬蘭潛水艇，可進入艦艙參觀——體驗 1940 年代水兵在極度狹窄空間作業的真實環境</li>
+        <li><strong>King's Gate（國王門，1754）</strong>：瑞典巴洛克古典主義傑作，曾是要塞正式入口；沿海城牆行走可遠眺赫爾辛基城市全景和波羅的海；Café Chapman 島上咖啡廳，肉桂卷必吃</li>
+      </ul>
+      <div class="alert alert-w" style="margin-top:2mm">⚠ 務必注意末班渡輪時間，避免被困島上過夜（渡輪每 30–60 分鐘一班，傍晚後班次減少）。</div>
+    </div>
+
+    <div class="attn" style="margin-bottom:0">
+      <div class="attn-head">⛏️ 岩石教堂 Temppeliaukio</div>
+      <div class="attn-meta"><span>⏱ 30–45 分鐘</span><span>💶 €5/人</span><span>📍 Lutherinkatu 3 · 計程車直達</span></div>
+      <p>岩石教堂的設計概念早在 1930 年代便已提出，但歷經二戰與資金困難一再延宕。1960 年設計競賽，建築師兄弟<strong>提莫與托摩·蘇奧馬萊寧（Timo & Tuomo Suomalainen）</strong>以大膽構想勝出：「直接把教堂炸鑿進城市中心的花崗岩山丘裡。」1969 年完工，震驚建築界——不建造，而是挖掘；不添加，而是移除。整個教堂深入地下 <strong>13 公尺</strong>，岩壁保持完全未加工的原始爆破質感，岩石縫隙中滲出的地下水是設計刻意保留的元素（調節室內濕度）。</p>
+      <ul>
+        <li><strong>音響奇蹟</strong>：天然花崗岩岩壁形成完美混響，殘響時間約 <strong>6–7 秒</strong>——是赫爾辛基最受歡迎的室內音樂會場地，每年舉辦超過 100 場演出；芬蘭廣播管弦樂團曾在此錄製唱片，許多世界知名演奏家都曾在此演出</li>
+        <li><strong>180 根放射狀銅樑</strong>：支撐頂部環形玻璃天窗，陽光沿銅樑向下輻射，冬天光線射入粗獷岩壁，形成無法複製的神祕光影——教堂本身就是光的藝術裝置</li>
+        <li><strong>冷戰核子避難所</strong>：芬蘭地處蘇聯鄰國，冷戰時期維持謹慎中立（「芬蘭化」），同時默默建造完整民防體系。岩石教堂被規劃為可容納數千市民的核子避難所；赫爾辛基地下有超過 <strong>200 公里</strong>的地下隧道和避難設施，至今部分仍為機密</li>
+        <li><strong>全年恆溫 15–18°C</strong>：花崗岩的自然蓄熱效果；教堂周邊為居民區，外觀不起眼——初次造訪的旅客常常找不到入口，它隱身在普通公寓樓之間</li>
+      </ul>
+      <div class="alert alert-i" style="margin-top:2mm">💡 計程車可直達教堂門口，入口有緩坡，媽媽無須步行。建議午前或傍晚前往，人少時更能感受岩壁靜謐之美。</div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>21</span></div>
+</div>
+
+<!-- ═══ PAGE 19 ─ 芬蘭美食 & 習俗文化 ═══ -->
+<div class="page">
+  <div class="blob" style="width:130mm;height:100mm;background:radial-gradient(ellipse,rgba(171,71,188,0.07) 0%,transparent 70%);top:0;right:-10mm"></div>
+  <div class="blob" style="width:80mm;height:80mm;background:radial-gradient(ellipse,rgba(38,198,218,0.06) 0%,transparent 70%);bottom:20mm;left:-5mm"></div>
+  <div class="content">
+    <div class="page-band"><div class="pblabel">Food & Culture</div><h1>芬蘭美食 ∙ 習俗文化</h1></div>
+    <div class="grid2">
+      <div>
+        <div class="section-title"><span>🍽️</span> 必嘗食物</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <thead><tr><th>食物</th><th>重點介紹</th></tr></thead>
+            <tbody>
+              <tr><td><strong>肉桂卷 Korvapuusti</strong> ⭐</td><td>加小荳蔻 + 珍珠糖粒，比瑞典版更香；Café Regatta / Fazer 必吃</td></tr>
+              <tr><td><strong>鮭魚奶油湯 Lohikeitto</strong> ⭐</td><td>奶白湯底、鮭魚塊、時蘿，芬蘭最家常湯品；老市場大廳必吃</td></tr>
+              <tr><td><strong>煙燻鮭魚 Savustettu lohi</strong></td><td>搭黑麥麵包 + 酸奶油 + 時蘿；港口市集現切最新鮮</td></tr>
+              <tr><td><strong>馴鹿薄肉片 Poronkäristys</strong></td><td>嫩煎薄切佐越橘果醬和馬鈴薯泥，拉普蘭最著名傳統菜</td></tr>
+              <tr><td><strong>雲莓 Lakka</strong></td><td>北方苔原珍品，橘黃色，口感酸甜帶蜂蜜氣息；機場有 Lakka 利口酒</td></tr>
+              <tr><td><strong>Fazer 藍巧克力</strong></td><td>1891 年創立，Karl Fazer 牛奶巧克力（藍色包裝）是最佳伴手禮</td></tr>
+              <tr><td><strong>Runeberg 蛋糕</strong></td><td>杏仁粉 + 覆盆子，波爾沃及 Fazer 旗艦才有正統版本</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:2mm;font-size:7.5pt;color:var(--muted)">☕ 人均咖啡消費量<strong>全球第一</strong>（12 kg/年）。淺焙滴濾為主，非義式濃縮。Salmiakki 鹽甘草糖是國民零食（口味極特殊，務必嘗試）。</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title"><span>🔥</span> 文化習俗</div>
+        <div class="card" style="margin-bottom:3mm">
+          <table>
+            <thead><tr><th>概念</th><th>說明</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Sisu 精神</strong></td><td>「堅韌不屈的意志力」——1939 年冬季戰爭以寡擊眾 105 天，成為芬蘭民族最深刻的精神象徵</td></tr>
+              <tr><td><strong>桑拿（Sauna）</strong></td><td>全國 300 萬個，2020 年 UNESCO 文化遺產。歷史上在桑拿中分娩、進行商業談判（「桑拿外交」）；水倒石頭上的蒸氣稱 <strong>Löyly</strong>，是桑拿的靈魂</td></tr>
+              <tr><td><strong>個人空間</strong></td><td>排隊自然間隔 1.5–2m；沉默是舒適的表現，不必急著填補</td></tr>
+              <tr><td><strong>直接溝通</strong></td><td>「不」就是「不」，不用婉拒，是對對方時間的尊重</td></tr>
+              <tr><td><strong>全民自然權</strong></td><td>任何人均可在他人土地自由行走、採莓果、在公共水域釣魚——自然不屬於任何個人</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="section-title"><span>🎨</span> 芬蘭設計</div>
+        <div class="card">
+          <table>
+            <tbody>
+              <tr><td style="width:24mm;font-weight:600;color:var(--accent)">Marimekko</td><td>1951 年，鮮豔大膽波點花卉印花，日本人最愛；赫爾辛基 Esplanadi 有旗艦店</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">Iittala</td><td>阿爾托花瓶（1936 年設計）至今仍在生產；玻璃陶瓷器皿的代表品牌</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">Moomin 嚕嚕米</td><td>作者 Tove Jansson（芬蘭瑞典語裔）1940 年代創作；機場及市區有豐富周邊</td></tr>
+              <tr><td style="font-weight:600;color:var(--accent)">芬蘭語趣味</td><td>「hän」= 他/她（無性別代詞）；Sauna 是進入 100+ 種語言的芬蘭詞；莫洛托夫雞尾酒（汽油彈）是冬季戰爭中芬蘭人的諷刺命名</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-r" style="margin-top:3mm"><strong>⛔ 媽媽嚴格禁用桑拿</strong>——高溫大量出汗造成嚴重脫水與電解質失衡，洗腎患者使用可能引發心臟驟停。</div>
+      </div>
+    </div>
+  </div>
+  <div class="page-foot"><span>芬蘭極光家族之旅 2026</span><span>22</span></div>
+</div>
+
+</body>
+</html>

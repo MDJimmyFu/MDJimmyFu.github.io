@@ -161,22 +161,6 @@
             </div>
         </div>
 
-        
-        <!-- Google 日曆設定區域 -->
-        <div id="googleSyncSection" class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500 mb-8">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-bold text-gray-700"><i class="fa-brands fa-google mr-2 text-blue-500"></i>Google 日曆自動同步</h3>
-            </div>
-            <p class="text-sm text-gray-600 mb-4">輸入您的 Google 日曆私人 iCal 網址，即可一鍵抓取當月排班並依照公司的「薪資計算規則」自動帶入時數與薪水。</p>
-            <div class="flex flex-col md:flex-row gap-2">
-                <input type="text" id="googleIcalUrl" class="flex-1 border p-2 rounded text-sm" placeholder="請貼上 https://calendar.google.com/calendar/ical/.../basic.ics">
-                <button onclick="syncGoogleCalendar()" id="syncBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-bold flex items-center justify-center whitespace-nowrap">
-                    <i class="fa-solid fa-rotate mr-2"></i>開始同步本月
-                </button>
-            </div>
-            <p class="text-xs text-gray-500 mt-2"><a href="https://support.google.com/calendar/answer/37648" target="_blank" class="text-blue-500 hover:underline"><i class="fa-solid fa-circle-question mr-1"></i>如何取得私人 iCal 網址？</a> 去 Google 日曆設定 > 整合日曆 > 複製「iCal 格式的私人網址」。請小心保存勿外洩。</p>
-        </div>
-
         <!-- 資料備份與管理區域 -->
         <div class="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
             <h3 class="text-lg font-bold text-gray-700 mb-4"><i class="fa-solid fa-database mr-2"></i>資料備份與管理</h3>
@@ -223,12 +207,68 @@
             <div class="p-4 max-h-[70vh] overflow-y-auto">
                 <form id="dayEntryForm">
                     <input type="hidden" id="entryDate">
-                    <div class="mb-3 flex justify-between items-center text-sm">
-                        <span class="text-gray-600 font-bold"><i class="fa-solid fa-clock mr-1"></i> 排班時段列表</span>
-                        <button type="button" onclick="addDayEntryRow()" class="bg-blue-100 text-blue-700 px-3 py-1.5 rounded hover:bg-blue-200 font-bold shadow-sm transition"><i class="fa-solid fa-plus mr-1"></i>新增時段</button>
+                    
+                    <!-- 上午 -->
+                    <div class="mb-4 border p-3 rounded bg-orange-50 border-orange-200">
+                        <h4 class="font-bold text-orange-700 mb-2"><i class="fa-regular fa-sun mr-1"></i>上午時段</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="col-span-2">
+                                <label class="block text-xs text-gray-500">公司</label>
+                                <select class="company-select w-full border rounded p-2 text-sm" id="amCompany">
+                                    <option value="">(無)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">時數(hr)</label>
+                                <input type="number" step="0.5" class="w-full border rounded p-2 text-sm" id="amHours" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">當次薪資($)</label>
+                                <input type="number" class="w-full border rounded p-2 text-sm" id="amSalary" placeholder="0">
+                            </div>
+                        </div>
                     </div>
-                    <div id="dayEntriesContainer" class="flex flex-col gap-3">
-                        <!-- JS 產生動態時段表單 -->
+
+                    <!-- 下午 -->
+                    <div class="mb-4 border p-3 rounded bg-blue-50 border-blue-200">
+                        <h4 class="font-bold text-blue-700 mb-2"><i class="fa-solid fa-sun mr-1"></i>下午時段</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="col-span-2">
+                                <label class="block text-xs text-gray-500">公司</label>
+                                <select class="company-select w-full border rounded p-2 text-sm" id="pmCompany">
+                                    <option value="">(無)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">時數(hr)</label>
+                                <input type="number" step="0.5" class="w-full border rounded p-2 text-sm" id="pmHours" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">當次薪資($)</label>
+                                <input type="number" class="w-full border rounded p-2 text-sm" id="pmSalary" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 晚上 -->
+                    <div class="mb-4 border p-3 rounded bg-indigo-50 border-indigo-200">
+                        <h4 class="font-bold text-indigo-700 mb-2"><i class="fa-solid fa-moon mr-1"></i>晚上時段</h4>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="col-span-2">
+                                <label class="block text-xs text-gray-500">公司</label>
+                                <select class="company-select w-full border rounded p-2 text-sm" id="nightCompany">
+                                    <option value="">(無)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">時數(hr)</label>
+                                <input type="number" step="0.5" class="w-full border rounded p-2 text-sm" id="nightHours" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-500">當次薪資($)</label>
+                                <input type="number" class="w-full border rounded p-2 text-sm" id="nightSalary" placeholder="0">
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -265,15 +305,7 @@
                         <span class="absolute left-3 top-2 text-gray-500">每月</span>
                         <span class="absolute right-3 top-2 text-gray-500">號</span>
                     </div>
-                    </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-bold mb-2">薪資計算規則</label>
-                    <textarea id="companySalaryRule" rows="3" class="w-full border p-2 rounded text-sm bg-gray-50 focus:bg-white" placeholder="若純時薪輸入：3000
-若有特殊級距，格式如：
-2=6000
-3=8000
-時薪=3000"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">可填純數字當作固定時薪；或設定特定「時數=對應薪資」符合特殊級距。</p>
+                    <p class="text-xs text-gray-500 mt-1">註：填寫 5 代表工作月份的「下個月 5 號」發薪。</p>
                 </div>
                 <button onclick="saveCompany()" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">確認儲存</button>
             </div>
@@ -284,67 +316,45 @@
         // --- 全域變數與初始化 ---
         let currentDate = new Date();
         let companies = JSON.parse(localStorage.getItem('salary_app_companies')) || [];
-        // 原資料結構 (am/pm/night)，即將相容轉換為: { '2023-10-25': [ { id, timeStr, companyId, hours, salary } ] }
-        let entries = {}; 
+        // 資料結構: { '2023-10-25': { am: {cid, hrs, money}, pm: {...}, night: {...} } }
+        let entries = JSON.parse(localStorage.getItem('salary_app_entries')) || {};
+        // 新增資料結構: { '2023-10-companyId': true }
         let receivedStatus = JSON.parse(localStorage.getItem('salary_app_received_status')) || {};
+
+        // 當前選中的醒目提示公司ID
         let currentHighlightId = null;
 
         // 初始化
         window.onload = function() {
-            // 讀取並執行資料結構轉移 (Migration)
-            const rawEntries = localStorage.getItem('salary_app_entries');
-            if (rawEntries) {
-                let parsed = JSON.parse(rawEntries);
-                let needsSave = false;
-                
-                Object.keys(parsed).forEach(date => {
-                    if (!Array.isArray(parsed[date])) {
-                        needsSave = true;
-                        let newArr = [];
-                        let old = parsed[date];
-                        if (old.am && (old.am.companyId || old.am.hours || old.am.salary)) newArr.push({ id: generateId(), timeStr: '上午', companyId: old.am.companyId, hours: old.am.hours, salary: old.am.salary });
-                        if (old.pm && (old.pm.companyId || old.pm.hours || old.pm.salary)) newArr.push({ id: generateId(), timeStr: '下午', companyId: old.pm.companyId, hours: old.pm.hours, salary: old.pm.salary });
-                        if (old.night && (old.night.companyId || old.night.hours || old.night.salary)) newArr.push({ id: generateId(), timeStr: '晚上', companyId: old.night.companyId, hours: old.night.hours, salary: old.night.salary });
-                        parsed[date] = newArr;
-                    }
-                });
-                entries = parsed;
-                if (needsSave) localStorage.setItem('salary_app_entries', JSON.stringify(entries));
-            }
-
-            // 初始化 iCal 網址
-            const storedIcal = localStorage.getItem('salary_app_ical_url');
-            if (storedIcal) {
-                const el = document.getElementById('googleIcalUrl');
-                if (el) el.value = storedIcal;
-            }
-
             renderCalendar();
             renderSettings();
             updateSalarySummary();
             
             // 如果沒有公司資料，預設提示添加
             if(companies.length === 0) {
+                // 根據使用者提供的 CSV 資料建立預設清單
                 const defaultCompanies = [
-                    { name: '康邁', bank: '國泰世華', payday: 5, salaryRule: "3=8000\n時薪=3000" },
-                    { name: '三美', bank: '第一銀行', payday: 5, salaryRule: "3000" },
-                    { name: '宏安', bank: '華南銀行', payday: 5, salaryRule: "3000" },
-                    { name: '季灃', bank: '第一銀行', payday: 5, salaryRule: "3000" },
-                    { name: '優實', bank: '中國信託', payday: 10, salaryRule: "3000" },
-                    { name: '實青', bank: '彰化銀行', payday: 10, salaryRule: "3000" },
-                    { name: '富爾達', bank: '第一銀行', payday: 15, salaryRule: "3000" },
-                    { name: '福安', bank: '兆豐銀行', payday: 20, salaryRule: "3000" },
-                    { name: '聖美麗', bank: '台灣銀行', payday: 25, salaryRule: "3000" },
-                    { name: '柏樂', bank: '中國信託', payday: 30, salaryRule: "3000" },
-                    { name: '盛順', bank: '第一銀行', payday: 30, salaryRule: "3000" },
-                    { name: '敏盛', bank: '王道銀行', payday: 30, salaryRule: "2500" },
-                    { name: '南門', bank: '國泰世華', payday: 15, salaryRule: "3=7200\n時薪=3000" },
-                    { name: '恆樂', bank: '合作金庫', payday: 10, salaryRule: "3000" },
-                    { name: '永煦', bank: '華南銀行', payday: 1, salaryRule: "3000" },
-                    { name: '樂欣', bank: '華南銀行', payday: 10, salaryRule: "3000" },
-                    { name: '冠緁', bank: '國泰世華', payday: 10, salaryRule: "3000" }
+                    { name: '康邁', bank: '國泰世華', payday: 5 },
+                    { name: '三美', bank: '第一銀行', payday: 5 },
+                    { name: '宏安', bank: '華南銀行', payday: 5 },
+                    { name: '季灃', bank: '第一銀行', payday: 5 },
+                    { name: '優實', bank: '中國信託', payday: 10 },
+                    { name: '實青', bank: '彰化銀行', payday: 10 },
+                    { name: '富爾達', bank: '第一銀行', payday: 15 },
+                    { name: '福安', bank: '兆豐銀行', payday: 20 },
+                    { name: '聖美麗', bank: '台灣銀行', payday: 25 },
+                    { name: '柏樂', bank: '中國信託', payday: 30 },
+                    { name: '盛順', bank: '第一銀行', payday: 30 },
+                    { name: '敏盛', bank: '王道銀行', payday: 30 },
+                    { name: '南門', bank: '國泰世華', payday: 15 },
+                    { name: '恆樂', bank: '合作金庫', payday: 10 },
+                    { name: '永許', bank: '華南銀行', payday: 1 }
                 ];
-                defaultCompanies.forEach(c => companies.push({ id: generateId(), ...c }));
+
+                defaultCompanies.forEach(c => {
+                    companies.push({ id: generateId(), ...c });
+                });
+
                 saveCompaniesToStorage();
                 renderSettings();
             }
@@ -354,62 +364,63 @@
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
+            
+            // 更新標題
             document.getElementById('currentMonthDisplay').textContent = `${year}年 ${month + 1}月`;
 
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
             const daysInMonth = lastDay.getDate();
-            const startDayOfWeek = firstDay.getDay();
+            const startDayOfWeek = firstDay.getDay(); // 0 is Sunday
 
             const grid = document.getElementById('calendarGrid');
             grid.innerHTML = '';
 
-            // 空白格
+            // 填充前面的空白
             for(let i = 0; i < startDayOfWeek; i++) {
                 const emptyCell = document.createElement('div');
                 emptyCell.className = 'calendar-day bg-gray-50 opacity-50';
                 grid.appendChild(emptyCell);
             }
 
-            // 日期格
+            // 填充日期
             for(let d = 1; d <= daysInMonth; d++) {
                 const dateStr = formatDateKey(new Date(year, month, d));
                 const cell = document.createElement('div');
                 cell.className = 'calendar-day p-1 md:p-2 relative flex flex-col';
                 if (isToday(year, month, d)) cell.classList.add('today');
                 
+                // 日期數字
                 const dateNum = document.createElement('span');
                 dateNum.className = 'text-gray-700 font-bold text-sm md:text-base mb-1';
                 dateNum.textContent = d;
                 cell.appendChild(dateNum);
 
-                const dayDataArray = entries[dateStr];
-                if(dayDataArray && dayDataArray.length > 0) {
+                // 顯示當日數據摘要
+                const dayData = entries[dateStr];
+                if(dayData) {
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'flex flex-col gap-1 text-[10px] md:text-xs overflow-hidden';
-                    let dailyTotal = 0;
                     
-                    // 色系輪換分配
-                    const colors = ['bg-orange-400', 'bg-blue-400', 'bg-indigo-500', 'bg-emerald-500', 'bg-rose-400', 'bg-teal-500'];
-
-                    dayDataArray.forEach((slot, idx) => {
-                        if(slot.companyId) {
-                            const cName = getCompanyName(slot.companyId);
-                            const money = slot.salary || 0;
-                            const tStr = slot.timeStr || `時段${idx+1}`;
-                            dailyTotal += parseFloat(money);
-                            const colorCls = colors[idx % colors.length];
+                    ['am', 'pm', 'night'].forEach(slot => {
+                        if(dayData[slot] && dayData[slot].companyId) {
+                            const cName = getCompanyName(dayData[slot].companyId);
+                            const money = dayData[slot].salary;
                             
+                            // 電腦版顯示文字，增加 company-indicator 類別與 data-cid 屬性
                             const tag = document.createElement('div');
-                            tag.className = `truncate rounded px-1 text-white company-indicator ${colorCls}`;
-                            tag.innerHTML = `<span class="hidden md:inline"><i class="fa-regular fa-clock text-[10px] mr-1"></i>${tStr} ${cName} $${money}</span>`;
-                            tag.dataset.cid = slot.companyId;
+                            tag.className = `truncate rounded px-1 text-white company-indicator ${getSlotColor(slot)}`;
+                            tag.innerHTML = `<span class="hidden md:inline">${getSlotIcon(slot)} ${cName} $${money}</span>`;
+                            tag.dataset.cid = dayData[slot].companyId; // 綁定公司ID
 
+                            // 手機版點點，增加 company-indicator 類別與 data-cid 屬性
                             const mobileDot = document.createElement('span');
-                            mobileDot.className = `md:hidden w-2 h-2 rounded-full inline-block mr-1 company-indicator ${colorCls}`;
-                            mobileDot.dataset.cid = slot.companyId;
+                            mobileDot.className = `md:hidden w-2 h-2 rounded-full inline-block mr-1 company-indicator ${getSlotColorBg(slot)}`;
+                            mobileDot.dataset.cid = dayData[slot].companyId; // 綁定公司ID
                             
+                            // 為了手機版佈局，這裡做一點特別處理
                             if(window.innerWidth < 768) {
+                                // 手機版用點點表示
                                 dateNum.appendChild(mobileDot);
                             } else {
                                 contentDiv.appendChild(tag);
@@ -419,166 +430,92 @@
                     
                     if(window.innerWidth >= 768) {
                         cell.appendChild(contentDiv);
-                    } else if(dailyTotal > 0) {
-                        const totalLabel = document.createElement('div');
-                        totalLabel.className = 'text-blue-600 text-[10px] font-bold mt-auto';
-                        totalLabel.textContent = `$${dailyTotal}`;
-                        cell.appendChild(totalLabel);
+                    } else {
+                         // 計算當日總額顯示在手機版
+                         let dailyTotal = 0;
+                         ['am', 'pm', 'night'].forEach(s => {
+                             if(dayData[s] && dayData[s].salary) dailyTotal += parseFloat(dayData[s].salary);
+                         });
+                         if(dailyTotal > 0) {
+                             const totalLabel = document.createElement('div');
+                             totalLabel.className = 'text-blue-600 text-[10px] font-bold mt-auto';
+                             totalLabel.textContent = `$${dailyTotal}`;
+                             cell.appendChild(totalLabel);
+                         }
                     }
                 }
 
-                cell.onclick = () => openDayModal(dateStr);
+                cell.onclick = (e) => {
+                    // 避免點擊到排班內容時觸發 highlight（如果只想編輯）
+                    // 但這裡我們一律開啟編輯，highlight 是在下方卡片觸發
+                    openDayModal(dateStr);
+                };
                 grid.appendChild(cell);
             }
-            if(currentHighlightId) applyHighlight(currentHighlightId);
+            
+            // 重新渲染後如果有點選的公司，要重新套用 highlight
+            if(currentHighlightId) {
+                applyHighlight(currentHighlightId);
+            }
         }
 
         // --- 邏輯：彈窗與資料輸入 ---
         function openDayModal(dateStr) {
             document.getElementById('entryDate').value = dateStr;
             const [y, m, d] = dateStr.split('-');
-            document.getElementById('modalDateTitle').textContent = `時段管理：${y}年${m}月${d}日`;
+            document.getElementById('modalDateTitle').textContent = `編輯 ${y}年${m}月${d}日 資料`;
 
-            const container = document.getElementById('dayEntriesContainer');
-            container.innerHTML = '';
+            // 填充下拉選單
+            updateCompanySelects();
 
-            const dayDataArray = entries[dateStr] || [];
-            if (dayDataArray.length === 0) {
-                // 如果空，預設給一行空表單
-                addDayEntryRow();
-            } else {
-                dayDataArray.forEach(data => addDayEntryRow(data));
-            }
+            // 讀取既有資料
+            const data = entries[dateStr] || {};
+            
+            fillSlotForm('am', data.am);
+            fillSlotForm('pm', data.pm);
+            fillSlotForm('night', data.night);
+
             openModal('dayModal');
         }
 
-        function addDayEntryRow(data = null) {
-            const container = document.getElementById('dayEntriesContainer');
-            const rowId = generateId();
-            const div = document.createElement('div');
-            div.className = 'border p-3 rounded bg-white border-gray-200 shadow-sm relative';
-            div.dataset.rowId = rowId;
-
-            // Optional close button for the row
-            const removeBtn = `<button type="button" onclick="this.parentElement.remove()" class="absolute top-2 right-2 text-gray-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>`;
-
-            // Select Options
-            let compOptions = '<option value="">(請選擇公司)</option>';
-            companies.forEach(c => {
-                compOptions += `<option value="${c.id}" ${data && data.companyId === c.id ? 'selected' : ''}>${c.name}</option>`;
-            });
-
-            div.innerHTML = `
-                ${removeBtn}
-                <div class="grid grid-cols-2 gap-2 mt-2">
-                    <div class="col-span-2">
-                        <label class="block text-xs text-gray-500 mb-1">時間 / 時段名稱</label>
-                        <input type="text" class="w-full border rounded p-2 text-sm dt-timeStr" placeholder="例：08:00 - 12:00 或 上午" value="${data ? (data.timeStr||'') : ''}">
-                    </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs text-gray-500 mb-1">公司</label>
-                        <select class="company-select w-full border rounded p-2 text-sm dt-comp">
-                            ${compOptions}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">時數(hr)</label>
-                        <input type="number" step="0.5" class="w-full border rounded p-2 text-sm dt-hours" value="${data ? (data.hours||'') : ''}" oninput="autoCalcRowSalary(this)">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-500 mb-1">當次薪資($)</label>
-                        <input type="number" class="w-full border rounded p-2 text-sm dt-salary" value="${data ? (data.salary||'') : ''}">
-                    </div>
-                </div>
-            `;
-            container.appendChild(div);
-        }
-
-        function autoCalcRowSalary(inputEl) {
-            const rowDiv = inputEl.closest('[data-row-id]');
-            const compSelect = rowDiv.querySelector('.dt-comp').value;
-            const hours = parseFloat(inputEl.value);
-            if(!compSelect || isNaN(hours)) return;
-
-            const comp = companies.find(c => c.id === compSelect);
-            if(comp && comp.salaryRule) {
-                const estimated = parseSalaryRule(comp.salaryRule, hours);
-                if (estimated > 0) {
-                    rowDiv.querySelector('.dt-salary').value = estimated;
-                }
-            }
+        function fillSlotForm(slot, data) {
+            document.getElementById(`${slot}Company`).value = data ? data.companyId : "";
+            document.getElementById(`${slot}Hours`).value = data ? data.hours : "";
+            document.getElementById(`${slot}Salary`).value = data ? data.salary : "";
         }
 
         function saveDayEntry() {
             const dateStr = document.getElementById('entryDate').value;
-            const container = document.getElementById('dayEntriesContainer');
-            const rows = container.querySelectorAll('[data-row-id]');
-            
-            const newArr = [];
-            rows.forEach(row => {
-                const timeStr = row.querySelector('.dt-timeStr').value;
-                const cid = row.querySelector('.dt-comp').value;
-                const hrs = row.querySelector('.dt-hours').value;
-                const sal = row.querySelector('.dt-salary').value;
+            const entryData = {
+                am: getSlotData('am'),
+                pm: getSlotData('pm'),
+                night: getSlotData('night')
+            };
 
-                // 只要有填寫一項，就儲存
-                if (cid || hrs || sal || timeStr) {
-                    newArr.push({
-                        id: generateId(),
-                        timeStr: timeStr,
-                        companyId: cid,
-                        hours: hrs,
-                        salary: sal
-                    });
-                }
-            });
-
-            if (newArr.length === 0) {
+            // 如果整天都空的，刪除該 key 以節省空間
+            if (!entryData.am && !entryData.pm && !entryData.night) {
                 delete entries[dateStr];
             } else {
-                entries[dateStr] = newArr;
+                entries[dateStr] = entryData;
             }
 
             localStorage.setItem('salary_app_entries', JSON.stringify(entries));
             closeModal('dayModal');
-            renderCalendar();
-            updateSalarySummary();
+            renderCalendar(); // 重繪月曆
+            updateSalarySummary(); // 更新總表
         }
 
-        // --- 解析特殊薪資規則 ---
-        // 支援 "2=6000", "時薪=3000", "3000"
-        function parseSalaryRule(ruleStr, hours) {
-            if (!ruleStr || isNaN(hours)) return 0;
-            const lines = ruleStr.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let defaultHourly = 0;
-            let specificFixed = null;
+        function getSlotData(slot) {
+            const cid = document.getElementById(`${slot}Company`).value;
+            const hrs = document.getElementById(`${slot}Hours`).value;
+            const sal = document.getElementById(`${slot}Salary`).value;
             
-            if (lines.length === 1 && !lines[0].includes('=')) {
-                const num = parseFloat(lines[0].replace(/[^\d.-]/g, ''));
-                if(!isNaN(num)) return num * hours;
-            }
-
-            for (let line of lines) {
-                let parts = line.split('=');
-                if (parts.length === 2) {
-                    let left = parts[0].trim();
-                    let right = parseFloat(parts[1].replace(/[^\d.-]/g, ''));
-                    // 比對是否符合特定小時
-                    if (left == hours.toString() || left === hours.toString() + 'hr' || left === hours.toString() + 'H') {
-                        specificFixed = right;
-                    } else if (left.includes('時薪') || left.includes('預設') || left.includes('時')) {
-                        defaultHourly = right;
-                    }
-                } else {
-                    const num = parseFloat(line.replace(/[^\d.-]/g, ''));
-                    if(!isNaN(num) && defaultHourly === 0) defaultHourly = num;
-                }
-            }
-
-            if (specificFixed !== null) {
-                return specificFixed;
-            }
-            return hours * defaultHourly;
+            if(!cid && !hrs && !sal) return null; // 空資料
+            return {
+                companyId: cid,
+                hours: hrs,
+                salary: sal
+            };
         }
 
         // --- 邏輯：薪資統計總表 ---
@@ -587,34 +524,45 @@
             container.innerHTML = '';
             
             const year = currentDate.getFullYear();
-            const month = currentDate.getMonth() + 1;
+            const month = currentDate.getMonth() + 1; // 1-12
             const prefix = `${year}-${String(month).padStart(2, '0')}`;
 
-            const monthlyStats = {}; 
-            let grandTotal = 0;
+            // 1. 篩選本月資料
+            const monthlyStats = {}; // { companyId: { totalSalary: 0, totalHours: 0 } }
+            let grandTotal = 0; // 本月總收入
 
             Object.keys(entries).forEach(dateKey => {
                 if(dateKey.startsWith(prefix)) {
-                    entries[dateKey].forEach(slot => {
-                        if(slot.companyId) {
-                            if(!monthlyStats[slot.companyId]) {
-                                monthlyStats[slot.companyId] = { totalSalary: 0, totalHours: 0 };
+                    const dayData = entries[dateKey];
+                    ['am', 'pm', 'night'].forEach(slot => {
+                        const sData = dayData[slot];
+                        if(sData && sData.companyId) {
+                            if(!monthlyStats[sData.companyId]) {
+                                monthlyStats[sData.companyId] = { totalSalary: 0, totalHours: 0 };
                             }
-                            const salary = parseFloat(slot.salary || 0);
-                            monthlyStats[slot.companyId].totalSalary += salary;
-                            monthlyStats[slot.companyId].totalHours += parseFloat(slot.hours || 0);
+                            const salary = parseFloat(sData.salary || 0);
+                            monthlyStats[sData.companyId].totalSalary += salary;
+                            monthlyStats[sData.companyId].totalHours += parseFloat(sData.hours || 0);
                             grandTotal += salary;
                         }
                     });
                 }
             });
             
+            // 更新本月總計顯示
             document.getElementById('grandTotalDisplay').textContent = `$${grandTotal.toLocaleString()}`;
 
+            // 2. 轉換為陣列並依照銀行排序
             const summaryList = [];
             Object.keys(monthlyStats).forEach(cid => {
                 const comp = companies.find(c => c.id == cid);
-                if(comp) summaryList.push({ cid, comp, stat: monthlyStats[cid] });
+                if(comp) {
+                    summaryList.push({
+                        cid: cid,
+                        comp: comp,
+                        stat: monthlyStats[cid]
+                    });
+                }
             });
 
             if(summaryList.length === 0) {
@@ -622,17 +570,27 @@
                 return;
             }
 
-            summaryList.sort((a, b) => (a.comp.bank || '').localeCompare(b.comp.bank || '', 'zh-Hant'));
+            // 排序邏輯：依照銀行名稱 (zh-Hant localeCompare)
+            summaryList.sort((a, b) => {
+                const bankA = a.comp.bank || '';
+                const bankB = b.comp.bank || '';
+                return bankA.localeCompare(bankB, 'zh-Hant');
+            });
 
+            // 3. 顯示卡片
             summaryList.forEach(item => {
                 const { cid, comp, stat } = item;
+
+                // 計算入帳日：下個月 X 號
                 let nextMonth = month + 1;
                 let nextYear = year;
                 if(nextMonth > 12) { nextMonth = 1; nextYear++; }
                 
+                // 檢查是否已入帳
                 const statusKey = `${year}-${String(month).padStart(2, '0')}-${cid}`;
                 const isReceived = receivedStatus[statusKey];
 
+                // 根據狀態設定樣式
                 const cardClass = isReceived ? 'bg-green-50 border-green-300' : 'bg-gray-50 border-gray-200';
                 const btnClass = isReceived 
                     ? 'bg-green-600 hover:bg-green-700 text-white' 
@@ -640,6 +598,7 @@
                 const btnText = isReceived ? '<i class="fa-solid fa-check mr-1"></i>已入帳' : '確認入帳';
                 const textClass = isReceived ? 'text-green-800' : 'text-gray-800';
 
+                // 檢查是否為當前醒目提示的公司
                 const isHighlighted = (cid === currentHighlightId);
                 const highlightClass = isHighlighted ? 'ring-2 ring-red-400 ring-offset-2' : '';
 
@@ -647,7 +606,9 @@
                 card.className = `${cardClass} ${highlightClass} border rounded p-4 flex flex-col justify-between transition-all duration-300 cursor-pointer hover:shadow-md company-card`;
                 card.dataset.cid = cid;
                 
+                // 點擊卡片本體觸發 highlight (需要排除按鈕點擊)
                 card.onclick = (e) => {
+                    // 如果點到的是按鈕或按鈕內部，不觸發 highlight
                     if (e.target.closest('button')) return;
                     highlightCompany(cid);
                 };
@@ -686,13 +647,25 @@
 
         // --- 醒目提示功能 ---
         function highlightCompany(cid) {
-            currentHighlightId = (currentHighlightId === cid) ? null : cid;
+            // 如果點擊同一個，則取消
+            if (currentHighlightId === cid) {
+                currentHighlightId = null;
+            } else {
+                currentHighlightId = cid;
+            }
+            
+            // 重新渲染卡片狀態 (為了更新卡片邊框)
             updateSalarySummary();
+            
+            // 套用月曆樣式
             applyHighlight(currentHighlightId);
         }
 
         function applyHighlight(cid) {
+            // 先取得所有指標
             const allIndicators = document.querySelectorAll('.company-indicator');
+            
+            // 重置所有樣式
             allIndicators.forEach(el => {
                 el.classList.remove('entry-highlight');
                 el.classList.remove('entry-dimmed');
@@ -700,6 +673,7 @@
 
             if (!cid) return;
 
+            // 針對特定 cid 加上 highlight，其他的加上 dimmed
             allIndicators.forEach(el => {
                 if(el.dataset.cid === cid) {
                     el.classList.add('entry-highlight');
@@ -710,8 +684,11 @@
         }
 
         function toggleReceived(key) {
-            if (receivedStatus[key]) delete receivedStatus[key];
-            else receivedStatus[key] = true;
+            if (receivedStatus[key]) {
+                delete receivedStatus[key];
+            } else {
+                receivedStatus[key] = true;
+            }
             localStorage.setItem('salary_app_received_status', JSON.stringify(receivedStatus));
             updateSalarySummary();
         }
@@ -724,12 +701,10 @@
             companies.forEach(comp => {
                 const tr = document.createElement('tr');
                 tr.className = 'border-b hover:bg-gray-50';
-                // Provide a quick preview of salary rule
-                const previewRule = comp.salaryRule ? ((comp.salaryRule.length > 10) ? comp.salaryRule.substring(0,10)+'...' : comp.salaryRule) : '未設';
                 tr.innerHTML = `
                     <td class="p-3 font-medium">${comp.name}</td>
                     <td class="p-3 text-gray-600">${comp.bank}</td>
-                    <td class="p-3 text-gray-600">次月 ${comp.payday} 號<br><span class="text-xs text-blue-500">計費:${previewRule}</span></td>
+                    <td class="p-3 text-gray-600">次月 ${comp.payday} 號</td>
                     <td class="p-3 text-right">
                         <button onclick="editCompany('${comp.id}')" class="text-blue-600 hover:text-blue-800 mr-2"><i class="fa-solid fa-pen"></i></button>
                         <button onclick="deleteCompany('${comp.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
@@ -745,15 +720,13 @@
             document.getElementById('companyName').value = '';
             document.getElementById('companyBank').value = '';
             document.getElementById('companyPayDay').value = '';
-            document.getElementById('companySalaryRule').value = '';
             
             if(id) {
                 const comp = companies.find(c => c.id == id);
                 if(comp) {
-                    document.getElementById('companyName').value = comp.name || '';
-                    document.getElementById('companyBank').value = comp.bank || '';
-                    document.getElementById('companyPayDay').value = comp.payday || '';
-                    document.getElementById('companySalaryRule').value = comp.salaryRule || '';
+                    document.getElementById('companyName').value = comp.name;
+                    document.getElementById('companyBank').value = comp.bank;
+                    document.getElementById('companyPayDay').value = comp.payday;
                 }
             }
             openModal('companyModal');
@@ -764,26 +737,29 @@
             const name = document.getElementById('companyName').value;
             const bank = document.getElementById('companyBank').value;
             const payday = document.getElementById('companyPayDay').value;
-            const salaryRule = document.getElementById('companySalaryRule').value;
 
             if(!name) { alert('請輸入公司名稱'); return; }
 
             if(id) {
+                // 編輯
                 const idx = companies.findIndex(c => c.id == id);
-                if(idx > -1) companies[idx] = { id, name, bank, payday, salaryRule };
+                if(idx > -1) {
+                    companies[idx] = { id, name, bank, payday };
+                }
             } else {
-                companies.push({ id: generateId(), name, bank, payday, salaryRule });
+                // 新增
+                companies.push({ id: generateId(), name, bank, payday });
             }
 
             saveCompaniesToStorage();
             closeModal('companyModal');
             renderSettings();
-            renderCalendar();
+            renderCalendar(); // 公司名稱可能改變
             updateSalarySummary();
         }
 
         function deleteCompany(id) {
-            if(confirm('確定要刪除這間公司嗎？')) {
+            if(confirm('確定要刪除這間公司嗎？這不會刪除已輸入的歷史薪資紀錄，但總表可能無法顯示該公司名稱。')) {
                 companies = companies.filter(c => c.id != id);
                 saveCompaniesToStorage();
                 renderSettings();
@@ -793,39 +769,58 @@
         }
 
         function updateCompanySelects() {
-            // 這個函數現階段其實用不到，因為我們把所有表單的 Select 都是動態創建的 (dayEntriesContainer)
+            const selects = document.querySelectorAll('.company-select');
+            selects.forEach(sel => {
+                const currentVal = sel.value;
+                sel.innerHTML = '<option value="">(無)</option>';
+                companies.forEach(comp => {
+                    const opt = document.createElement('option');
+                    opt.value = comp.id;
+                    opt.textContent = comp.name;
+                    sel.appendChild(opt);
+                });
+                sel.value = currentVal;
+            });
         }
 
         // --- 邏輯：匯出與匯入 ---
+        
+        // 1. 匯出 CSV 報表
         function exportCSV() {
             if(Object.keys(entries).length === 0) {
-                alert("目前沒有紀錄可以匯出。");
+                alert("目前沒有任何薪資紀錄可以匯出。");
                 return;
             }
 
-            let csvContent = "\uFEFF"; 
-            csvContent += "日期,時間段,公司名稱,入帳銀行,預計入帳日(隔月),時數(hr),金額($)\n";
+            let csvContent = "\uFEFF"; // UTF-8 BOM
+            csvContent += "日期,時段,公司名稱,入帳銀行,預計入帳日(隔月),時數(hr),金額($)\n";
 
+            // 取得所有日期並排序
             const sortedDates = Object.keys(entries).sort();
 
             sortedDates.forEach(date => {
-                if(Array.isArray(entries[date])) {
-                    entries[date].forEach(slot => {
-                        if(slot.companyId) {
-                            const comp = companies.find(c => c.id == slot.companyId) || { name: '已刪除', bank: '-', payday: '-' };
-                            const row = [
-                                date,
-                                `"${slot.timeStr || ''}"`,
-                                `"${comp.name}"`,
-                                `"${comp.bank}"`,
-                                comp.payday,
-                                slot.hours || 0,
-                                slot.salary || 0
-                            ].join(",");
-                            csvContent += row + "\n";
-                        }
-                    });
-                }
+                const dayData = entries[date];
+                ['am', 'pm', 'night'].forEach(slot => {
+                    if(dayData[slot] && dayData[slot].companyId) {
+                        const d = dayData[slot];
+                        const comp = companies.find(c => c.id == d.companyId) || { name: '已刪除公司', bank: '-', payday: '-' };
+                        
+                        let slotName = '上午';
+                        if(slot === 'pm') slotName = '下午';
+                        if(slot === 'night') slotName = '晚上';
+
+                        const row = [
+                            date,
+                            slotName,
+                            `"${comp.name}"`, // 防止名稱有逗號
+                            `"${comp.bank}"`,
+                            comp.payday,
+                            d.hours,
+                            d.salary
+                        ].join(",");
+                        csvContent += row + "\n";
+                    }
+                });
             });
 
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -839,10 +834,11 @@
             document.body.removeChild(link);
         }
 
+        // 2. 匯出備份 (JSON)
         function backupData() {
             const backup = {
                 timestamp: new Date().toISOString(),
-                version: "2.0",
+                version: "1.0",
                 companies: companies,
                 entries: entries,
                 receivedStatus: receivedStatus
@@ -860,6 +856,7 @@
             document.body.removeChild(link);
         }
 
+        // 3. 還原資料 (Import JSON)
         function restoreData(input) {
             const file = input.files[0];
             if (!file) return;
@@ -868,18 +865,24 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.companies || !data.entries) throw new Error("格式錯誤：找不到必要的資料欄位");
+                    
+                    // 簡單驗證格式
+                    if (!data.companies || !data.entries) {
+                        throw new Error("格式錯誤：找不到必要的資料欄位");
+                    }
 
                     if(confirm(`確定要還原此備份檔嗎？\n備份時間：${data.timestamp || '未知'}\n\n警告：這將會覆蓋您目前所有的資料！`)) {
                         localStorage.setItem('salary_app_companies', JSON.stringify(data.companies));
                         localStorage.setItem('salary_app_entries', JSON.stringify(data.entries));
                         localStorage.setItem('salary_app_received_status', JSON.stringify(data.receivedStatus || {}));
+                        
                         alert("還原成功！頁面將重新整理。");
                         location.reload();
                     }
                 } catch (err) {
                     alert("還原失敗：檔案格式錯誤或損毀。\n" + err.message);
                 }
+                // 清空 input 讓同個檔案可以再選一次
                 input.value = '';
             };
             reader.readAsText(file);
@@ -891,6 +894,7 @@
             currentDate.setMonth(currentDate.getMonth() + offset);
             renderCalendar();
             updateSalarySummary();
+            // 切換月份時，清除 highlight
             currentHighlightId = null;
         }
 
@@ -922,6 +926,24 @@
             return c ? c.name : '未知公司';
         }
 
+        function getSlotColor(slot) {
+            if(slot === 'am') return 'bg-orange-400';
+            if(slot === 'pm') return 'bg-blue-400';
+            return 'bg-indigo-500';
+        }
+        
+        function getSlotColorBg(slot) {
+             if(slot === 'am') return 'bg-orange-400';
+            if(slot === 'pm') return 'bg-blue-400';
+            return 'bg-indigo-500';
+        }
+
+        function getSlotIcon(slot) {
+            if(slot === 'am') return '<i class="fa-regular fa-sun text-[10px]"></i>';
+            if(slot === 'pm') return '<i class="fa-solid fa-sun text-[10px]"></i>';
+            return '<i class="fa-solid fa-moon text-[10px]"></i>';
+        }
+
         function openModal(id) {
             document.getElementById(id).classList.add('active');
         }
@@ -938,151 +960,10 @@
             localStorage.setItem('salary_app_companies', JSON.stringify(companies));
         }
         
+        // 編輯既有公司
         window.editCompany = function(id) {
             openCompanyModal(id);
         }
-
-        // --- iCal Google Calendar 同步機制 ---
-        async function syncGoogleCalendar() {
-            const url = document.getElementById('googleIcalUrl').value.trim();
-            if (!url) return alert('請輸入您的 Google 日曆 iCal 網址！');
-            localStorage.setItem('salary_app_ical_url', url);
-            
-            const btn = document.getElementById('syncBtn');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>同步中...';
-            btn.disabled = true;
-
-            try {
-                // 透過 CORS Proxy 獲得內容
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-                const icsText = data.contents;
-                
-                if(!icsText || !icsText.includes('BEGIN:VCALENDAR')) {
-                    throw new Error("無法讀取有效的日曆資料，請確認網址是否正確且為 iCal 格式。");
-                }
-
-                const events = parseICS(icsText);
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth() + 1;
-                const prefix = `${year}-${String(month).padStart(2, '0')}`;
-                
-                let syncedCount = 0;
-
-                events.forEach(ev => {
-                    if (!ev.start || !ev.end || !ev.summary) return;
-                    const startDateStr = ev.start.split('T')[0];
-                    if (startDateStr.startsWith(prefix)) {
-                        let matchedCid = null;
-                        for (let comp of companies) {
-                            if (ev.summary.includes(comp.name)) {
-                                matchedCid = comp.id;
-                                break;
-                            }
-                        }
-
-                        if (matchedCid) {
-                            const sTime = new Date(ev.start);
-                            const eTime = new Date(ev.end);
-                            const hours = (eTime - sTime) / (1000 * 60 * 60);
-
-                            if (hours > 0 && hours < 24) { 
-                                const timeStr = `${formatHM(sTime)}-${formatHM(eTime)}`;
-                                const comp = companies.find(c => c.id == matchedCid);
-                                const salary = parseSalaryRule(comp.salaryRule, hours);
-
-                                if(!entries[startDateStr]) entries[startDateStr] = [];
-                                
-                                const exists = entries[startDateStr].find(e => e.companyId === matchedCid && e.timeStr === timeStr);
-                                if (!exists) {
-                                    entries[startDateStr].push({
-                                        id: generateId(),
-                                        timeStr: timeStr,
-                                        companyId: matchedCid,
-                                        hours: hours,
-                                        salary: salary
-                                    });
-                                    syncedCount++;
-                                }
-                            }
-                        }
-                    }
-                });
-
-                localStorage.setItem('salary_app_entries', JSON.stringify(entries));
-                renderCalendar();
-                updateSalarySummary();
-                alert(`同步完成！共匯入 ${syncedCount} 筆排班資料到本月。`);
-
-            } catch (err) {
-                console.error(err);
-                alert('同步失敗：' + err.message);
-            } finally {
-                btn.innerHTML = '<i class="fa-solid fa-rotate mr-2"></i>開始同步本月';
-                btn.disabled = false;
-            }
-        }
-
-        // 解析 ICS 格式
-        function parseICS(icsText) {
-            const lines = icsText.split(/\r?\n/);
-            const events = [];
-            let currentEvent = null;
-
-            for (let i = 0; i < lines.length; i++) {
-                let line = lines[i];
-                while (i + 1 < lines.length && (lines[i+1].startsWith(' ') || lines[i+1].startsWith('\t'))) {
-                    line += lines[i+1].substring(1);
-                    i++;
-                }
-
-                if (line === 'BEGIN:VEVENT') {
-                    currentEvent = {};
-                } else if (line === 'END:VEVENT') {
-                    if (currentEvent && currentEvent.start) events.push(currentEvent);
-                    currentEvent = null;
-                } else if (currentEvent) {
-                    if (line.startsWith('SUMMARY:')) {
-                        currentEvent.summary = line.substring(8);
-                    } else if (line.startsWith('DTSTART:')) {
-                        currentEvent.start = parseICalDate(line.substring(8));
-                    } else if (line.startsWith('DTSTART;')) {
-                        currentEvent.start = parseICalDate(line.split(':')[1]);
-                    } else if (line.startsWith('DTEND:')) {
-                        currentEvent.end = parseICalDate(line.substring(6));
-                    } else if (line.startsWith('DTEND;')) {
-                        currentEvent.end = parseICalDate(line.split(':')[1]);
-                    }
-                }
-            }
-            return events;
-        }
-
-        function parseICalDate(dateStr) {
-            if (!dateStr) return null;
-            let isUTC = dateStr.endsWith('Z');
-            dateStr = dateStr.replace(/Z$/, '');
-            const y = parseInt(dateStr.substring(0,4));
-            const m = parseInt(dateStr.substring(4,6));
-            const d = parseInt(dateStr.substring(6,8));
-            if(dateStr.length > 8) {
-                const h = parseInt(dateStr.substring(9,11));
-                const min = parseInt(dateStr.substring(11,13));
-                const s = parseInt(dateStr.substring(13,15));
-                if (isUTC) {
-                    return new Date(Date.UTC(y, m-1, d, h, min, s)).toISOString();
-                } else {
-                    return new Date(y, m-1, d, h, min, s).toISOString();
-                }
-            }
-            return new Date(y, m-1, d, 0, 0, 0).toISOString();
-        }
-
-        function formatHM(date) {
-            return String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0');
-        }
-
     </script>
 </body>
 </html>
