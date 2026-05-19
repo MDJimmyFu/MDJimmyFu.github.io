@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P11 · section-review 確認體驗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 56px 80px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* 左：論述 */
+  .left h1 {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .left h1 .accent { color: var(--teal-8); }
+  .left .lead {
+    margin-top: 24px;
+    font-size: 22px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+
+  .principles {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .pr-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 16px;
+  }
+  .pr-icon {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--teal-1);
+    color: var(--teal-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .pr-card.warning .pr-icon {
+    background: var(--yellow-1);
+    color: #b88300;
+  }
+  .pr-card .pr-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .pr-card .pr-desc {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .pr-card .pr-desc strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* 右：UI mockup — Mantine 風格 */
+  .ui-frame {
+    background: #fff;
+    border: 1px solid var(--rule);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .ui-titlebar {
+    background: #f1f3f5;
+    border-bottom: 1px solid var(--rule);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .ui-titlebar .dots {
+    display: flex; gap: 6px;
+  }
+  .ui-titlebar .dot {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: #ced4da;
+  }
+  .ui-titlebar .url {
+    flex: 1;
+    text-align: center;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+
+  .ui-header {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .ui-header .breadcrumb {
+    font-size: 13px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .ui-header .patient {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 2px;
+  }
+  .ui-header .pill {
+    background: var(--teal-1);
+    color: var(--teal-8);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  /* Section 區塊 */
+  .section-block {
+    padding: 22px 28px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-block.active {
+    background: var(--teal-1);
+    border-left: 4px solid var(--teal-8);
+  }
+  .section-block.collapsed {
+    background: #fafafa;
+    color: var(--ink-3);
+  }
+
+  .sb-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .sb-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sb-title .badge {
+    background: var(--ink);
+    color: #fff;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-family: var(--font-en);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+  }
+  .sb-title .ai-badge {
+    background: var(--teal-8);
+  }
+  .sb-status {
+    font-size: 13px;
+    color: var(--ink-3);
+    font-family: var(--font-en);
+    letter-spacing: 0.04em;
+  }
+  .sb-status.done { color: var(--teal-8); font-weight: 600; }
+  .sb-status.review { color: #b88300; font-weight: 600; }
+
+  /* tri-state 病史 row */
+  .hx-row-ui {
+    display: grid;
+    grid-template-columns: 90px 1fr 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--rule);
+    font-size: 14px;
+  }
+  .hx-row-ui:last-child { border-bottom: none; }
+  .hx-row-ui .hx-name {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .seg .opt {
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--ink-3);
+    background: #fff;
+    border-right: 1px solid var(--rule);
+    font-family: var(--font-en);
+    letter-spacing: 0.04em;
+  }
+  .seg .opt:last-child { border-right: none; }
+  .seg .opt.sel {
+    background: var(--teal-8);
+    color: #fff;
+    font-weight: 700;
+  }
+  .seg .opt.sel-warn {
+    background: var(--red-8);
+    color: #fff;
+    font-weight: 700;
+  }
+  .seg .opt.sel-amb {
+    background: #ffd43b;
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .hx-meta {
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .hx-meta .src {
+    color: var(--teal-8);
+    font-family: var(--font-en);
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  .review-bar {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+  }
+  .review-info {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+  .review-info strong { color: var(--ink); font-weight: 700; }
+
+  .btn-confirm {
+    background: var(--teal-8);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-zh);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    box-shadow: 0 2px 6px rgba(9,146,104,0.25);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--teal-8);"></span>
+    <span>第三幕 · 為什麼非要資料庫</span>
+  </div>
+  <div class="ph-right">11 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="left">
+    <div class="kicker teal">section-review · 確認體驗</div>
+    <h1>
+      AI 是助手，<br>
+      醫師仍是<span class="accent">最終裁量</span>。
+    </h1>
+    <p class="lead">
+      AI 先寫草案，醫師<strong style="color:var(--ink);">一個區塊一次確認</strong>。<br>
+      不是一項一項勾、也不是一鍵全簽。
+    </p>
+
+    <div class="principles">
+      <div class="pr-card">
+        <div class="pr-icon">✓</div>
+        <div>
+          <div class="pr-title">區塊級確認</div>
+          <div class="pr-desc">每個段落（病史 / Airway / Lab / 計劃）單獨確認一次，<strong>不是 50 個勾選逐項點</strong>，也不是文件級一鍵簽。</div>
+        </div>
+      </div>
+
+      <div class="pr-card">
+        <div class="pr-icon">✓</div>
+        <div>
+          <div class="pr-title">AI 來源全程可追溯</div>
+          <div class="pr-desc">每個預填欄位都附 <strong>資料來源 + 信心 + 取得時間</strong>；醫師點開可看到 AI 是怎麼推得的。</div>
+        </div>
+      </div>
+
+      <div class="pr-card warning">
+        <div class="pr-icon">!</div>
+        <div>
+          <div class="pr-title">不確定的，AI 不填</div>
+          <div class="pr-desc">病摘沒提到的項目自動標 <strong>「未問」</strong>，提醒醫師主動詢問。<br>不為了好看亂填。</div>
+        </div>
+      </div>
+
+      <div class="pr-card">
+        <div class="pr-icon">✓</div>
+        <div>
+          <div class="pr-title">簽名仍是醫師</div>
+          <div class="pr-desc">所有確認、修改、最終簽章都記在醫師名下；<strong>AI 不簽名</strong>，只標示「曾建議過什麼」。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="ui-frame">
+      <div class="ui-titlebar">
+        <div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+        <div class="url">pre-anes-eval.fjuh.local / patient / 12345678 / new-eval</div>
+      </div>
+
+      <div class="ui-header">
+        <div>
+          <div class="breadcrumb">麻醉前評估　/　新建</div>
+          <div class="patient">王○○　·　68y　·　Inguinal Hernia Repair</div>
+        </div>
+        <div class="pill">Section 2 / 6</div>
+      </div>
+
+      <!-- Section 1 折疊已確認 -->
+      <div class="section-block collapsed">
+        <div class="sb-head">
+          <div class="sb-title">① 病人基本資料 · Vitals</div>
+          <div class="sb-status done">✓ Confirmed 09:14</div>
+        </div>
+      </div>
+
+      <!-- Section 2 active：過去病史 -->
+      <div class="section-block active">
+        <div class="sb-head">
+          <div class="sb-title">② 過去病史 <span class="badge ai-badge">AI DRAFT</span></div>
+          <div class="sb-status review">Awaiting review</div>
+        </div>
+
+        <div class="hx-row-ui">
+          <div class="hx-name">DM</div>
+          <div class="seg">
+            <div class="opt">無</div>
+            <div class="opt sel-warn">有</div>
+            <div class="opt">未問</div>
+          </div>
+          <div class="hx-meta"><span class="src">HIS 病摘</span>　·　2024.07 type 2 DM 診斷</div>
+        </div>
+
+        <div class="hx-row-ui">
+          <div class="hx-name">HTN</div>
+          <div class="seg">
+            <div class="opt">無</div>
+            <div class="opt sel-warn">有</div>
+            <div class="opt">未問</div>
+          </div>
+          <div class="hx-meta"><span class="src">HIS · 用藥</span>　·　Amlodipine 5mg QD</div>
+        </div>
+
+        <div class="hx-row-ui">
+          <div class="hx-name">Allergy</div>
+          <div class="seg">
+            <div class="opt sel">無</div>
+            <div class="opt">有</div>
+            <div class="opt">未問</div>
+          </div>
+          <div class="hx-meta"><span class="src">HIS · 過敏</span>　·　空白 — 但需向病人再次確認</div>
+        </div>
+
+        <div class="hx-row-ui">
+          <div class="hx-name">Smoking</div>
+          <div class="seg">
+            <div class="opt">無</div>
+            <div class="opt">有</div>
+            <div class="opt sel-amb">未問</div>
+          </div>
+          <div class="hx-meta">病摘未提及　·　AI 不擅自填寫，請當面詢問</div>
+        </div>
+
+        <div class="review-bar">
+          <div class="review-info">
+            <strong>4 項已預填</strong>　·　1 項待人工確認　·　簽名後可進下一段
+          </div>
+          <button class="btn-confirm">✓ 確認本段並進下一段</button>
+        </div>
+      </div>
+
+      <!-- Section 3 折疊未進入 -->
+      <div class="section-block collapsed">
+        <div class="sb-head">
+          <div class="sb-title">③ 實驗室數據 + 影像</div>
+          <div class="sb-status">Pending</div>
+        </div>
+      </div>
+
+      <!-- Section 4 折疊未進入 -->
+      <div class="section-block collapsed" style="border-bottom:none;">
+        <div class="sb-head">
+          <div class="sb-title">④ 麻醉計劃 + 簽章</div>
+          <div class="sb-status">Pending</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>section-review · 確認體驗</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

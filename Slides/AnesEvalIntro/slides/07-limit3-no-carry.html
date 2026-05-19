@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P07 · 限制 3 · 跨手術不會帶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 64px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .head-left { flex: 1; }
+  .title {
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .q { color: var(--red-8); }
+  .head-right { text-align: right; color: var(--ink-3); font-size: 16px; line-height: 1.4; }
+  .head-right .big-num {
+    font-family: var(--font-en);
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--red-8);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 60px;
+    align-items: stretch;
+  }
+
+  /* 左：病人時間軸 */
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 22px 26px;
+  }
+  .tl-head {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .tl-head .sub {
+    font-size: 13px;
+    color: var(--ink-3);
+    font-family: var(--font-en);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  .tl-event {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 16px;
+    align-items: start;
+    padding: 10px 0;
+    position: relative;
+  }
+  .tl-event:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 38px;
+    top: 36px;
+    bottom: -8px;
+    width: 2px;
+    background: var(--rule);
+  }
+  .tl-event .tl-date {
+    font-family: var(--font-en);
+    font-size: 13px;
+    color: var(--ink-3);
+    padding-top: 4px;
+  }
+  .tl-event .tl-date strong {
+    display: block;
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .tl-event .tl-content {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .tl-event .tl-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--ink);
+    margin-top: 8px;
+    flex-shrink: 0;
+  }
+  .tl-event .tl-text {
+    flex: 1;
+  }
+  .tl-event .tl-text .op {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .tl-event .tl-text .ward {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-top: 2px;
+  }
+  .tl-event.repeat .tl-dot {
+    background: var(--red-8);
+  }
+
+  /* 右：3 份空白表 */
+  .forms-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+  }
+  .form-mini {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: center;
+    background: var(--paper-2);
+    padding: 16px 20px;
+    border-left: 5px solid var(--red-8);
+  }
+  .form-mini .fm-tag {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ink-3);
+    text-align: center;
+    padding-right: 18px;
+    border-right: 1px solid var(--rule);
+  }
+  .form-mini .fm-tag .num {
+    display: block;
+    font-size: 32px;
+    color: var(--red-8);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+  .form-mini .fm-paper {
+    background: #FFFEFB;
+    border: 1px solid var(--rule);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .form-mini .fm-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 1fr 1fr;
+    gap: 8px;
+    align-items: baseline;
+    font-size: 12px;
+  }
+  .form-mini .fm-row .lbl { color: var(--ink-3); }
+  .form-mini .fm-row .line {
+    border-bottom: 1px solid var(--ink-3);
+    height: 12px;
+  }
+  .form-mini .fm-empty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--red-8);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .form-mini .fm-empty .stamp {
+    font-family: var(--font-en);
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border: 1.5px solid var(--red-8);
+    font-size: 11px;
+  }
+
+  /* 底部結論 */
+  .bottom-callout {
+    background: var(--ink);
+    color: #fff;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .bottom-callout .bc-label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    padding-right: 22px;
+    border-right: 1px solid rgba(255,255,255,0.18);
+  }
+  .bottom-callout .bc-text {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .bottom-callout .bc-text em {
+    color: #ffa94d;
+    font-style: normal;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--red-8);"></span>
+    <span>第二幕 · 紙的五個結構性限制</span>
+  </div>
+  <div class="ph-right">07 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div class="head-left">
+      <div class="kicker red">Constraint 03 · No Carry-Forward</div>
+      <h1 class="title">
+        同一個病人三次手術，<br>
+        三份<span class="q">完全空白</span>的表。
+      </h1>
+    </div>
+    <div class="head-right">
+      <div class="big-num">3<span style="font-size:24px;color:var(--ink-3);font-weight:500;"> / 5</span></div>
+      <div style="margin-top:6px;">五個結構性限制<br>之三</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- 左：病人手術史 -->
+    <div class="timeline">
+      <div class="tl-head">
+        王先生 ， 68 y / o
+        <span class="sub">3 anesthesia events · 14 months</span>
+      </div>
+
+      <div class="tl-event">
+        <div class="tl-date"><strong>2025.04</strong>第 1 次</div>
+        <div class="tl-content">
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <div class="op">L 鎖骨骨折切開復位</div>
+            <div class="ward">區域麻醉 · CABG s/p 2018 · 過敏 Cefazolin</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-event repeat">
+        <div class="tl-date"><strong>2025.11</strong>第 2 次</div>
+        <div class="tl-content">
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <div class="op">L 鎖骨內固定移除</div>
+            <div class="ward">全麻 · 你需要再問一次過去病史</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-event repeat">
+        <div class="tl-date"><strong>2026.05</strong>第 3 次</div>
+        <div class="tl-content">
+          <div class="tl-dot"></div>
+          <div class="tl-text">
+            <div class="op">R inguinal hernia repair</div>
+            <div class="ward">同樣 12 項勾選、Mallampati、Airway 再評估一次</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：3 份空白表 -->
+    <div class="forms-stack">
+      <div class="form-mini">
+        <div class="fm-tag">第 <span class="num">1</span> 次</div>
+        <div class="fm-paper">
+          <div class="fm-row"><span class="lbl">病史</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">過敏</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">Airway</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-empty">
+            <span class="stamp">BLANK</span>
+            <span>從零開始問</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-mini">
+        <div class="fm-tag">第 <span class="num">2</span> 次</div>
+        <div class="fm-paper">
+          <div class="fm-row"><span class="lbl">病史</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">過敏</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">Airway</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-empty">
+            <span class="stamp">BLANK</span>
+            <span>從零開始問</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-mini">
+        <div class="fm-tag">第 <span class="num">3</span> 次</div>
+        <div class="fm-paper">
+          <div class="fm-row"><span class="lbl">病史</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">過敏</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-row"><span class="lbl">Airway</span><span class="line"></span><span class="line"></span><span class="line"></span></div>
+          <div class="fm-empty">
+            <span class="stamp">BLANK</span>
+            <span>從零開始問</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-callout">
+    <div class="bc-label">Insight</div>
+    <div class="bc-text">
+      上一次費力問出來的病史、過敏、Airway 評估 — <em>下一次都沒有了</em>。<br>
+      工作沒省到，紀錄反而可能<em>愈問愈不一致</em>。
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>限制 3 · No Carry-Forward</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

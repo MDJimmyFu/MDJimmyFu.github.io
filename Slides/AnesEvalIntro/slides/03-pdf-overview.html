@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P03 · 大家手上這張表</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 56px 96px 48px;
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: 72px;
+    align-items: start;
+  }
+
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  .left-col h1 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .left-col h1 .accent { color: var(--indigo-8); }
+  .left-col .lead {
+    font-size: 22px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+
+  .key-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .key-row {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    align-items: start;
+    gap: 18px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule-2);
+  }
+  .key-row:last-child { border-bottom: 1px solid var(--rule-2); }
+  .key-row .k-num {
+    font-family: var(--font-en);
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--indigo-8);
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 4px;
+  }
+  .key-row .k-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .key-row .k-sub {
+    margin-top: 4px;
+    font-size: 15px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+
+  /* PDF 縮影 */
+  .pdf-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1.414;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .pdf-mini {
+    width: 100%;
+    height: 100%;
+    background: #FFFEFB;
+    border: 1px solid var(--ink-2);
+    box-shadow: 0 10px 36px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 18px 22px;
+    gap: 8px;
+    position: relative;
+    font-size: 9px;
+    color: var(--ink);
+  }
+
+  .pdf-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 6px;
+  }
+  .pdf-title .meta {
+    font-size: 8px;
+    color: var(--ink-3);
+    font-weight: 400;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+    font-family: var(--font-en);
+  }
+
+  /* 區塊：基本資料 */
+  .sec {
+    border: 1px solid var(--rule);
+    padding: 6px 8px;
+    position: relative;
+    background: #fff;
+  }
+  .sec-label {
+    position: absolute;
+    top: -7px; left: 8px;
+    background: #FFFEFB;
+    padding: 0 6px;
+    font-size: 8px;
+    color: var(--ink-3);
+    letter-spacing: 0.04em;
+  }
+  .sec-row {
+    display: grid;
+    gap: 4px 8px;
+    font-size: 8px;
+    margin: 3px 0;
+  }
+  .sec-row.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .sec-row.c3 { grid-template-columns: 1fr 1fr 1fr; }
+  .sec-row.c2 { grid-template-columns: 1fr 1fr; }
+
+  .field {
+    display: flex;
+    gap: 4px;
+    align-items: baseline;
+  }
+  .field .lbl { color: var(--ink-2); white-space: nowrap; }
+  .field .ul {
+    flex: 1;
+    border-bottom: 0.75px solid var(--ink-3);
+    height: 8px;
+  }
+
+  /* 過去病史 + lab 兩欄 */
+  .mid-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1.6fr;
+    gap: 6px;
+  }
+
+  .hx-mini {
+    border: 1px solid var(--rule);
+    padding: 4px 6px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .hx-mini .hx-th {
+    display: grid;
+    grid-template-columns: 1fr 16px 16px 1fr;
+    gap: 4px;
+    font-size: 7px;
+    color: var(--ink-2);
+    border-bottom: 0.75px solid var(--ink-2);
+    padding-bottom: 2px;
+    font-weight: 600;
+  }
+  .hx-mini .hx-th .c { text-align: center; }
+  .hx-mini .hx-row {
+    display: grid;
+    grid-template-columns: 1fr 16px 16px 1fr;
+    gap: 4px;
+    font-size: 7px;
+    align-items: center;
+  }
+  .hx-mini .cb {
+    width: 8px; height: 8px;
+    border: 0.75px solid var(--ink-2);
+    justify-self: center;
+  }
+  .hx-mini .ul {
+    height: 6px;
+    border-bottom: 0.5px solid var(--ink-3);
+  }
+
+  .lab-mini {
+    border: 1px solid var(--rule);
+    padding: 4px 6px;
+    background: #fff;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 3px 8px;
+    font-size: 7.5px;
+  }
+
+  /* 麻醉醫囑區 */
+  .order-mini {
+    border: 1px solid var(--rule);
+    padding: 4px 8px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 7.5px;
+  }
+  .order-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 9px;
+    border-bottom: 0.75px solid var(--ink);
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+  }
+  .order-row {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .order-row .opt {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 4px;
+  }
+  .order-row .opt .cb { width:7px;height:7px;border:0.75px solid var(--ink-2); display:inline-block; }
+
+  /* 高亮區 */
+  .highlight {
+    position: absolute;
+    border: 2.5px solid var(--indigo-8);
+    background: rgba(54,79,199,0.06);
+    pointer-events: none;
+    z-index: 5;
+  }
+  .highlight .hl-num {
+    position: absolute;
+    top: -16px; left: -16px;
+    width: 30px; height: 30px;
+    background: var(--indigo-8);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  .pdf-foot {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7px;
+    color: var(--ink-3);
+    padding-top: 4px;
+    border-top: 0.5px solid var(--rule);
+    font-family: var(--font-en);
+  }
+
+  .pdf-caption {
+    margin-top: 14px;
+    text-align: center;
+    font-size: 15px;
+    color: var(--ink-3);
+    font-family: var(--font-en);
+    letter-spacing: 0.06em;
+  }
+  .pdf-caption strong { color: var(--ink); font-weight: 600; font-family: var(--font-zh); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark"></span>
+    <span>第一幕 · 重新檢視這張紙</span>
+  </div>
+  <div class="ph-right">03 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="left-col">
+    <div class="kicker">As-is Form</div>
+    <h1>
+      大家手上這張<br>
+      <span class="accent">MR-RE027 第 2 版</span>
+    </h1>
+    <p class="lead">
+      一頁 A4，承擔整個術前麻醉評估。<br>
+      下面四個區塊，等等會反覆出現。
+    </p>
+
+    <div class="key-list">
+      <div class="key-row">
+        <div class="k-num">1</div>
+        <div>
+          <div class="k-title">病人基本資料 + 生命徵象</div>
+          <div class="k-sub">病歷號、姓名、生日、身高體重、血壓、SpO₂ — 全部在 HIS</div>
+        </div>
+      </div>
+      <div class="key-row">
+        <div class="k-num">2</div>
+        <div>
+          <div class="k-title">過去病史 (12 項 + Others)</div>
+          <div class="k-sub">無 / 有 兩欄勾選 + 自由文字「說明」欄</div>
+        </div>
+      </div>
+      <div class="key-row">
+        <div class="k-num">3</div>
+        <div>
+          <div class="k-title">實驗室數據 (17 項)</div>
+          <div class="k-sub">WBC、Hb、PT/PTT、BUN/Cre、電解質 — 也在 HIS</div>
+        </div>
+      </div>
+      <div class="key-row">
+        <div class="k-num">4</div>
+        <div>
+          <div class="k-title">麻醉醫囑暨評估紀錄</div>
+          <div class="k-sub">ASA、Airway、麻醉計劃、疼痛計劃、簽章</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="pdf-wrap">
+      <div class="pdf-mini">
+        <div class="pdf-title">
+          麻醉前評估紀錄
+          <div class="meta">MR-RE027　[版本：第 2 版]　輔大醫院</div>
+        </div>
+
+        <!-- 區塊 1：基本資料 -->
+        <div class="sec" style="position:relative;">
+          <div class="sec-row c4">
+            <div class="field"><span class="lbl">病歷號</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">姓名</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">生日</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">床號</span><span class="ul"></span></div>
+          </div>
+          <div class="sec-row c4">
+            <div class="field"><span class="lbl">年齡</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">身高</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">體重</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">血型</span><span class="ul"></span></div>
+          </div>
+          <div class="sec-row c4">
+            <div class="field"><span class="lbl">體溫</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">心跳</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">呼吸</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">血壓</span><span class="ul"></span></div>
+          </div>
+          <div class="sec-row c3">
+            <div class="field"><span class="lbl">預定手術日期</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">主治醫師</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">SpO₂</span><span class="ul"></span></div>
+          </div>
+          <div class="sec-row c2">
+            <div class="field"><span class="lbl">術前診斷</span><span class="ul"></span></div>
+            <div class="field"><span class="lbl">預計手術名稱</span><span class="ul"></span></div>
+          </div>
+
+          <div class="highlight" style="top:-3px; left:-3px; right:-3px; bottom:-3px;">
+            <div class="hl-num">1</div>
+          </div>
+        </div>
+
+        <!-- 區塊 2+3：病史 + Lab 並排 -->
+        <div class="mid-grid" style="position:relative;">
+          <div class="hx-mini" style="position:relative;">
+            <div class="hx-th">
+              <div>過去病史</div><div class="c">無</div><div class="c">有</div><div>說明</div>
+            </div>
+            <div class="hx-row"><div>DM</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>CVA</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>HTN</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Cardiac</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Asthma</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>COPD</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Hepatitis</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Renal</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Bleeding</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Allergy</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Smoking</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row"><div>Major op</div><div class="cb"></div><div class="cb"></div><div class="ul"></div></div>
+            <div class="hx-row" style="color:var(--ink-3);font-size:6.5px;"><div>Others：</div><div></div><div></div><div class="ul"></div></div>
+
+            <div class="highlight" style="top:-3px; left:-3px; right:-3px; bottom:-3px;">
+              <div class="hl-num">2</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="lab-mini" style="position:relative;">
+              <div class="field"><span class="lbl">WBC</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Hb</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Hct</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">PLT</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">PT</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">PTT</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">INR</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">T-Bil</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">AST</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">ALT</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">BUN</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Cre</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Na</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">K</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Cl</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Ca</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">Glu</span><span class="ul"></span></div>
+              <div class="field"><span class="lbl">　</span><span style="height:8px;"></span></div>
+
+              <div class="highlight" style="top:-3px; left:-3px; right:-3px; bottom:-3px;">
+                <div class="hl-num">3</div>
+              </div>
+            </div>
+            <div style="border:1px solid var(--rule);padding:4px 6px;background:#fff;font-size:7px;color:var(--ink-2);">
+              評估醫師：<span style="border-bottom:0.5px solid var(--ink-3);display:inline-block;width:80px;height:8px;"></span>
+              　年 月 日 時 分
+            </div>
+          </div>
+        </div>
+
+        <!-- 區塊 4：麻醉醫囑 -->
+        <div class="order-mini" style="position:relative;">
+          <div class="order-title">麻醉醫囑暨評估紀錄</div>
+          <div class="order-row">
+            <span style="font-weight:600;">1. ASA Class：</span>
+            <span class="opt"><span class="cb"></span>Ⅰ</span>
+            <span class="opt"><span class="cb"></span>Ⅱ</span>
+            <span class="opt"><span class="cb"></span>Ⅲ</span>
+            <span class="opt"><span class="cb"></span>Ⅳ</span>
+            <span class="opt"><span class="cb"></span>Ⅴ</span>
+            <span class="opt"><span class="cb"></span>Ⅵ</span>
+            <span class="opt"><span class="cb"></span>E</span>
+          </div>
+          <div class="order-row">
+            <span style="font-weight:600;">2. 呼吸道：</span>
+            <span class="opt"><span class="cb"></span>容易</span>
+            <span class="opt"><span class="cb"></span>中等</span>
+            <span class="opt"><span class="cb"></span>困難</span>
+            <span class="opt"><span class="cb"></span>Mallampati Ⅰ-Ⅳ</span>
+          </div>
+          <div class="order-row">
+            <span style="font-weight:600;">3. 心血管：</span>
+            <span class="opt"><span class="cb"></span>RHB</span>
+            <span class="opt"><span class="cb"></span>異常 _____</span>
+            <span style="font-weight:600;margin-left:6px;">4. 呼吸：</span>
+            <span class="opt"><span class="cb"></span>BS clear</span>
+            <span class="opt"><span class="cb"></span>異常 _____</span>
+          </div>
+          <div class="order-row">
+            <span style="font-weight:600;">5. 麻醉計劃 (方式 / 特殊處理 / 疼痛 / 禁食)</span>
+          </div>
+          <div class="order-row">
+            <span style="color:var(--ink-3);">執行麻醉醫師：____　□主治　□住院　日期：__ 年 __ 月 __ 日 __ 時 __ 分</span>
+          </div>
+
+          <div class="highlight" style="top:-3px; left:-3px; right:-3px; bottom:-3px;">
+            <div class="hl-num">4</div>
+          </div>
+        </div>
+
+        <div class="pdf-foot">
+          <span>MR-RE027 [版本：第 2 版]</span>
+          <span>輔大醫院病歷管理委員會 2020.12.14 修訂</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdf-caption">
+      <strong>單頁 A4　·　全部用一張紙承擔</strong>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>表單全貌　·　Overview</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

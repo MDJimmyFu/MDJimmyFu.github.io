@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P08 · 限制 4 · 沒有版本/審計痕跡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 64px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .title {
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .q { color: var(--red-8); }
+  .head-right { text-align: right; color: var(--ink-3); font-size: 16px; line-height: 1.4; }
+  .head-right .big-num {
+    font-family: var(--font-en);
+    font-size: 56px; font-weight: 700; color: var(--red-8);
+    line-height: 1; letter-spacing: -0.02em;
+  }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 64px;
+    align-items: stretch;
+  }
+
+  /* 左：被改過的紙 + ? 問號 */
+  .stack-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 20px 0;
+  }
+  .stack-mini {
+    position: relative;
+    width: 360px;
+    height: 460px;
+  }
+  .stack-mini .paper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #FFFEFB;
+    border: 1px solid var(--ink-2);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    padding: 22px 26px;
+  }
+  .stack-mini .paper.p3 {
+    top: 18px; left: 18px;
+    transform: rotate(2deg);
+    z-index: 1;
+  }
+  .stack-mini .paper.p2 {
+    top: 9px; left: 9px;
+    transform: rotate(-1deg);
+    z-index: 2;
+  }
+  .stack-mini .paper.p1 {
+    z-index: 3;
+  }
+  .stack-mini .p-title {
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .stack-mini .p-row {
+    display: grid;
+    grid-template-columns: 70px 1fr;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--ink-2);
+    margin-bottom: 6px;
+  }
+  .stack-mini .p-row .lbl { color: var(--ink-2); font-weight: 600; }
+  .stack-mini .p-row .val {
+    flex: 1;
+    border-bottom: 1px solid var(--ink-3);
+    height: 16px;
+    position: relative;
+    padding-left: 4px;
+    font-family: 'Brush Script MT', cursive;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 16px;
+  }
+  /* 塗改痕跡 */
+  .strikeout {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    color: var(--ink-3);
+    margin-right: 6px;
+  }
+  .added {
+    color: var(--red-8);
+    font-family: 'Brush Script MT', cursive;
+    font-weight: 700;
+  }
+
+  .questions-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .q-mark {
+    position: absolute;
+    font-family: var(--font-en);
+    font-size: 96px;
+    font-weight: 900;
+    color: var(--red-8);
+    opacity: 0.85;
+    line-height: 1;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .q-mark.qm1 { top: 4%; right: -2%; transform: rotate(8deg); }
+  .q-mark.qm2 { bottom: 12%; left: -5%; transform: rotate(-12deg); font-size: 72px; }
+
+  /* 右：4 個無法回答的問題 */
+  .qa-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    justify-content: center;
+  }
+  .qa-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 22px 26px;
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 22px;
+    align-items: start;
+  }
+  .qa-card .qa-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--red-1);
+    color: var(--red-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .qa-card .qa-q {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.35;
+  }
+  .qa-card .qa-a {
+    margin-top: 6px;
+    font-size: 16px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .qa-card .qa-a strong {
+    color: var(--red-8);
+    font-weight: 700;
+  }
+
+  .bottom-callout {
+    background: var(--ink);
+    color: #fff;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .bottom-callout .bc-label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    padding-right: 22px;
+    border-right: 1px solid rgba(255,255,255,0.18);
+  }
+  .bottom-callout .bc-text {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .bottom-callout .bc-text em {
+    color: #ffa94d;
+    font-style: normal;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--red-8);"></span>
+    <span>第二幕 · 紙的五個結構性限制</span>
+  </div>
+  <div class="ph-right">08 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div>
+      <div class="kicker red">Constraint 04 · No Version, No Audit</div>
+      <h1 class="title">
+        改了，<span class="q">沒人知道</span>。<br>
+        什麼時候改的，<span class="q">也沒人知道</span>。
+      </h1>
+    </div>
+    <div class="head-right">
+      <div class="big-num">4<span style="font-size:24px;color:var(--ink-3);font-weight:500;"> / 5</span></div>
+      <div style="margin-top:6px;">五個結構性限制<br>之四</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="stack-area">
+      <div class="stack-mini">
+        <div class="paper p3"></div>
+        <div class="paper p2"></div>
+        <div class="paper p1">
+          <div class="p-title">麻醉前評估紀錄</div>
+          <div class="p-row">
+            <span class="lbl">ASA Class</span>
+            <span class="val"><span class="strikeout">Ⅱ</span><span class="added">Ⅲ</span></span>
+          </div>
+          <div class="p-row">
+            <span class="lbl">Airway</span>
+            <span class="val"><span class="strikeout">容易</span><span class="added">困難</span></span>
+          </div>
+          <div class="p-row">
+            <span class="lbl">過敏</span>
+            <span class="val">無 <span class="added">→ NSAID</span></span>
+          </div>
+          <div class="p-row">
+            <span class="lbl">疼痛計劃</span>
+            <span class="val">一般病房 <span class="added">→ PCA</span></span>
+          </div>
+          <div class="p-row">
+            <span class="lbl">禁食</span>
+            <span class="val">前日午夜</span>
+          </div>
+          <div class="p-row" style="margin-top:14px;">
+            <span class="lbl">簽名</span>
+            <span class="val" style="font-family:'Brush Script MT', cursive;">林○○</span>
+          </div>
+          <div class="p-row">
+            <span class="lbl">日期</span>
+            <span class="val" style="font-family:var(--font-en);font-size:12px;color:var(--ink);">2026. __ . __  __:__</span>
+          </div>
+        </div>
+        <div class="questions-overlay">
+          <div class="q-mark qm1">?</div>
+          <div class="q-mark qm2">?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-list">
+      <div class="qa-card">
+        <div class="qa-icon">?</div>
+        <div>
+          <div class="qa-q">這個 ASA 是誰改的？</div>
+          <div class="qa-a">紙上只有最終結果。原本 Ⅱ 被改成 Ⅲ ，但是<strong>哪位醫師、根據什麼決策</strong>，沒有任何紀錄。</div>
+        </div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-icon">?</div>
+        <div>
+          <div class="qa-q">什麼時候改的？</div>
+          <div class="qa-a">是<strong>術前重新評估</strong>，還是<strong>術後回填</strong>？紙本沒有時戳。</div>
+        </div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-icon">?</div>
+        <div>
+          <div class="qa-q">兩次評估之間發生了什麼？</div>
+          <div class="qa-a">無從追溯。<strong>看不出來病人狀況變化</strong>導致改評估、還是先前評估錯了。</div>
+        </div>
+      </div>
+
+      <div class="qa-card">
+        <div class="qa-icon">?</div>
+        <div>
+          <div class="qa-q">糾紛時，誰能還原當下決策？</div>
+          <div class="qa-a">紙本是<strong>單一切面</strong>，沒有歷史版本 — 法律與品管都很難追溯。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-callout">
+    <div class="bc-label">Insight</div>
+    <div class="bc-text">
+      紙本只記錄<em>最終狀態</em>，不記錄<em>過程</em>。<br>
+      DB 化最便宜的好處：每次變更自動記下 who/when/what — 不需要醫師多做任何事。
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>限制 4 · No Version / No Audit</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

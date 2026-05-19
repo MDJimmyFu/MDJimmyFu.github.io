@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P13 · 不會打斷現有流程 · 安全 · Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 56px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .head h1 {
+    font-size: 54px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .head h1 .accent { color: var(--indigo-8); }
+  .head .lead {
+    margin-top: 14px;
+    font-size: 22px;
+    color: var(--ink-2);
+  }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+    align-items: stretch;
+  }
+
+  /* 左：上下兩個 card — 並存 + 安全 */
+  .left-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 22px 28px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .card-tag {
+    background: var(--indigo-8);
+    color: #fff;
+    padding: 4px 12px;
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border-radius: 3px;
+    font-weight: 700;
+  }
+  .card-tag.teal { background: var(--teal-8); }
+  .card-tag.ink { background: var(--ink); }
+  .card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .coexist-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 14px;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .ce-box {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    padding: 14px 12px;
+    text-align: center;
+    border-radius: 4px;
+  }
+  .ce-box .name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ce-box .sub {
+    margin-top: 4px;
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.4;
+  }
+  .ce-box.now { border-top: 3px solid var(--ink); }
+  .ce-box.new { border-top: 3px solid var(--teal-8); background: var(--teal-1); }
+  .ce-sep {
+    font-family: var(--font-en);
+    color: var(--ink-3);
+    font-weight: 700;
+    font-size: 18px;
+  }
+
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .check-row {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 12px;
+    align-items: start;
+    font-size: 15px;
+    color: var(--ink);
+    line-height: 1.55;
+  }
+  .check-row .ck {
+    color: var(--teal-8);
+    font-family: var(--font-en);
+    font-weight: 700;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  .check-row strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .check-row em {
+    color: var(--ink-3);
+    font-style: normal;
+    font-size: 13px;
+  }
+
+  /* 右：roadmap */
+  .roadmap {
+    background: var(--ink);
+    color: #fff;
+    padding: 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+  }
+  .roadmap .card-tag {
+    background: #9bffdd;
+    color: var(--ink);
+  }
+  .roadmap .card-title { color: #fff; }
+  .roadmap .lead-text {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.55;
+  }
+
+  .rm-line {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 8px;
+  }
+  .rm-phase {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: relative;
+  }
+  .rm-phase:last-child { border-bottom: none; }
+  .rm-phase .rm-dot {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: #9bffdd;
+    margin-top: 6px;
+  }
+  .rm-phase.future .rm-dot {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.3);
+  }
+  .rm-phase:not(:last-child) .rm-dot::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 26px;
+    bottom: -16px;
+    width: 2px;
+    background: rgba(255,255,255,0.15);
+  }
+  .rm-phase .rm-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .rm-phase .rm-title .rm-when {
+    font-family: var(--font-en);
+    font-size: 12px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+  .rm-phase .rm-desc {
+    margin-top: 4px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.55;
+  }
+  .rm-phase.current .rm-title { color: #9bffdd; }
+  .rm-phase.future .rm-title { color: rgba(255,255,255,0.6); font-weight: 500; }
+  .rm-phase.future .rm-desc { color: rgba(255,255,255,0.45); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--indigo-8);"></span>
+    <span>第四幕 · 那這張 PDF 怎麼辦</span>
+  </div>
+  <div class="ph-right">13 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div class="kicker">Roll-out · Safety · Roadmap</div>
+    <h1>
+      不會<span class="accent">打斷</span>大家現在的流程
+    </h1>
+    <div class="lead">紙本與新版並存 · 資料留在院內 · 一步一步來</div>
+  </div>
+
+  <div class="main">
+
+    <div class="left-stack">
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-tag">Roll-out</span>
+          <span class="card-title">並存策略</span>
+        </div>
+
+        <div class="coexist-grid">
+          <div class="ce-box now">
+            <div class="name">MR-RE027 紙本</div>
+            <div class="sub">繼續可印<br>不強制下架</div>
+          </div>
+          <div class="ce-sep">+</div>
+          <div class="ce-box new">
+            <div class="name">新版 web 評估</div>
+            <div class="sub">志願試用<br>同意才導入</div>
+          </div>
+          <div class="ce-sep">→</div>
+          <div class="ce-box">
+            <div class="name">逐步切換</div>
+            <div class="sub">資料完整<br>再考慮取代</div>
+          </div>
+        </div>
+
+        <div class="checklist" style="margin-top: 14px;">
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>不強制使用</strong> — 試用期內舊表單與新系統可同時存在，由你決定哪個用得順手。</span>
+          </div>
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>影印列印仍是 official</strong> — 新版的列印視圖可印出，紙本格式接近大家熟悉的 MR-RE027。</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-tag teal">Safety</span>
+          <span class="card-title">資料安全與 PHI</span>
+        </div>
+
+        <div class="checklist">
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>本地 LLM</strong> — 病摘預讀跑在科內 Mac Studio，<em>不出院區網路</em>。</span>
+          </div>
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>去識別才上雲</strong> — 真的需要外部模型時，先剝離 PHI，沒有姓名 / 病歷號 / 床號離院。</span>
+          </div>
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>HIS 帳號登入</strong> — 沿用 HIS SSO；不需要再記第二組帳密。</span>
+          </div>
+          <div class="check-row">
+            <span class="ck">✓</span>
+            <span><strong>權限分級</strong> — 主治 / 住院 / 護理 各自可見範圍不同；變更全部留痕。</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="roadmap">
+      <div class="card-head" style="border-bottom-color:rgba(255,255,255,0.15);">
+        <span class="card-tag">Roadmap</span>
+        <span class="card-title">麻醉週期一條龍</span>
+      </div>
+
+      <div class="lead-text">
+        今天講的是 <strong style="color:#9bffdd;">Phase 1 pre-op</strong>。<br>
+        之後幾個 phase 都建立在這個 DB 之上 —
+        所以 Phase 1 做好，後面才有機會做。
+      </div>
+
+      <div class="rm-line">
+
+        <div class="rm-phase current">
+          <div class="rm-dot"></div>
+          <div>
+            <div class="rm-title">
+              Phase 1 · 麻醉前評估
+              <span class="rm-when">2026 H1 · NOW</span>
+            </div>
+            <div class="rm-desc">tri-state 病史 · HIS 預填 · section-review · 跨手術 carry-forward · 紙本 / web 並存試用</div>
+          </div>
+        </div>
+
+        <div class="rm-phase future">
+          <div class="rm-dot"></div>
+          <div>
+            <div class="rm-title">
+              Phase 2 · PACU + QA 統計
+              <span class="rm-when">2026 H2</span>
+            </div>
+            <div class="rm-desc">術前結論流到 PACU 交班 · 麻醉部 KPI / 困難氣道事件追蹤 / 風險評分校正 — 不再事後 chart-review</div>
+          </div>
+        </div>
+
+        <div class="rm-phase future">
+          <div class="rm-dot"></div>
+          <div>
+            <div class="rm-title">
+              Phase 3 · 術中監控接力
+              <span class="rm-when">2027　最難最晚</span>
+            </div>
+            <div class="rm-desc">術前結論直通術中監視 · ASA / Airway / 計劃即時可調 · 與監視主機整合最複雜，留到基礎成熟後再做</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>不會打斷 · 安全 · Roadmap</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

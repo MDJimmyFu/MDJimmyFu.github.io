@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P02 · 今天的三個問題</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 80px 120px 64px;
+    display: grid;
+    grid-template-columns: 0.95fr 1.05fr;
+    gap: 100px;
+    align-items: center;
+  }
+  .left-col h1 {
+    font-size: 80px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .left-col h1 .num {
+    color: var(--indigo-8);
+    font-family: var(--font-en);
+  }
+  .left-col p {
+    margin-top: 32px;
+    font-size: 26px;
+    line-height: 1.65;
+    color: var(--ink-2);
+    max-width: 540px;
+  }
+
+  .q-list {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .q-item {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    align-items: start;
+    gap: 28px;
+    padding: 28px 32px;
+    background: #fff;
+    border: 1px solid var(--rule);
+    border-left: 6px solid var(--indigo-8);
+  }
+  .q-item .q-num {
+    font-family: var(--font-en);
+    font-size: 64px;
+    font-weight: 700;
+    color: var(--indigo-8);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .q-item .q-text {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .q-item .q-sub {
+    margin-top: 8px;
+    font-size: 18px;
+    color: var(--ink-3);
+    font-family: var(--font-en);
+    letter-spacing: 0.06em;
+  }
+  .q-item .q-pages {
+    margin-top: 14px;
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--indigo-1);
+    color: var(--indigo-8);
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark"></span>
+    <span>麻醉前評估系統 · 內部介紹</span>
+  </div>
+  <div class="ph-right">02 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="left-col">
+    <div class="kicker">Agenda</div>
+    <h1>
+      今天<br>
+      想跟大家<br>
+      聊<span class="num">三</span>件事
+    </h1>
+    <p>
+      不講技術細節、不畫架構圖；<br>
+      從大家手上這張表單出發，<br>
+      一起看它能不能變得更好。
+    </p>
+  </div>
+
+  <div class="q-list">
+    <div class="q-item">
+      <div class="q-num">01</div>
+      <div>
+        <div class="q-text">我們現在怎麼做？</div>
+        <div class="q-sub">As-is workflow</div>
+        <div class="q-pages">pp. 3-4</div>
+      </div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-num">02</div>
+      <div>
+        <div class="q-text">為什麼非要改？</div>
+        <div class="q-sub">5 structural limits of paper</div>
+        <div class="q-pages">pp. 5-9</div>
+      </div>
+    </div>
+
+    <div class="q-item">
+      <div class="q-num">03</div>
+      <div>
+        <div class="q-text">改完，會變成什麼樣子？</div>
+        <div class="q-sub">DB-driven form &amp; AI assist</div>
+        <div class="q-pages">pp. 10-13</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>議程　·　Agenda</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P06 · 限制 2 · 病歷散落 ， 人工翻容易漏</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 36px 80px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .title {
+    font-size: 50px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .q { color: var(--red-8); }
+  .head-right { text-align: right; color: var(--ink-3); font-size: 15px; line-height: 1.4; }
+  .head-right .big-num {
+    font-family: var(--font-en);
+    font-size: 46px;
+    font-weight: 700;
+    color: var(--red-8);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.35fr 60px 0.65fr;
+    gap: 16px;
+    align-items: stretch;
+    min-height: 0;
+  }
+
+  /* 左：HIS modules 散落 */
+  .his-grid {
+    background: var(--ink);
+    color: #fff;
+    padding: 18px 22px 16px;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.18);
+  }
+  .his-grid .hg-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #343a40;
+  }
+  .his-grid .hg-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .his-grid .hg-sub {
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #adb5bd;
+  }
+
+  .modules {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    flex: 1;
+    align-content: stretch;
+  }
+  .mod {
+    background: #2c2e33;
+    border: 1px solid #343a40;
+    border-radius: 3px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .mod .mod-name {
+    font-size: 12px;
+    color: #f8f9fa;
+    font-weight: 700;
+  }
+  .mod .mod-name-en {
+    font-family: var(--font-en);
+    font-size: 9px;
+    color: #868e96;
+    letter-spacing: 0.04em;
+  }
+  .mod .mod-where {
+    font-family: var(--font-en);
+    font-size: 9px;
+    color: #74c0fc;
+    margin-top: 2px;
+    letter-spacing: 0.02em;
+  }
+  .mod.missed {
+    background: rgba(201,42,42,0.18);
+    border: 1px solid var(--red-8);
+  }
+  .mod.missed .mod-name { color: #ffc9c9; }
+  .mod.missed .mod-where { color: #ffa8a8; }
+  .mod.missed::after {
+    content: 'MISSED';
+    position: absolute;
+    top: -7px; right: -4px;
+    background: var(--red-8);
+    color: #fff;
+    font-family: var(--font-en);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 2px;
+    transform: rotate(3deg);
+  }
+
+  .hg-foot {
+    display: flex;
+    gap: 18px;
+    padding-top: 8px;
+    border-top: 1px solid #343a40;
+    font-family: var(--font-en);
+    font-size: 11px;
+    color: #868e96;
+    letter-spacing: 0.04em;
+  }
+  .hg-foot .swatch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hg-foot .sw {
+    width: 12px; height: 12px;
+    border-radius: 2px;
+  }
+  .hg-foot .sw.taken { background: #2c2e33; border: 1px solid #343a40; }
+  .hg-foot .sw.missed { background: rgba(201,42,42,0.4); border: 1px solid var(--red-8); }
+
+  /* 中：人工翻 */
+  .relay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .relay .label {
+    font-size: 14px;
+    color: var(--red-8);
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.35;
+    writing-mode: horizontal-tb;
+  }
+  .relay .label .big {
+    display: block;
+    font-family: var(--font-en);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .relay .arrow {
+    width: 0; height: 0;
+    border-left: 22px solid var(--red-8);
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+  }
+  .relay .reason {
+    font-size: 11px;
+    color: var(--ink-3);
+    text-align: center;
+    line-height: 1.5;
+    max-width: 100px;
+    padding: 6px 8px;
+    background: var(--paper-2);
+    border-radius: 3px;
+  }
+
+  /* 右：紙上只裝下小片段 */
+  .paper-frag {
+    background: #FFFEFB;
+    border: 1.5px solid var(--ink);
+    padding: 18px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .paper-frag .pf-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding-bottom: 8px;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .paper-frag .pf-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .paper-frag .pf-tag {
+    background: var(--red-8);
+    color: #fff;
+    padding: 3px 8px;
+    font-family: var(--font-en);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+
+  .pf-row {
+    display: flex;
+    gap: 8px;
+    font-size: 11.5px;
+    padding: 5px 0;
+    border-bottom: 1px dashed var(--rule);
+    align-items: baseline;
+  }
+  .pf-row:last-of-type { border-bottom: none; }
+  .pf-row .k {
+    font-weight: 600;
+    color: var(--ink-2);
+    min-width: 70px;
+  }
+  .pf-row .v {
+    flex: 1;
+    color: var(--ink);
+    font-family: 'Brush Script MT', cursive;
+    font-size: 14px;
+    border-bottom: 1px solid var(--ink-3);
+  }
+  .pf-row.gap .v {
+    background: var(--yellow-1);
+    color: var(--ink-3);
+    font-style: italic;
+    font-family: var(--font-zh);
+    font-size: 10.5px;
+    padding-left: 4px;
+  }
+  .pf-row .missed-stamp {
+    background: var(--red-8);
+    color: #fff;
+    font-family: var(--font-en);
+    font-size: 9px;
+    padding: 1px 5px;
+    letter-spacing: 0.04em;
+    font-weight: 700;
+    border-radius: 2px;
+  }
+
+  .pf-foot {
+    margin-top: 4px;
+    font-size: 10.5px;
+    color: var(--red-8);
+    font-weight: 600;
+    text-align: center;
+    padding: 6px 8px;
+    background: var(--red-1);
+  }
+
+  /* 底部結論 */
+  .bottom-callout {
+    background: var(--ink);
+    color: #fff;
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+  .bottom-callout .bc-label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    padding-right: 22px;
+    border-right: 1px solid rgba(255,255,255,0.18);
+  }
+  .bottom-callout .bc-text {
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.5;
+  }
+  .bottom-callout .bc-text em {
+    color: #ffa94d;
+    font-style: normal;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--red-8);"></span>
+    <span>第二幕 · 紙的五個結構性限制</span>
+  </div>
+  <div class="ph-right">06 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div>
+      <div class="kicker red">Constraint 02 · Fragmented Chart Review</div>
+      <h1 class="title">
+        病歷散落在 HIS 各角落，<br>
+        靠人工翻 — <span class="q">容易漏</span>。
+      </h1>
+    </div>
+    <div class="head-right">
+      <div class="big-num">2<span style="font-size:24px;color:var(--ink-3);font-weight:500;"> / 5</span></div>
+      <div style="margin-top:6px;">五個結構性限制<br>之二</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- 左：HIS modules 散落 -->
+    <div class="his-grid">
+      <div class="hg-head">
+        <div class="hg-title">FJUH HIS · 病歷分散在多個 module</div>
+        <div class="hg-sub">9 sources · need manual hop</div>
+      </div>
+
+      <div class="modules">
+        <div class="mod">
+          <div class="mod-name">病人基本</div>
+          <div class="mod-name-en">Demographics</div>
+          <div class="mod-where">PT_INFO</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">入院 Vitals</div>
+          <div class="mod-name-en">Admission VS</div>
+          <div class="mod-where">NIS_VS</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">Lab 趨勢</div>
+          <div class="mod-name-en">Labs (90d)</div>
+          <div class="mod-where">LAB_RPT</div>
+        </div>
+        <div class="mod missed">
+          <div class="mod-name">出院摘要</div>
+          <div class="mod-name-en">Discharge summary</div>
+          <div class="mod-where">CHT_DSCH</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">用藥列表</div>
+          <div class="mod-name-en">Active meds</div>
+          <div class="mod-where">RX_ACTIVE</div>
+        </div>
+        <div class="mod missed">
+          <div class="mod-name">過敏記錄</div>
+          <div class="mod-name-en">Allergy alerts</div>
+          <div class="mod-where">RX_ALLG</div>
+        </div>
+        <div class="mod missed">
+          <div class="mod-name">影像報告</div>
+          <div class="mod-name-en">Echo · CXR · ECG</div>
+          <div class="mod-where">IMG_RPT</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">心臟內科會診</div>
+          <div class="mod-name-en">Cardio consult</div>
+          <div class="mod-where">CON_NOTE</div>
+        </div>
+        <div class="mod missed">
+          <div class="mod-name">過去麻醉紀錄</div>
+          <div class="mod-name-en">Prior anes</div>
+          <div class="mod-where">ANES_HIST</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">門診紀錄</div>
+          <div class="mod-name-en">OPD notes</div>
+          <div class="mod-where">OPD_NOTE</div>
+        </div>
+        <div class="mod">
+          <div class="mod-name">入院紀錄</div>
+          <div class="mod-name-en">Admission note</div>
+          <div class="mod-where">ADM_NOTE</div>
+        </div>
+        <div class="mod missed">
+          <div class="mod-name">手術紀錄</div>
+          <div class="mod-name-en">OR records</div>
+          <div class="mod-where">OR_RPT</div>
+        </div>
+      </div>
+
+      <div class="hg-foot">
+        <div class="swatch"><span class="sw taken"></span>已翻過</div>
+        <div class="swatch"><span class="sw missed"></span>可能漏看（時間不夠 / 不知道有）</div>
+      </div>
+    </div>
+
+    <!-- 中：人工翻 -->
+    <div class="relay">
+      <div class="label">
+        <span class="big">人工翻</span>
+        manual<br>chart-review
+      </div>
+      <div class="arrow"></div>
+      <div class="reason">
+        每位醫師 抽到的<br>子集不一樣
+      </div>
+    </div>
+
+    <!-- 右：紙上只裝下小片段 -->
+    <div class="paper-frag">
+      <div class="pf-head">
+        <div class="pf-title">MR-RE027 · 評估完成</div>
+        <div class="pf-tag">PARTIAL</div>
+      </div>
+
+      <div class="pf-row">
+        <span class="k">DM</span>
+        <span class="v">有</span>
+      </div>
+      <div class="pf-row">
+        <span class="k">HTN</span>
+        <span class="v">有</span>
+      </div>
+      <div class="pf-row gap">
+        <span class="k">過敏</span>
+        <span class="v">　（漏 Cefazolin alert）</span>
+        <span class="missed-stamp">MISSED</span>
+      </div>
+      <div class="pf-row gap">
+        <span class="k">心功能</span>
+        <span class="v">　（漏 EF 40% echo 2025）</span>
+        <span class="missed-stamp">MISSED</span>
+      </div>
+      <div class="pf-row gap">
+        <span class="k">前次麻醉</span>
+        <span class="v">　（漏困難氣道紀錄）</span>
+        <span class="missed-stamp">MISSED</span>
+      </div>
+      <div class="pf-row">
+        <span class="k">禁食</span>
+        <span class="v">前日午夜</span>
+      </div>
+
+      <div class="pf-foot">
+        紙本看起來「完整」， 實際上落差來自<strong>沒被翻到的角落</strong>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-callout">
+    <div class="bc-label">Insight</div>
+    <div class="bc-text">
+      問題不是「<em>抄寫慢</em>」， 是「<em>抄寫不完整</em>」 — 而且醫師<em>不知道自己漏了什麼</em>。<br>
+      DB + AI 預讀的價值：把散落的子集<em>系統化彙整</em>， 漏失從機率事件變成例外。
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>限制 2 · Fragmented Chart Review</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

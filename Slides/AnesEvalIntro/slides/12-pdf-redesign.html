@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P12 · Before / After PDF 重設計 (3 變體)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 36px 80px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  /* 頂部 — 標題 + Tweaks 切換 */
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 40px;
+  }
+  .title {
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .accent { color: var(--indigo-8); }
+  .head .sub {
+    margin-top: 6px;
+    font-size: 16px;
+    color: var(--ink-3);
+  }
+  /* 精簡 toggle — 預設 Variant B、其他兩個為次要選項 */
+  .tweak-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-en);
+  }
+  .tweak-label {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .tweak-btn {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 6px 12px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.04em;
+    border-radius: 3px;
+    line-height: 1.3;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tweak-btn .v-letter {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink-3);
+    padding: 1px 6px;
+    border-radius: 2px;
+    background: var(--paper-2);
+    letter-spacing: 0.04em;
+  }
+  .tweak-btn .v-zh {
+    font-family: var(--font-zh);
+    font-size: 12px;
+    color: var(--ink-2);
+  }
+  .tweak-btn:hover {
+    background: #f8f9fa;
+    border-color: var(--ink-3);
+  }
+  .tweak-btn.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+  .tweak-btn.active .v-letter {
+    background: #9bffdd;
+    color: var(--ink);
+  }
+  .tweak-btn.active .v-zh {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* 變體容器 */
+  .variant-stage {
+    flex: 1;
+    position: relative;
+    background: var(--paper-2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .variant {
+    position: absolute;
+    inset: 0;
+    padding: 28px 36px;
+    display: none;
+    overflow: hidden;
+  }
+  .variant.active { display: flex; flex-direction: column; gap: 18px; }
+
+  /* === 通用：兩側容器 === */
+  .va-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 16px;
+    color: var(--ink-2);
+  }
+  .va-head .va-title {
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+  }
+  .va-head .va-arrow {
+    color: var(--indigo-8);
+    font-family: var(--font-en);
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .va-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr;
+    gap: 0;
+    align-items: stretch;
+    min-height: 0;
+  }
+  .va-side {
+    background: #FFFEFB;
+    border: 1px solid var(--rule);
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .va-side.old { border-top: 4px solid var(--red-8); }
+  .va-side.new { border-top: 4px solid var(--teal-8); }
+
+  .va-side .side-tag {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--font-en);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .va-side .side-tag .stamp {
+    padding: 2px 8px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .va-side.old .side-tag .stamp { background: var(--red-8); }
+  .va-side.new .side-tag .stamp { background: var(--teal-8); }
+  .va-side .side-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+
+  /* 中間箭頭 */
+  .va-arrow-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .va-arrow-col .pill {
+    width: 32px;
+    height: 32px;
+    background: var(--indigo-8);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  /* === Variant A — 區塊重畫（過去病史 + Active conditions）=== */
+  /* 舊：勾選表格 */
+  .va-old-table {
+    display: grid;
+    grid-template-columns: 100px 40px 40px 1fr;
+    gap: 6px 12px;
+    font-size: 13px;
+  }
+  .va-old-table .th {
+    font-weight: 600;
+    color: var(--ink-2);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
+  }
+  .va-old-table .th.c { text-align: center; }
+  .va-old-table .item { font-size: 12px; color: var(--ink); padding: 3px 0; }
+  .va-old-table .cb {
+    width: 14px; height: 14px;
+    border: 1.2px solid var(--ink-2);
+    justify-self: center;
+  }
+  .va-old-table .ul {
+    border-bottom: 1px solid var(--ink-3);
+    align-self: end;
+    height: 14px;
+  }
+
+  /* 新：條列式 */
+  .narr-group {
+    margin-top: 4px;
+  }
+  .narr-group .ng-label {
+    font-family: var(--font-en);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 700;
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .narr-group .ng-label.warn { color: var(--red-8); }
+  .narr-group .ng-label.muted { color: var(--ink-3); }
+  .narr-group .ng-label.amber { color: #b88300; }
+
+  .narr-item {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    align-items: baseline;
+  }
+  .narr-item .bullet {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .narr-item.warn .bullet { color: var(--red-8); }
+  .narr-item .text {
+    color: var(--ink);
+  }
+  .narr-item .text strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .narr-item .text .detail {
+    color: var(--ink-2);
+    font-size: 11px;
+  }
+  .narr-item .src {
+    font-family: var(--font-en);
+    font-size: 9.5px;
+    color: var(--teal-8);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    padding-left: 8px;
+  }
+
+  .narr-neg-row {
+    margin-top: 4px;
+    padding: 5px 8px;
+    background: var(--paper);
+    font-size: 11.5px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    border-left: 2px solid var(--rule);
+  }
+  .narr-neg-row strong { color: var(--ink); }
+
+  .va-new-foot {
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-en);
+    font-size: 10px;
+    color: var(--ink-3);
+  }
+  .va-new-foot .ver {
+    font-weight: 700;
+    color: var(--indigo-8);
+  }
+
+  .va-notes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--ink-2);
+    padding-top: 4px;
+  }
+  .va-notes .note-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .va-notes .marker {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .va-notes .marker.old { background: var(--red-8); }
+  .va-notes .marker.new { background: var(--teal-8); }
+  .va-notes strong { color: var(--ink); font-weight: 700; }
+
+  /* === Variant B — 整張表並排（重設計後）=== */
+  .vb-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    min-height: 0;
+  }
+
+  /* 舊版（壓縮） */
+  .vb-page {
+    background: #FFFEFB;
+    border: 1px solid var(--ink-2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    padding: 14px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 8px;
+    overflow: hidden;
+    position: relative;
+  }
+  .vb-page .vp-tag {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--red-8);
+    color: #fff;
+    padding: 3px 10px;
+    font-family: var(--font-en);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    z-index: 2;
+  }
+  .vb-page.new .vp-tag { background: var(--teal-8); }
+
+  .vb-page .vp-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    border-bottom: 1.5px solid var(--ink);
+    padding-bottom: 4px;
+    position: relative;
+  }
+  .vb-page .vp-sec {
+    border: 1px solid var(--rule);
+    padding: 6px 8px;
+    background: #fff;
+  }
+  .vb-page .vp-sec-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .vb-page .vp-row {
+    display: grid;
+    gap: 4px 8px;
+    margin: 2px 0;
+  }
+  .vb-page .vp-row.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .vb-page .vp-row.c2 { grid-template-columns: 1fr 1fr; }
+  .vb-page .vp-field {
+    display: flex; gap: 4px; align-items: baseline;
+    font-size: 7.5px;
+  }
+  .vb-page .vp-field .lbl { color: var(--ink-2); }
+  .vb-page .vp-field .ul {
+    flex: 1; height: 7px;
+    border-bottom: 0.5px solid var(--ink-3);
+  }
+  .vb-page .vp-field .ul.wash {
+    background: var(--yellow-1);
+    border-bottom: none;
+    height: 8px;
+  }
+  .vb-page .vp-hx {
+    display: grid;
+    grid-template-columns: 1fr 14px 14px 1fr;
+    gap: 3px;
+    font-size: 7px;
+    align-items: center;
+    margin: 1px 0;
+  }
+  .vb-page .vp-hx .cb {
+    width: 7px; height: 7px;
+    border: 0.5px solid var(--ink-2);
+    justify-self: center;
+  }
+  .vb-page .vp-hx .ul-tiny {
+    height: 5px;
+    border-bottom: 0.5px solid var(--ink-3);
+  }
+  .vb-page .vp-foot {
+    margin-top: auto;
+    padding-top: 4px;
+    border-top: 0.5px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-size: 7px;
+    color: var(--ink-3);
+  }
+
+  /* === 新版（重設計）=== */
+  .new-pdf {
+    background: #FFFEFB;
+    border: 1px solid var(--ink-2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+  .new-pdf .np-tag {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--teal-8);
+    color: #fff;
+    padding: 3px 10px;
+    font-family: var(--font-en);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    z-index: 5;
+  }
+
+  /* Banner 病患資訊 + ASA + 麻醉方式 */
+  .np-banner {
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 16px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 18px;
+    align-items: center;
+  }
+  .np-banner .pt-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .np-banner .pt-name {
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .np-banner .pt-name .sex {
+    color: #9bffdd;
+    font-weight: 600;
+    margin-left: 8px;
+  }
+  .np-banner .pt-row {
+    display: flex;
+    gap: 12px;
+    font-size: 9.5px;
+    color: rgba(255,255,255,0.75);
+    font-family: var(--font-en);
+    letter-spacing: 0.02em;
+  }
+  .np-banner .pt-row strong { color: #fff; font-weight: 600; }
+  .np-banner .pt-row .div { color: rgba(255,255,255,0.3); }
+
+  .np-banner .vital-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 4px;
+    border-left: 3px solid #9bffdd;
+  }
+  .np-banner .vital-pill .vp-lbl {
+    font-family: var(--font-en);
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.14em;
+    font-weight: 600;
+  }
+  .np-banner .vital-pill .vp-val {
+    font-family: var(--font-en);
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 2px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .np-banner .vital-pill .vp-val.compact {
+    font-size: 13px;
+  }
+
+  /* 摘要 row：subtitle 區塊 */
+  .np-subbanner {
+    padding: 6px 16px;
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 8.5px;
+    color: var(--ink-2);
+  }
+  .np-subbanner .ssrc {
+    font-family: var(--font-en);
+    color: var(--teal-8);
+    letter-spacing: 0.04em;
+    font-weight: 600;
+  }
+
+  /* 兩個主要 section */
+  .np-section {
+    padding: 8px 16px 10px;
+  }
+  .np-section + .np-section {
+    border-top: 1.5px solid var(--ink);
+  }
+  .np-sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .np-sec-head .sno {
+    font-family: var(--font-en);
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--indigo-8);
+    letter-spacing: -0.02em;
+  }
+  .np-sec-head .stitle {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+  .np-sec-head .ssub {
+    font-family: var(--font-en);
+    font-size: 8px;
+    color: var(--ink-3);
+    margin-left: auto;
+    letter-spacing: 0.08em;
+  }
+
+  .np-block {
+    margin: 6px 0;
+  }
+  .np-block-lbl {
+    font-family: var(--font-en);
+    font-size: 7.5px;
+    letter-spacing: 0.14em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .np-block-lbl.warn { color: var(--red-8); }
+  .np-block-lbl.amber { color: #b88300; }
+
+  .np-item {
+    display: grid;
+    grid-template-columns: 8px 1fr;
+    gap: 5px;
+    padding: 1px 0;
+    font-size: 8.5px;
+    line-height: 1.45;
+    color: var(--ink);
+  }
+  .np-item .b {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 8px;
+    line-height: 1.45;
+  }
+  .np-item.warn .b { color: var(--red-8); }
+  .np-item strong { font-weight: 700; }
+  .np-item .det {
+    color: var(--ink-2);
+  }
+  .np-item .src {
+    font-family: var(--font-en);
+    color: var(--teal-8);
+    font-size: 7.5px;
+    font-weight: 600;
+    margin-left: 4px;
+  }
+
+  .np-neg-line {
+    background: var(--paper);
+    padding: 3px 8px;
+    font-size: 8px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    border-left: 2px solid var(--rule);
+  }
+  .np-neg-line strong { color: var(--ink); font-weight: 700; }
+
+  .np-foot {
+    margin-top: auto;
+    padding: 6px 16px;
+    background: var(--paper-2);
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-en);
+    font-size: 8px;
+    color: var(--ink-3);
+  }
+  .np-foot .ver {
+    color: var(--indigo-8);
+    font-weight: 700;
+  }
+
+  /* === Variant C: 概念圖 === */
+  .vc-stage {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 200px 1fr;
+    align-items: center;
+    gap: 0;
+  }
+  .vc-box {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 36px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+    justify-content: center;
+  }
+  .vc-box.old { border-top: 6px solid var(--red-8); }
+  .vc-box.new { border-top: 6px solid var(--teal-8); }
+
+  .vc-icon {
+    width: 96px; height: 96px;
+    border-radius: 16px;
+    background: var(--paper-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+  .vc-icon.old { background: var(--red-1); }
+  .vc-icon.new { background: var(--teal-1); }
+  .vc-icon svg { width: 56px; height: 56px; }
+
+  .vc-tag {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+  .vc-name {
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .vc-desc {
+    font-size: 16px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    max-width: 360px;
+  }
+  .vc-desc strong { color: var(--ink); font-weight: 700; }
+  .vc-box.old .vc-name .x { color: var(--red-8); }
+  .vc-box.new .vc-name .x { color: var(--teal-8); }
+
+  .vc-list {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--ink-2);
+  }
+  .vc-list .li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .vc-list .li .marker {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .vc-box.old .marker { background: var(--red-8); }
+  .vc-box.new .marker { background: var(--teal-8); }
+
+  .vc-mid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .vc-mid .word {
+    background: var(--ink);
+    color: #fff;
+    padding: 10px 24px;
+    font-family: var(--font-en);
+    font-size: 14px;
+    letter-spacing: 0.16em;
+    font-weight: 700;
+    border-radius: 999px;
+  }
+  .vc-mid .big-arrow {
+    width: 0; height: 0;
+    border-left: 48px solid var(--ink);
+    border-top: 30px solid transparent;
+    border-bottom: 30px solid transparent;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--indigo-8);"></span>
+    <span>第四幕 · 那這張 PDF 怎麼辦</span>
+  </div>
+  <div class="ph-right">12 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div>
+      <div class="kicker">PDF Redesign</div>
+      <h1 class="title">
+        舊 PDF 是<span class="accent">手寫容器</span>，<br>
+        新 PDF 是 DB 的<span class="accent">列印視圖</span>（條列式 ， 不用勾選）
+      </h1>
+      <div class="sub">點上方切換 3 種重設計方向 · 用鍵盤 → 進下一頁</div>
+    </div>
+
+    <div class="tweak-bar">
+      <span class="tweak-label">Other views</span>
+      <button class="tweak-btn" data-variant="a" title="區塊重畫：拿過去病史作樣本看細節">
+        <span class="v-letter">A</span><span class="v-zh">區塊</span>
+      </button>
+      <button class="tweak-btn active" data-variant="b" title="整張表前後對比：全頁重設計">
+        <span class="v-letter">B</span><span class="v-zh">整張</span>
+      </button>
+      <button class="tweak-btn" data-variant="c" title="概念圖：手寫容器 → DB 視圖">
+        <span class="v-letter">C</span><span class="v-zh">概念</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="variant-stage">
+
+    <!-- ============= Variant A ============= -->
+    <div class="variant" data-variant="a">
+
+      <div class="va-head">
+        <div>
+          <div class="va-title">取「過去病史」區塊作樣本　/　Sample: Past Medical History</div>
+        </div>
+        <div class="va-arrow">paper checkbox → narrative w/ source</div>
+      </div>
+
+      <div class="va-grid">
+
+        <div class="va-side old">
+          <div class="side-tag">
+            <span>MR-RE027 第 2 版</span>
+            <span class="stamp">BEFORE</span>
+          </div>
+          <div class="side-title">原始：無 / 有 + 手寫說明</div>
+
+          <div class="va-old-table">
+            <div class="th">項目</div>
+            <div class="th c">無</div>
+            <div class="th c">有</div>
+            <div class="th">說明</div>
+
+            <div class="item">DM</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item">HTN</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item">Cardiac</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item">Asthma</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item">Allergy</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item">Smoking</div><div class="cb"></div><div class="cb"></div><div class="ul"></div>
+            <div class="item" style="color:var(--ink-3);">…共 12 項</div><div></div><div></div><div></div>
+          </div>
+        </div>
+
+        <div class="va-arrow-col">
+          <div class="pill">→</div>
+        </div>
+
+        <div class="va-side new">
+          <div class="side-tag">
+            <span>DB-rendered Print View</span>
+            <span class="stamp">AFTER</span>
+          </div>
+          <div class="side-title">條列式　·　依據來源　·　病史敘述</div>
+
+          <div style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;">
+
+            <div class="narr-group">
+              <div class="ng-label warn">Active Conditions ( 3 )</div>
+              <div class="narr-item warn">
+                <div class="bullet">●</div>
+                <div class="text">
+                  <strong>Type 2 DM</strong>　<span class="detail">2024.07 確診 · Metformin 500mg BID · HbA1c 7.2 (2026.03)</span>
+                </div>
+                <div class="src">HIS · 病摘</div>
+              </div>
+              <div class="narr-item warn">
+                <div class="bullet">●</div>
+                <div class="text">
+                  <strong>Hypertension</strong>　<span class="detail">Amlodipine 5mg QD · 入院 BP 128/82</span>
+                </div>
+                <div class="src">HIS · 用藥</div>
+              </div>
+              <div class="narr-item warn">
+                <div class="bullet">●</div>
+                <div class="text">
+                  <strong>CAD s/p CABG (2018)</strong>　<span class="detail">EF 55% (echo 2025.11) · Aspirin 100mg QD</span>
+                </div>
+                <div class="src">HIS · 出院紀錄</div>
+              </div>
+            </div>
+
+            <div class="narr-group">
+              <div class="ng-label warn">Allergy</div>
+              <div class="narr-item warn">
+                <div class="bullet">●</div>
+                <div class="text">
+                  <strong>Cefazolin</strong>　<span class="detail">2019 全身性紅疹 · 避免使用</span>
+                </div>
+                <div class="src">HIS · 過敏紀錄</div>
+              </div>
+            </div>
+
+            <div class="narr-group">
+              <div class="ng-label">Negative ( 已詢問 )</div>
+              <div class="narr-neg-row">
+                <strong>否認</strong>：CVA · Asthma · COPD · Hepatitis · Renal disease · Bleeding disorder
+              </div>
+            </div>
+
+            <div class="narr-group">
+              <div class="ng-label amber">Unknown ( 待詢問 )</div>
+              <div class="narr-item">
+                <div class="bullet" style="color:#b88300;">○</div>
+                <div class="text">
+                  <strong>Smoking history</strong>　<span class="detail">病摘未提及 · 麻醉前訪視時補問</span>
+                </div>
+                <div class="src" style="color:#b88300;">— pending</div>
+              </div>
+            </div>
+
+            <div class="va-new-foot">
+              <span>Eval ID 2026-0518-1142 · 林○○ MD</span>
+              <span class="ver">v 1.2 · signed 2026.05.19 09:48</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="va-notes">
+        <div class="note-item">
+          <div class="marker old">A</div>
+          <div>
+            <strong>勾選只是符號 ， 內涵是文字。</strong>
+            「沒勾」可能是沒問、可能是 Class I 、可能是漏掉 — 紙本無法分辨。
+          </div>
+        </div>
+        <div class="note-item">
+          <div class="marker new">B</div>
+          <div>
+            <strong>條列式呈現病史內容 ， 不再用勾選。</strong>
+            Active / Negative / Unknown 三種狀態各自顯眼 ， 來源、用藥、時間一併留痕。
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============= Variant B ============= -->
+    <div class="variant active" data-variant="b">
+
+      <div class="va-head" style="margin-bottom:6px;">
+        <div>
+          <div class="va-title">整張表前後對比　/　Full-page Redesign</div>
+        </div>
+        <div class="va-arrow">single-page narrative print view</div>
+      </div>
+
+      <div class="vb-grid">
+
+        <!-- 舊版 -->
+        <div class="vb-page">
+          <span class="vp-tag">BEFORE</span>
+          <div class="vp-title">麻醉前評估紀錄　·　MR-RE027</div>
+
+          <div class="vp-sec">
+            <div class="vp-row c4">
+              <div class="vp-field"><span class="lbl">病歷號</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">姓名</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">生日</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">床號</span><span class="ul wash"></span></div>
+            </div>
+            <div class="vp-row c4">
+              <div class="vp-field"><span class="lbl">身高</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">體重</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">血壓</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">SpO₂</span><span class="ul wash"></span></div>
+            </div>
+          </div>
+
+          <div class="vp-sec">
+            <div class="vp-sec-title">過去病史 (12 項)</div>
+            <div class="vp-hx"><div>DM</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx"><div>HTN</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx"><div>Cardiac</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx"><div>Asthma</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx"><div>Allergy</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx"><div>Smoking</div><div class="cb"></div><div class="cb"></div><div class="ul-tiny"></div></div>
+            <div class="vp-hx" style="color:var(--ink-3);font-size:6px;"><div>… +6 項 + Others</div><div></div><div></div><div></div></div>
+          </div>
+
+          <div class="vp-sec">
+            <div class="vp-sec-title">Lab (17 項)</div>
+            <div class="vp-row c4">
+              <div class="vp-field"><span class="lbl">Hb</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">PLT</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">INR</span><span class="ul wash"></span></div>
+              <div class="vp-field"><span class="lbl">Cre</span><span class="ul wash"></span></div>
+            </div>
+            <div style="font-size:6px;color:var(--ink-3);margin-top:2px;">… 共 17 項手抄</div>
+          </div>
+
+          <div class="vp-sec">
+            <div class="vp-sec-title">麻醉醫囑</div>
+            <div style="font-size:7px;">ASA: □Ⅰ □Ⅱ □Ⅲ □Ⅳ □Ⅴ　·　Airway: □容易 □中等 □困難</div>
+            <div style="font-size:7px;margin-top:2px;">心血管 □ RHB □異常<span class="wash" style="display:inline-block;width:40px;height:8px;vertical-align:-1px;"></span></div>
+          </div>
+
+          <div class="vp-foot">
+            <span>MR-RE027 [版本：第 2 版]</span>
+            <span>輔大醫院 2020.12.14</span>
+          </div>
+        </div>
+
+        <!-- 新版（重設計）-->
+        <div class="new-pdf">
+          <span class="np-tag">AFTER</span>
+
+          <!-- Banner -->
+          <div class="np-banner">
+            <div class="pt-info">
+              <div class="pt-name">王○○　<span class="sex">男 · 68 y</span></div>
+              <div class="pt-row">
+                <span><strong>MRN</strong> 12345678</span>
+                <span class="div">|</span>
+                <span><strong>168cm</strong> / 72kg</span>
+                <span class="div">|</span>
+                <span><strong>BMI</strong> 25.5</span>
+                <span class="div">|</span>
+                <span><strong>BP</strong> 128/82</span>
+                <span class="div">|</span>
+                <span><strong>SpO₂</strong> 99</span>
+              </div>
+            </div>
+            <div class="vital-pill">
+              <div class="vp-lbl">ASA Class</div>
+              <div class="vp-val">Ⅲ</div>
+            </div>
+            <div class="vital-pill">
+              <div class="vp-lbl">Anesthesia</div>
+              <div class="vp-val compact">GA-ETT</div>
+            </div>
+          </div>
+
+          <div class="np-subbanner">
+            <span>Inguinal Hernia Repair (R)　·　預定 2026.05.20</span>
+            <span class="ssrc">DB Eval · v1.2 · 自動生成</span>
+          </div>
+
+          <!-- 上段：麻醉評估 -->
+          <div class="np-section">
+            <div class="np-sec-head">
+              <span class="sno">§ 01</span>
+              <span class="stitle">麻醉評估　/　Pre-anesthetic Assessment</span>
+              <span class="ssub">DB-derived · physician confirmed</span>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl warn">Active Conditions</div>
+              <div class="np-item warn"><div class="b">●</div><div><strong>Type 2 DM</strong>　<span class="det">Metformin BID · HbA1c 7.2</span><span class="src">HIS</span></div></div>
+              <div class="np-item warn"><div class="b">●</div><div><strong>HTN</strong>　<span class="det">Amlodipine 5mg QD</span><span class="src">HIS</span></div></div>
+              <div class="np-item warn"><div class="b">●</div><div><strong>CAD s/p CABG 2018</strong>　<span class="det">EF 55% · Aspirin 100mg</span><span class="src">HIS</span></div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl warn">Allergy</div>
+              <div class="np-item warn"><div class="b">●</div><div><strong>Cefazolin</strong>　<span class="det">2019 紅疹 · 避用</span><span class="src">HIS</span></div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Airway</div>
+              <div class="np-item"><div class="b">●</div><div><strong>Mallampati Ⅱ</strong>　·　thyromental 6.5 cm　·　mouth opening 4 cm</div></div>
+              <div class="np-item"><div class="b">●</div><div>頸部活動 < 30°　—　預備 Glidescope</div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Labs ( 7d , normal unless noted )</div>
+              <div class="np-item"><div class="b">●</div><div>Hb <strong>13.4</strong> · Hct 39.8 · PLT <strong>218</strong> · PT 12.1 / INR <strong>1.02</strong> · BUN 14 / Cre <strong>0.92</strong> (eGFR 78)</div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Risk Summary</div>
+              <div class="np-item"><div class="b">●</div><div><strong>ASA Ⅲ</strong> (DM + CAD)　·　<strong>RCRI 1</strong> (moderate)　·　<strong>STOP-Bang 3</strong></div></div>
+            </div>
+
+            <div class="np-neg-line">
+              <strong>Negative ( 已詢問 )：</strong>CVA · Asthma · COPD · Hepatitis · Renal · Bleeding ｜ <strong>Unknown：</strong>Smoking history
+            </div>
+          </div>
+
+          <!-- 下段：麻醉計劃 -->
+          <div class="np-section" style="background:var(--paper-2);">
+            <div class="np-sec-head">
+              <span class="sno">§ 02</span>
+              <span class="stitle">麻醉計劃　/　Anesthesia Plan</span>
+              <span class="ssub">physician authored</span>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Technique</div>
+              <div class="np-item"><div class="b">●</div><div><strong>GA with ETT</strong>　·　Standard induction: Propofol 2 mg/kg + Rocuronium 0.6 mg/kg</div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Monitoring</div>
+              <div class="np-item"><div class="b">●</div><div>Standard ASA monitors + 5-lead ECG　·　Arterial line (R radial)</div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">Post-op</div>
+              <div class="np-item"><div class="b">●</div><div><strong>PCA</strong> — Morphine 1mg/q10min, 1h limit 6 mg　·　PACU 60 min observation</div></div>
+            </div>
+
+            <div class="np-block">
+              <div class="np-block-lbl">禁食 / NPO</div>
+              <div class="np-item"><div class="b">●</div><div>前日午夜十二時起 NPO　·　Clear liquid up to 2h preop</div></div>
+            </div>
+          </div>
+
+          <div class="np-foot">
+            <span>Eval ID · 2026-0518-1142</span>
+            <span class="ver">v 1.2 · signed 林○○ 09:48</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ============= Variant C ============= -->
+    <div class="variant" data-variant="c">
+
+      <div class="vc-stage">
+
+        <div class="vc-box old">
+          <div class="vc-icon old">
+            <svg viewBox="0 0 56 56" fill="none" stroke="#c92a2a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 6 L36 6 L46 16 L46 50 L10 50 Z"/>
+              <path d="M36 6 L36 16 L46 16"/>
+              <line x1="16" y1="22" x2="40" y2="22"/>
+              <line x1="16" y1="30" x2="36" y2="30"/>
+              <line x1="16" y1="38" x2="40" y2="38"/>
+              <path d="M22 44 L18 48 L16 46 L22 44 Z" fill="#c92a2a"/>
+            </svg>
+          </div>
+          <div class="vc-tag">As-is</div>
+          <div class="vc-name">手寫<span class="x">容器</span></div>
+          <div class="vc-desc">PDF 是<strong>事實源頭</strong>。<br>欄位、勾選、自由文字都長在紙上。</div>
+          <div class="vc-list">
+            <div class="li"><span class="marker"></span>欄位設計給筆寫</div>
+            <div class="li"><span class="marker"></span>勾選後無法 cross-check</div>
+            <div class="li"><span class="marker"></span>改了沒人知道</div>
+            <div class="li"><span class="marker"></span>無法跨手術 / 跨單位流轉</div>
+          </div>
+        </div>
+
+        <div class="vc-mid">
+          <div class="word">REDESIGN</div>
+          <div class="big-arrow"></div>
+          <div style="font-size:13px;color:var(--ink-2);text-align:center;line-height:1.5;max-width:160px;">
+            事實源頭從<br>
+            <strong style="color:var(--ink);">紙</strong> 移到 <strong style="color:var(--indigo-8);">DB</strong>
+          </div>
+        </div>
+
+        <div class="vc-box new">
+          <div class="vc-icon new">
+            <svg viewBox="0 0 56 56" fill="none" stroke="#099268" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <ellipse cx="28" cy="12" rx="20" ry="6"/>
+              <path d="M8 12 L8 28 C 8 31.3 16.95 34 28 34 C 39.05 34 48 31.3 48 28 L 48 12"/>
+              <path d="M8 28 L8 44 C 8 47.3 16.95 50 28 50 C 39.05 50 48 47.3 48 44 L 48 28"/>
+            </svg>
+          </div>
+          <div class="vc-tag">To-be</div>
+          <div class="vc-name">DB 的<span class="x">列印視圖</span></div>
+          <div class="vc-desc">PDF 是 DB 的<strong>列印快照</strong>。<br>條列式敘述 ， 不再用勾選欄位。</div>
+          <div class="vc-list">
+            <div class="li"><span class="marker"></span>上方 banner：病患資訊 + ASA + 麻醉方式</div>
+            <div class="li"><span class="marker"></span>上段：麻醉評估（條列）</div>
+            <div class="li"><span class="marker"></span>下段：麻醉計劃（條列）</div>
+            <div class="li"><span class="marker"></span>每項附來源 + 版本 + 簽章 metadata</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>PDF 重設計　·　Narrative print view</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.tweak-btn');
+  const variants = document.querySelectorAll('.variant');
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const v = btn.dataset.variant;
+      buttons.forEach(b => b.classList.toggle('active', b.dataset.variant === v));
+      variants.forEach(el => el.classList.toggle('active', el.dataset.variant === v));
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+/* 麻醉前評估系統介紹 — 共享設計 token
+ * grammar: 教學型臨床演講、Mantine v7 色盤、低反差暖白底
+ */
+
+:root {
+  /* 色盤 — Mantine v7 shade 8 為主 + 低反差中性色 */
+  --paper:        #F8F6F2;   /* 暖白底，有紙感 */
+  --paper-2:      #EFEBE3;   /* 區塊底色 */
+  --ink:          #1A1B1E;   /* 主文字 */
+  --ink-2:        #495057;   /* 次文字 */
+  --ink-3:        #868E96;   /* 弱文字、標籤 */
+  --rule:         #D6D0C4;   /* 分隔線（暖灰） */
+  --rule-2:       #E5E1D6;   /* 淺分隔線 */
+
+  --indigo-8:     #364fc7;   /* 結構/解法主色 */
+  --indigo-1:     #EDF2FF;
+  --red-8:        #c92a2a;   /* 痛點紅 */
+  --red-1:        #FFF5F5;
+  --teal-8:       #099268;   /* 解法綠 */
+  --teal-1:       #E6FCF5;
+  --orange-8:     #d9480f;   /* 警示/手寫區 */
+  --yellow-1:     #FFF9DB;
+
+  /* 字 */
+  --font-zh:      "Noto Sans TC", "PingFang TC", system-ui, sans-serif;
+  --font-en:      "Inter", "Noto Sans TC", sans-serif;
+  --font-mono:    "JetBrains Mono", "SF Mono", Consolas, monospace;
+
+  /* 字號階 */
+  --fs-title:     108px;     /* 封面主標 */
+  --fs-h1:        72px;      /* 章節主標 */
+  --fs-h2:        52px;      /* 一般頁主標 */
+  --fs-h3:        36px;      /* 小標 */
+  --fs-body:      28px;      /* 正文 */
+  --fs-body-sm:   22px;
+  --fs-caption:   18px;      /* 表格、註腳 */
+  --fs-chrome:    16px;      /* 頁眉頁腳 */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-zh);
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* 頁眉 */
+.page-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 64px;
+  padding: 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-en);
+  font-size: var(--fs-chrome);
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--rule-2);
+}
+.page-header .ph-left {
+  display: flex; align-items: center; gap: 12px;
+}
+.page-header .ph-mark {
+  width: 8px; height: 8px;
+  background: var(--indigo-8);
+  border-radius: 2px;
+}
+.page-header .ph-right {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 頁腳 */
+.page-footer {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 56px;
+  padding: 0 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--fs-chrome);
+  color: var(--ink-3);
+  border-top: 1px solid var(--rule-2);
+}
+
+/* 主內容區（避開 header/footer） */
+.page-body {
+  position: absolute;
+  top: 64px; left: 0; right: 0; bottom: 56px;
+  padding: 72px 96px;
+}
+
+/* kicker — 小型結構標籤 */
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-en);
+  font-size: 18px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 28px;
+}
+.kicker::before {
+  content: '';
+  width: 36px;
+  height: 2px;
+  background: var(--indigo-8);
+}
+.kicker.red::before { background: var(--red-8); }
+.kicker.teal::before { background: var(--teal-8); }
+
+/* 主標題 */
+h1.page-title {
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+h1.page-title .accent { color: var(--indigo-8); }
+h1.page-title .accent-red { color: var(--red-8); }
+h1.page-title .accent-teal { color: var(--teal-8); }
+
+/* 副標 / lead */
+p.lead {
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--ink-2);
+  max-width: 1400px;
+}
+
+/* 通用文字 utility */
+.tnum { font-variant-numeric: tabular-nums; }
+.mono { font-family: var(--font-mono); }
+.en   { font-family: var(--font-en); }

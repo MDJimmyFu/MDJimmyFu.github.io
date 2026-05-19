@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>麻醉前評估系統介紹 · 14 張</title>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- DECK MANIFEST                                            -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<script>
+  window.DECK_MANIFEST = [
+    { file: "slides/01-cover.html",              label: "01 封面 · 從紙到資料庫" },
+    { file: "slides/02-agenda.html",             label: "02 議程 · 三個問題" },
+    { file: "slides/03-pdf-overview.html",       label: "03 表單全貌" },
+    { file: "slides/04-handwriting-first.html",  label: "04 手寫優先" },
+    { file: "slides/05-limit1-tristate.html",    label: "05 限制 1 · tri-state 缺失" },
+    { file: "slides/06-limit2-his-rewrite.html", label: "06 限制 2 · HIS 重抄" },
+    { file: "slides/07-limit3-no-carry.html",    label: "07 限制 3 · 跨手術不會帶" },
+    { file: "slides/08-limit4-no-audit.html",    label: "08 限制 4 · 無版本/審計" },
+    { file: "slides/09-limit5-disconnect.html",  label: "09 限制 5 · 跨段斷層 (輕描)" },
+    { file: "slides/10-db-solves.html",          label: "10 DB 一次解 + AI 著力點" },
+    { file: "slides/11-section-review.html",     label: "11 section-review 確認體驗" },
+    { file: "slides/12-pdf-redesign.html",       label: "12 PDF 重設計 · 3 變體" },
+    { file: "slides/13-rollout-safety.html",     label: "13 並存 · 安全 · Roadmap" },
+    { file: "slides/14-qa-pilot.html",           label: "14 Q&A · Pilot 邀請" },
+  ];
+
+  window.DECK_WIDTH = 1920;
+  window.DECK_HEIGHT = 1080;
+</script>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- SPEAKER NOTES (按 N 開關)                                 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<script type="application/json" id="speaker-notes">
+[
+  "（封面停留約 10 秒）大家早安，今天想跟科內同仁聊一件我們科未來幾季會推動的事 — 麻醉前評估系統。今天不講技術細節、也不展示任何架構圖，我想從一個很具體的東西開始：大家手上每天都在用的這張 MR-RE027 表單。題目叫『從紙到資料庫』，意思是這張表單背後的事實源頭，會從紙本搬到資料庫；簡報目的不是要你接受結論，而是讓你看到我推這件事的理由。預計講 15 分鐘，最後 5 分鐘留 Q&A 。",
+
+  "今天三件事。第一件 — 我們現在怎麼做？把這張紙重新看一遍，會發現以前沒注意的東西。第二件 — 為什麼非要改？我會給五個結構性的限制，每個限制都是這張紙本身的設計帶來的，不是哪個人不認真。第三件 — 改完會變成什麼樣？包括 UI 大致長相、新版 PDF 怎麼設計、roll out 怎麼走。請大家聽到不認同的點，先記下來，最後一起討論。",
+
+  "這就是 MR-RE027 第 2 版，2020 修訂版。一頁 A4 承擔整個術前麻醉評估。右邊我畫了一張縮影，標出四個區塊：① 病人基本資料與生命徵象，② 過去病史 12 項，③ Lab 17 項，④ 麻醉醫囑暨評估紀錄含 ASA、Airway、麻醉計劃與簽章。這四個區塊等等會反覆出現，請大家先記一下位置。",
+
+  "把這張表的版面仔細看一遍 — 你會發現，整張表的灰底邏輯是「手寫優先」。勾選框只是配角，主角其實是醫師手寫的自由文字。光是 12 項病史就有 12 條說明線，再加上備註框、Others、異常欄、其他、簽名，總共 19 處自由文字框。最關鍵的數字 — 0 個欄位能被機器查詢。這不是表單做得不好，這是它的本來設計目的：給人讀、給人寫。問題是現在我們需要它變成資料。",
+
+  "第一個限制 — tri-state 缺失。每一項病史只有「無」「有」兩格。但同樣是「沒勾」，可能代表四件事：問了沒有、忘了問、不適用、問了有但忘了勾。四種狀態壓成兩格，紙本永遠分不出來。Mallampati 也一樣，沒勾代表沒做、還是 Class I？這就是病歷品質的盲區。DB 化的第一個價值，就是把這四種狀態各自記下來，包括「未問」這個誠實留痕的選項。",
+
+  "第二個限制是這次想特別強調的 — 問題不在『抄寫慢』 ， 而是『抄寫不完整』。我們科內現在的痛點是 HIS 病歷散落在很多 module：病基、Vitals、Lab 是基本資料；可是出院摘要、過敏 alert、影像報告 (echo / CXR / ECG)、心臟內科會診、過去麻醉紀錄、手術紀錄、用藥列表、門診筆記、入院紀錄 — 通通分散在不同視窗。麻醉前訪視只有 10-20 分鐘 ， 每位醫師抽到的子集都不一樣 ， 容易漏掉關鍵 alert — 像 Cefazolin allergy 沒看到、EF 40% 的 echo 沒翻到、上次困難氣道紀錄沒查。紙本看起來填得完整 ， 但落差來自『沒被翻到的角落』 ， 醫師不知道自己漏了什麼。DB + AI 預讀的價值不是省抄寫時間 ， 是把散落的子集系統化彙整 ， 漏失從機率事件變成例外 ， 醫師可以把時間花在判斷上 ， 不是在 HIS 視窗之間跳。",
+
+  "第三個限制 — 跨手術不會帶。同一個病人三個月內三次手術，我們填三份完全空白的表。第一次費力問出的過敏、過去手術、Airway 評估，第二次第三次完全不存在。工作沒省，紀錄反而愈問愈不一致 — 你問到的過敏品名、上次的人沒寫，這次就漏了。DB 化後上一次的評估可以一鍵帶入，逐項覆核，速度快又一致。",
+
+  "第四個限制 — 沒有版本與審計痕跡。紙本上的每一個塗改，都是無法回答的問號：ASA 從 Ⅱ 改成 Ⅲ 是誰改的？什麼時候改？是術前重評還是術後回填？兩次評估之間發生了什麼？萬一糾紛，怎麼還原當下決策？紙本只記錄『最終狀態』，不記錄『過程』。DB 最便宜的好處 — 每次變更自動記下 who/when/what，醫師不需要多做任何事。",
+
+  "第五個限制是伏筆，今天輕描。pre-op 評估的結論走不出術前訪視這張紙 — 出了 OR，術中麻醉、PACU、QA 都得重新評估一遍，因為沒辦法 link 回術前的判斷。這頁不是今天主題，我只想先講一句：DB 化會讓這條斷掉的線重新接起來。同一份結構從 pre-op 流到術中、PACU、QA，下一個 phase 才有機會做。",
+
+  "第三幕。DB 化怎麼一次解掉這 5 件事。左邊是 5 個限制對應 5 個解法：tri-state 三態欄位、HIS 自動預填、跨手術帶入、自動審計、跨段資料流動。右邊更重要 — 這也是 AI 才有著力點的原因。紙本之上做 AI 沒意義，因為文字非結構化、跨欄位無法 cross-check。有了結構化資料，AI 才能做病摘預讀、自動算 ASA RCRI、自由文字結構化這三件事。請記住順序 — DB 是基礎，AI 是延伸；沒有前者，後者只是噱頭。",
+
+  "這是大概的 UI 樣子，重點不是好不好看，是右邊一個原則 — section-review。AI 是助手，醫師仍是最終裁量。每個段落單獨確認一次，不是 50 個勾選逐項點、也不是文件級一鍵簽。每個 AI 預填欄位都附資料來源、信心、取得時間，醫師點開可看到 AI 怎麼推得的。病摘沒提到的項目，AI 不擅自填，標『未問』提醒主動詢問。所有確認、修改、最終簽章都記在醫師名下；AI 不簽名，只標示『曾建議過什麼』。",
+
+  "現在面對最直接的問題：那這張 PDF 怎麼辦？大家眼前看到的就是新版 PDF 的設計方向 — 一個原則：條列式敘述 ， 不再用勾選欄位。最上方一條黑色 banner ， 把病人資訊、ASA Class、預定麻醉方式醒目化 ， 一眼抓重點。banner 下面分上下兩段 — 上段 §01 麻醉評估 ， 條列 Active Conditions / Allergy / Airway / Labs / Risk Summary / Negative；下段 §02 麻醉計劃 ， 條列 Technique / Monitoring / Post-op / NPO。每項都附資料來源、版本與簽章 metadata。右上角還有兩個其他切換方向 ， A 是區塊重畫過去病史看細節 、 C 是概念圖最快理解；現在主推這個整張版 ， 想看另外兩個我隨時切。歡迎針對 banner 重點欄位、條列分類給意見。",
+
+  "三件事讓大家放心。第一 — 不會打斷現有流程。新版與紙本並存，志願試用，覺得不順可以退回紙本，列印格式接近現有 MR-RE027 樣式。第二 — 資料安全。AI 跑在科內 Mac Studio 本地，PHI 不出院區網路；非要用外部模型時先做去識別。登入用 HIS SSO，不要記第二組密碼。第三 — Roadmap 排序很重要。我們現在做 Phase 1 pre-op；Phase 2 是 PACU 接力 + QA 統計 ， 因為 PACU 主要是讀術前結論 + KPI 統計 ， 技術上單純；Phase 3 才是術中監控接力 ， 那是最難的 — 要跟 OR 監視主機整合 、 即時更新 ASA / Airway / 計劃 ， 技術跟流程複雜度都最高 ， 所以排最後做。Phase 1 做好 ， 後面才有機會做。",
+
+  "Q&A 時間。任何問題、質疑、不認同都歡迎現在就提出來；不認同也是一種貢獻。兩個邀請：第一，Phase 1 上線時希望有 3-5 位同仁加入 pilot，每週 1-2 位病人試用即可，隨時可以退出。第二，給回饋的管道 — 現在說、會後找我、mail 都可以；欄位設計、UX、安全疑慮、覺得這整件事方向錯了，我都想聽。謝謝大家。"
+]
+</script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: #1A1B1E;
+    overflow: hidden;
+    font-family: -apple-system, "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+  #stage {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform-origin: top left;
+    will-change: transform;
+    background: #fff;
+    box-shadow: 0 12px 64px rgba(0,0,0,0.5);
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #fff;
+  }
+  .counter {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    font-variant-numeric: tabular-nums;
+    z-index: 100;
+    user-select: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .counter:hover { opacity: 1; }
+  .counter .label { color: rgba(255,255,255,0.7); margin-left: 10px; }
+  /* nav-zone — 縮成窄邊條 ， 不吞掉 slide 內互動 UI */
+  .nav-zone {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 80px;
+    cursor: pointer;
+    z-index: 50;
+  }
+  .nav-zone.left  { left: 0; }
+  .nav-zone.right { right: 0; }
+  .nav-hint {
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .nav-zone.left  .nav-hint { left: 20px; }
+  .nav-zone.right .nav-hint { right: 20px; }
+  .nav-zone:hover .nav-hint { opacity: 1; }
+
+  /* Speaker notes 面板 */
+  .notes-panel {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(20,20,22,0.96);
+    color: #f8f9fa;
+    padding: 20px 36px 24px;
+    max-height: 36vh;
+    overflow-y: auto;
+    z-index: 80;
+    transform: translateY(100%);
+    transition: transform 0.25s;
+    border-top: 2px solid var(--rule, #495057);
+    font-family: "Noto Sans TC", -apple-system, sans-serif;
+  }
+  .notes-panel.open { transform: translateY(0); }
+  .notes-panel .np-head {
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 8px;
+  }
+  .notes-panel .np-body {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #e9ecef;
+  }
+
+  /* Print: one slide per page */
+  @media print {
+    @page { size: 1920px 1080px; margin: 0; }
+    html, body { background: #fff; overflow: visible; height: auto; }
+    #stage { position: static; transform: none !important; box-shadow: none; }
+    .counter, .nav-zone, .notes-panel { display: none !important; }
+    .print-stack { display: block; }
+    .print-stack iframe {
+      width: 1920px;
+      height: 1080px;
+      page-break-after: always;
+      display: block;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <iframe id="frame" src="about:blank"></iframe>
+</div>
+
+<div class="nav-zone left"  id="navL"><div class="nav-hint">‹</div></div>
+<div class="nav-zone right" id="navR"><div class="nav-hint">›</div></div>
+<div class="counter" id="counter">1 / 1</div>
+
+<div class="notes-panel" id="notesPanel">
+  <div class="np-head"><span id="np-num">01</span> · Speaker Notes　·　按 N 收起</div>
+  <div class="np-body" id="np-body"></div>
+</div>
+
+<div class="print-stack" id="printStack" style="display:none;"></div>
+
+<script>
+(function () {
+  const W = window.DECK_WIDTH || 1920;
+  const H = window.DECK_HEIGHT || 1080;
+  const deck = window.DECK_MANIFEST || [];
+  const notes = JSON.parse(document.getElementById('speaker-notes').textContent || '[]');
+  const stage = document.getElementById('stage');
+  const frame = document.getElementById('frame');
+  const counter = document.getElementById('counter');
+  const printStack = document.getElementById('printStack');
+  const notesPanel = document.getElementById('notesPanel');
+  const npNum = document.getElementById('np-num');
+  const npBody = document.getElementById('np-body');
+  const storageKey = 'deck-anes-preop-' + location.pathname;
+  let current = 0;
+
+  stage.style.width  = W + 'px';
+  stage.style.height = H + 'px';
+
+  function fit() {
+    const s = Math.min(window.innerWidth / W, window.innerHeight / H);
+    const x = (window.innerWidth  - W * s) / 2;
+    const y = (window.innerHeight - H * s) / 2;
+    stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+    stage.style.top = '0';
+    stage.style.left = '0';
+  }
+
+  function show(idx) {
+    if (idx < 0 || idx >= deck.length) return;
+    current = idx;
+    frame.src = deck[idx].file;
+    counter.innerHTML = `${idx + 1} / ${deck.length} <span class="label">${deck[idx].label || ''}</span>`;
+    npNum.textContent = String(idx + 1).padStart(2, '0');
+    npBody.textContent = notes[idx] || '（無）';
+    try { localStorage.setItem(storageKey, String(idx)); } catch (_) {}
+    if (location.hash !== '#' + (idx + 1)) {
+      history.replaceState(null, '', '#' + (idx + 1));
+    }
+  }
+
+  function next() { show(Math.min(current + 1, deck.length - 1)); }
+  function prev() { show(Math.max(current - 1, 0)); }
+  function toggleNotes() { notesPanel.classList.toggle('open'); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    switch (e.key) {
+      case 'ArrowRight': case ' ': case 'PageDown': e.preventDefault(); next(); break;
+      case 'ArrowLeft':  case 'PageUp':              e.preventDefault(); prev(); break;
+      case 'Home':                                    e.preventDefault(); show(0); break;
+      case 'End':                                     e.preventDefault(); show(deck.length - 1); break;
+      case 'p': case 'P':                             window.print(); break;
+      case 'n': case 'N':                             toggleNotes(); break;
+      default:
+        if (e.key >= '1' && e.key <= '9') {
+          const i = parseInt(e.key, 10) - 1;
+          if (i < deck.length) { e.preventDefault(); show(i); }
+        }
+    }
+  });
+
+  document.getElementById('navL').addEventListener('click', prev);
+  document.getElementById('navR').addEventListener('click', next);
+  window.addEventListener('resize', fit);
+  window.addEventListener('hashchange', () => {
+    const m = location.hash.match(/^#(\d+)$/);
+    if (m) show(parseInt(m[1], 10) - 1);
+  });
+
+  const hashMatch = location.hash.match(/^#(\d+)$/);
+  if (hashMatch) current = Math.min(parseInt(hashMatch[1], 10) - 1, deck.length - 1);
+  else try {
+    const v = parseInt(localStorage.getItem(storageKey), 10);
+    if (!isNaN(v) && v >= 0 && v < deck.length) current = v;
+  } catch (_) {}
+  fit();
+  show(current);
+
+  window.addEventListener('beforeprint', () => {
+    printStack.innerHTML = '';
+    deck.forEach(item => {
+      const f = document.createElement('iframe');
+      f.src = item.file;
+      printStack.appendChild(f);
+    });
+    printStack.style.display = 'block';
+    document.getElementById('stage').style.display = 'none';
+  });
+  window.addEventListener('afterprint', () => {
+    printStack.innerHTML = '';
+    printStack.style.display = 'none';
+    document.getElementById('stage').style.display = '';
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P01 · 封面</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  /* 封面 — 大字排版 + 右側雙物件對比 */
+  .cover-body {
+    position: absolute;
+    inset: 0;
+    padding: 96px 120px;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .left-col { display: flex; flex-direction: column; gap: 36px; }
+
+  .deck-kicker {
+    display: flex; align-items: center; gap: 18px;
+    font-family: var(--font-en);
+    font-size: 18px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .deck-kicker .dot {
+    width: 10px; height: 10px;
+    background: var(--indigo-8);
+    border-radius: 2px;
+  }
+  .deck-kicker .sep { color: var(--ink-3); }
+
+  .cover-title {
+    font-size: 140px;
+    font-weight: 900;
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+  .cover-title .arrow {
+    color: var(--indigo-8);
+    font-family: var(--font-en);
+    font-weight: 700;
+    margin: 0 12px;
+  }
+  .cover-title .to {
+    color: var(--indigo-8);
+  }
+
+  .cover-sub {
+    font-size: 34px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    font-weight: 400;
+    max-width: 720px;
+  }
+  .cover-sub strong {
+    font-weight: 700;
+    color: var(--ink);
+    border-bottom: 3px solid var(--indigo-8);
+    padding-bottom: 2px;
+  }
+
+  .meta-row {
+    display: flex;
+    gap: 56px;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid var(--rule);
+  }
+  .meta-item .label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+  .meta-item .value {
+    font-size: 22px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* 右側對比視覺：紙 vs DB */
+  .right-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 60px;
+    position: relative;
+  }
+
+  .object-card {
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+  }
+  .object-card .object-label {
+    font-family: var(--font-en);
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+  .object-card .object-label-zh {
+    font-size: 18px;
+    color: var(--ink-2);
+    font-weight: 500;
+    margin-top: 4px;
+  }
+
+  /* 紙張示意 */
+  .paper-mini {
+    width: 220px;
+    height: 290px;
+    background: #FFFEFB;
+    border: 1px solid var(--rule);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    position: relative;
+    padding: 16px 14px;
+    transform: rotate(-3deg);
+  }
+  .paper-mini .pm-line {
+    height: 4px; background: var(--ink-3); opacity: 0.35;
+    margin-bottom: 6px;
+    border-radius: 1px;
+  }
+  .paper-mini .pm-line.w70 { width: 70%; }
+  .paper-mini .pm-line.w50 { width: 50%; }
+  .paper-mini .pm-line.w85 { width: 85%; }
+  .paper-mini .pm-line.w60 { width: 60%; }
+  .paper-mini .pm-block {
+    margin-top: 12px;
+    height: 80px;
+    border: 1px dashed var(--rule);
+    background: var(--yellow-1);
+    opacity: 0.55;
+  }
+  .paper-mini .pm-checks {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+  .paper-mini .pm-check {
+    width: 12px; height: 12px;
+    border: 1.5px solid var(--ink-3);
+  }
+  .paper-mini .pm-stamp {
+    position: absolute;
+    bottom: 14px; right: 14px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--red-8);
+    opacity: 0.7;
+    transform: rotate(8deg);
+    letter-spacing: 0.1em;
+  }
+
+  /* DB 示意 — 三條 cylinder */
+  .db-mini {
+    width: 220px;
+    height: 290px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+  }
+  .db-cyl {
+    width: 150px;
+    height: 36px;
+    background: var(--indigo-8);
+    border-radius: 50% / 24%;
+    position: relative;
+    box-shadow: 0 4px 14px rgba(54,79,199,0.25);
+  }
+  .db-cyl::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 14px; bottom: -28px;
+    background: var(--indigo-8);
+    border-bottom-left-radius: 50% / 36%;
+    border-bottom-right-radius: 50% / 36%;
+    z-index: -1;
+  }
+  .db-cyl + .db-cyl { margin-top: -12px; }
+  .db-cyl.c2 { background: #4c6ef5; box-shadow: 0 4px 14px rgba(76,110,245,0.25); }
+  .db-cyl.c3 { background: #748ffc; box-shadow: 0 4px 14px rgba(116,143,252,0.22); }
+
+  /* 中間箭頭 */
+  .arrow-pill {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--indigo-8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--indigo-8);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    z-index: 10;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark"></span>
+    <span>麻醉前評估系統 · 內部介紹</span>
+  </div>
+  <div class="ph-right">01 / 14</div>
+</div>
+
+<div class="cover-body">
+  <div class="left-col">
+    <div class="deck-kicker">
+      <span class="dot"></span>
+      <span>FJUH Anesthesia</span>
+      <span class="sep">·</span>
+      <span>科內晨會</span>
+      <span class="sep">·</span>
+      <span>2026.05</span>
+    </div>
+
+    <h1 class="cover-title">
+      從紙<span class="arrow">→</span><span class="to">資料庫</span>
+    </h1>
+
+    <p class="cover-sub">
+      為什麼<strong>麻醉前評估</strong>非做不可，<br>
+      以及這張表單之後會變成什麼樣子。
+    </p>
+
+    <div class="meta-row">
+      <div class="meta-item">
+        <div class="label">Speaker</div>
+        <div class="value">傅俊銜　麻醉科</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Format</div>
+        <div class="value">15 min talk · 5 min Q&amp;A</div>
+      </div>
+      <div class="meta-item">
+        <div class="label">Reference</div>
+        <div class="value">MR-RE027 第 2 版</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-col">
+    <!-- 紙 -->
+    <div class="object-card">
+      <div class="paper-mini">
+        <div class="pm-line w70"></div>
+        <div class="pm-line w50"></div>
+        <div class="pm-line w85"></div>
+        <div class="pm-checks">
+          <div class="pm-check"></div><div class="pm-check"></div>
+          <div class="pm-check"></div><div class="pm-check"></div>
+          <div class="pm-check"></div><div class="pm-check"></div>
+          <div class="pm-check"></div><div class="pm-check"></div>
+        </div>
+        <div class="pm-block"></div>
+        <div class="pm-line w60" style="margin-top:10px;"></div>
+        <div class="pm-stamp">手寫優先</div>
+      </div>
+      <div>
+        <div class="object-label">As-is</div>
+        <div class="object-label-zh">MR-RE027 紙本</div>
+      </div>
+    </div>
+
+    <!-- 中間箭頭 -->
+    <div class="arrow-pill">→</div>
+
+    <!-- DB -->
+    <div class="object-card">
+      <div class="db-mini">
+        <div class="db-cyl"></div>
+        <div class="db-cyl c2"></div>
+        <div class="db-cyl c3"></div>
+      </div>
+      <div>
+        <div class="object-label">To-be</div>
+        <div class="object-label-zh">結構化資料庫</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page-footer">
+  <div>封面　·　Cover</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

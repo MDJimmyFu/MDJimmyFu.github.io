@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P05 · 限制 1 · tri-state 缺失</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 64px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  /* 頂部標題區 */
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .head-left { flex: 1; }
+  .title {
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .title .q {
+    color: var(--red-8);
+  }
+  .head-right {
+    text-align: right;
+    color: var(--ink-3);
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  .head-right .big-num {
+    font-family: var(--font-en);
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--red-8);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* 主內容兩欄 */
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    min-height: 0;
+  }
+
+  .panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+  }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  .panel-tag {
+    font-family: var(--font-en);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 3px;
+    color: #fff;
+  }
+  .panel-tag.evidence { background: var(--ink); }
+  .panel-tag.problem { background: var(--red-8); }
+  .panel-title {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* 左：PDF 區塊重畫（過去病史） */
+  .pdf-section {
+    background: #FFFEFB;
+    border: 1px solid var(--rule);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04);
+    padding: 22px 26px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .pdf-section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--ink);
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .pdf-section-title .src {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+
+  .hx-table {
+    display: grid;
+    grid-template-columns: 1fr 60px 60px 1fr;
+    column-gap: 16px;
+    row-gap: 5px;
+    font-size: 16px;
+    color: var(--ink);
+  }
+  .hx-table .th {
+    font-weight: 600;
+    color: var(--ink-2);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 4px;
+  }
+  .hx-table .th.center { text-align: center; }
+  .hx-table .item {
+    font-size: 15px;
+    padding: 2px 0;
+  }
+  .hx-table .cb {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--ink-2);
+    justify-self: center;
+    align-self: center;
+  }
+  .hx-table .explain {
+    border-bottom: 1px solid var(--rule-2);
+    height: 18px;
+    align-self: end;
+  }
+
+  .pdf-callout {
+    margin-top: 14px;
+    padding: 10px 14px;
+    background: var(--red-1);
+    border-left: 4px solid var(--red-8);
+    font-size: 15px;
+    color: var(--ink);
+  }
+  .pdf-callout strong { color: var(--red-8); }
+
+  /* 右：「沒勾」的 4 種真相 */
+  .truth-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .truth-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .truth-card .tc-num {
+    font-family: var(--font-en);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-3);
+    letter-spacing: 0.1em;
+  }
+  .truth-card .tc-title {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--ink);
+  }
+  .truth-card .tc-desc {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink-2);
+  }
+  .truth-card .tc-mark {
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 36px;
+  }
+  .truth-card.t1 .tc-mark { background: #74c0fc; }
+  .truth-card.t2 .tc-mark { background: #ffa94d; }
+  .truth-card.t3 .tc-mark { background: var(--red-8); }
+  .truth-card.t4 .tc-mark { background: #adb5bd; }
+
+  /* 底部結論 */
+  .bottom-callout {
+    background: var(--ink);
+    color: #fff;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .bottom-callout .bc-label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    padding-right: 22px;
+    border-right: 1px solid rgba(255,255,255,0.18);
+  }
+  .bottom-callout .bc-text {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.45;
+  }
+  .bottom-callout .bc-text em {
+    color: #ffa94d;
+    font-style: normal;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--red-8);"></span>
+    <span>第二幕 · 紙的五個結構性限制</span>
+  </div>
+  <div class="ph-right">05 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div class="head-left">
+      <div class="kicker red">Constraint 01 · Tri-state Missing</div>
+      <h1 class="title">
+        「沒勾」到底是<span class="q">沒有</span>，<br>
+        還是<span class="q">沒問</span>？
+      </h1>
+    </div>
+    <div class="head-right">
+      <div class="big-num">1<span style="font-size:24px;color:var(--ink-3);font-weight:500;"> / 5</span></div>
+      <div style="margin-top:6px;">五個結構性限制<br>之一</div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- 左：原 PDF 區塊重畫 -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-tag evidence">Evidence</span>
+        <span class="panel-title">原表單「過去病史」區塊</span>
+      </div>
+
+      <div class="pdf-section">
+        <div class="pdf-section-title">
+          過去病史
+          <span class="src">MR-RE027 · §3</span>
+        </div>
+
+        <div class="hx-table">
+          <div class="th">項目</div>
+          <div class="th center">無</div>
+          <div class="th center">有</div>
+          <div class="th">說　明</div>
+
+          <div class="item">DM</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item">CVA</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item">Hypertension</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item">Cardiac disease</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item">Asthma</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item">COPD</div>
+          <div class="cb"></div><div class="cb"></div>
+          <div class="explain"></div>
+
+          <div class="item" style="color:var(--ink-3);">… 共 12 項 + Others</div>
+          <div></div><div></div>
+          <div></div>
+        </div>
+
+        <div class="pdf-callout">
+          每一項只有 <strong>「無 / 有」兩格</strong>。<br>
+          <span style="color:var(--ink-2);font-size:13px;">同樣的問題出現在 Mallampati Class I-Ⅳ — 沒勾代表沒做，還是 Class I？</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：「沒勾」的 4 種真相 -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-tag problem">Problem</span>
+        <span class="panel-title">同樣是「沒勾」，可能代表 4 件事</span>
+      </div>
+
+      <div class="truth-grid">
+        <div class="truth-card t1">
+          <div class="tc-mark"></div>
+          <div class="tc-num">CASE 01</div>
+          <div class="tc-title">問了，沒有</div>
+          <div class="tc-desc">病人否認 — 但表單上沒留下「我問過」的證據。</div>
+        </div>
+
+        <div class="truth-card t2">
+          <div class="tc-mark"></div>
+          <div class="tc-num">CASE 02</div>
+          <div class="tc-title">忘了問</div>
+          <div class="tc-desc">時間趕、流程跳了；事後重看也補不回來。</div>
+        </div>
+
+        <div class="truth-card t3">
+          <div class="tc-mark"></div>
+          <div class="tc-num">CASE 03</div>
+          <div class="tc-title">不適用</div>
+          <div class="tc-desc">病人意識不清、語言不通；應該標註而非留白。</div>
+        </div>
+
+        <div class="truth-card t4">
+          <div class="tc-mark"></div>
+          <div class="tc-num">CASE 04</div>
+          <div class="tc-title">問了，有<br>但忘了勾</div>
+          <div class="tc-desc">填寫疏漏 — 表單卻顯示「無」，是錯誤資訊。</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-callout">
+    <div class="bc-label">Insight</div>
+    <div class="bc-text">
+      四種狀態壓成兩格 → 病歷品質的<em>盲區</em>。<br>
+      DB 化的第一個價值，是把這四種狀態各自記下來，誠實留痕。
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>限制 1 · Tri-state Missing</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

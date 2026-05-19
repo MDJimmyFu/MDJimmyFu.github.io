@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P10 · DB 化怎麼解 + AI 才有著力點</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 56px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .title {
+    font-size: 58px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .accent { color: var(--teal-8); }
+  .head-right { text-align: right; color: var(--ink-3); font-size: 15px; line-height: 1.4; max-width: 260px; }
+
+  .main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 50px;
+    align-items: stretch;
+  }
+
+  /* 左：5 行對照表 */
+  .matrix {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+  }
+  .mx-head {
+    display: grid;
+    grid-template-columns: 36px 1fr 32px 1fr;
+    gap: 16px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .mx-row {
+    display: grid;
+    grid-template-columns: 36px 1fr 32px 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    align-items: center;
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .mx-row:last-child { border-bottom: none; }
+
+  .mx-row .num {
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--ink-3);
+    letter-spacing: -0.02em;
+  }
+  .mx-row .problem {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.45;
+  }
+  .mx-row .problem .strike {
+    text-decoration: line-through;
+    color: var(--red-8);
+    text-decoration-thickness: 1.5px;
+  }
+  .mx-row .arrow {
+    color: var(--teal-8);
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .mx-row .solution {
+    font-size: 16px;
+    color: var(--ink);
+    line-height: 1.45;
+    font-weight: 500;
+  }
+  .mx-row .solution strong {
+    color: var(--teal-8);
+    font-weight: 700;
+  }
+
+  /* 右：AI 三個著力點 */
+  .ai-panel {
+    background: var(--ink);
+    color: #fff;
+    padding: 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .ai-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 160px; height: 160px;
+    background: radial-gradient(circle at top right, rgba(155,255,221,0.15), transparent 70%);
+    pointer-events: none;
+  }
+  .ai-panel .ap-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+  }
+  .ai-panel .ap-tag {
+    background: var(--teal-8);
+    color: #fff;
+    padding: 5px 14px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border-radius: 3px;
+  }
+  .ai-panel .ap-title {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .ai-panel .ap-intro {
+    font-size: 16px;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.55;
+  }
+  .ai-panel .ap-intro strong { color: #9bffdd; font-weight: 600; }
+
+  .ai-items {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .ai-item {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .ai-item:last-child { border-bottom: none; }
+  .ai-item .ai-num {
+    font-family: var(--font-en);
+    font-size: 18px;
+    font-weight: 700;
+    color: #9bffdd;
+    letter-spacing: -0.02em;
+    padding-top: 2px;
+  }
+  .ai-item .ai-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .ai-item .ai-desc {
+    margin-top: 4px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.5;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--teal-8);"></span>
+    <span>第三幕 · 為什麼非要資料庫</span>
+  </div>
+  <div class="ph-right">10 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div>
+      <div class="kicker teal">Solution</div>
+      <h1 class="title">
+        DB 化<span class="accent">一次解掉</span>這 5 件事，<br>
+        <span style="font-size:42px;color:var(--ink-2);font-weight:500;">而且 AI 也才有著力點。</span>
+      </h1>
+    </div>
+    <div class="head-right">
+      資料一旦從紙搬到結構化資料庫，<br>
+      前 5 頁的痛點同時被消除 — <br>
+      不是分頭做 5 件事，是<strong style="color:var(--teal-8);">同一件事</strong>。
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="matrix">
+      <div class="mx-head">
+        <div>#</div>
+        <div>原本的限制</div>
+        <div></div>
+        <div>DB 化後</div>
+      </div>
+
+      <div class="mx-row">
+        <div class="num">1</div>
+        <div class="problem"><span class="strike">無 / 有 兩格</span> ， 無法分辨「沒問」</div>
+        <div class="arrow">→</div>
+        <div class="solution">三態欄位（<strong>有 / 無 / 未問</strong>）誠實留痕</div>
+      </div>
+
+      <div class="mx-row">
+        <div class="num">2</div>
+        <div class="problem"><span class="strike">病歷散落 ， 人工翻容易漏</span></div>
+        <div class="arrow">→</div>
+        <div class="solution">AI <strong>系統化彙整</strong>各 module ， 漏失變例外</div>
+      </div>
+
+      <div class="mx-row">
+        <div class="num">3</div>
+        <div class="problem"><span class="strike">三次手術三份空白表</span></div>
+        <div class="arrow">→</div>
+        <div class="solution">上次評估<strong>一鍵帶入</strong>，逐項覆核更新</div>
+      </div>
+
+      <div class="mx-row">
+        <div class="num">4</div>
+        <div class="problem"><span class="strike">塗改沒留痕跡</span></div>
+        <div class="arrow">→</div>
+        <div class="solution">每次變更自動記 <strong>who / when / what</strong></div>
+      </div>
+
+      <div class="mx-row">
+        <div class="num">5</div>
+        <div class="problem"><span class="strike">出 OR 之後沒人讀</span></div>
+        <div class="arrow">→</div>
+        <div class="solution">同一份結構流到<strong>術中 / PACU / QA</strong></div>
+      </div>
+    </div>
+
+    <div class="ai-panel">
+      <div class="ap-head">
+        <span class="ap-tag">AI</span>
+        <span class="ap-title">DB 也是 AI 的著力點</span>
+      </div>
+
+      <div class="ap-intro">
+        紙本之上做 AI 沒有意義 — 文字非結構化、跨欄位無法 cross-check 。<br>
+        <strong>有了結構化資料</strong>，AI 才能做這三件事：
+      </div>
+
+      <div class="ai-items">
+        <div class="ai-item">
+          <div class="ai-num">01</div>
+          <div>
+            <div class="ai-name">病歷預讀</div>
+            <div class="ai-desc">從 HIS 病摘、出院紀錄、過敏紀錄整理出建議草案；醫師打開頁面時，欄位已先填好。</div>
+          </div>
+        </div>
+
+        <div class="ai-item">
+          <div class="ai-num">02</div>
+          <div>
+            <div class="ai-name">風險評分自動算</div>
+            <div class="ai-desc">ASA、RCRI、STOP-Bang、Mallampati 建議從結構化資料推導；醫師確認或調整。</div>
+          </div>
+        </div>
+
+        <div class="ai-item">
+          <div class="ai-num">03</div>
+          <div>
+            <div class="ai-name">自由文字結構化</div>
+            <div class="ai-desc">病人自述、過去手術 narrative 拆成可查詢欄位 — 不再消失在「說明欄」裡。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>DB 是基礎 · AI 是延伸</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

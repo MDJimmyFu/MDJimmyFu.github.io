@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P09 · 限制 5 · 跟術中/PACU 斷層</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 64px 96px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 60px;
+  }
+  .title {
+    font-size: 60px;
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+  }
+  .title .q { color: var(--red-8); }
+  .head-right { text-align: right; color: var(--ink-3); font-size: 16px; line-height: 1.4; }
+  .head-right .big-num {
+    font-family: var(--font-en);
+    font-size: 56px; font-weight: 700; color: var(--red-8);
+    line-height: 1; letter-spacing: -0.02em;
+  }
+
+  .light-note {
+    font-size: 18px;
+    color: var(--ink-3);
+    padding: 8px 16px;
+    border-left: 3px solid var(--ink-3);
+    background: var(--paper-2);
+    align-self: flex-start;
+  }
+
+  /* 麻醉週期 — 4 站流程圖 */
+  .pipeline {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 80px 1fr 80px 1fr 80px 1fr;
+    gap: 0;
+    align-items: center;
+    padding: 0 12px;
+  }
+
+  .station {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 24px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 220px;
+  }
+  .station .st-num {
+    font-family: var(--font-en);
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .station .st-name {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+  .station .st-data {
+    margin-top: 6px;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.55;
+    padding-top: 10px;
+    border-top: 1px dashed var(--rule);
+  }
+  .station .st-data strong {
+    color: var(--indigo-8);
+    font-weight: 700;
+  }
+  .station.start { border-top: 4px solid var(--indigo-8); }
+  .station.mid { border-top: 4px solid var(--indigo-8); }
+  .station.end { border-top: 4px solid var(--indigo-8); }
+
+  /* 連接線 */
+  .connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .connector .line {
+    width: 100%;
+    height: 2px;
+    background: var(--indigo-8);
+  }
+  .connector.broken .line {
+    background: transparent;
+    border-top: 3px dashed var(--red-8);
+  }
+  .connector .arrow-h {
+    position: absolute;
+    right: -2px;
+    width: 0; height: 0;
+    border-left: 12px solid var(--indigo-8);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+  }
+  .connector.broken .arrow-h {
+    border-left-color: var(--red-8);
+  }
+  .connector.broken::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: -28px;
+    width: 36px;
+    height: 36px;
+    background: var(--red-8);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-en);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 36px;
+    text-align: center;
+  }
+  .connector.broken::before { content: '!'; }
+  .connector .label {
+    position: absolute;
+    bottom: -36px;
+    font-size: 13px;
+    color: var(--ink-3);
+    white-space: nowrap;
+    font-family: var(--font-en);
+    letter-spacing: 0.04em;
+  }
+  .connector.broken .label {
+    color: var(--red-8);
+    font-weight: 700;
+  }
+
+  /* 底部結論 + 伏筆 */
+  .bottom-callout {
+    background: var(--paper-2);
+    border-left: 5px solid var(--ink);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .bottom-callout .bc-label {
+    font-family: var(--font-en);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding-right: 22px;
+    border-right: 1px solid var(--rule);
+  }
+  .bottom-callout .bc-text {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+  .bottom-callout .bc-text em {
+    color: var(--indigo-8);
+    font-style: normal;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark" style="background: var(--red-8);"></span>
+    <span>第二幕 · 紙的五個結構性限制</span>
+  </div>
+  <div class="ph-right">09 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="head">
+    <div>
+      <div class="kicker red">Constraint 05 · Pre-op ⇎ Intra-op ⇎ PACU</div>
+      <h1 class="title">
+        評估的結論<span class="q">走不出術前訪視這張紙</span>。
+      </h1>
+    </div>
+    <div class="head-right">
+      <div class="big-num">5<span style="font-size:24px;color:var(--ink-3);font-weight:500;"> / 5</span></div>
+      <div style="margin-top:6px;">五個結構性限制<br>之五（輕描）</div>
+    </div>
+  </div>
+
+  <div class="light-note">
+    今天主題是 pre-op，這頁只是<strong>留個伏筆</strong>：DB 化會讓下面這條斷掉的線重新接起來。
+  </div>
+
+  <div class="pipeline">
+
+    <div class="station start">
+      <div class="st-num">Step 01</div>
+      <div class="st-name">術前訪視</div>
+      <div class="st-data">
+        ASA · Airway · <strong>麻醉計劃</strong><br>
+        過敏 · 疼痛偏好 · 困難氣道應對
+      </div>
+    </div>
+
+    <div class="connector">
+      <div class="line"></div>
+      <div class="arrow-h"></div>
+      <div class="label">paper handoff</div>
+    </div>
+
+    <div class="station mid">
+      <div class="st-num">Step 02</div>
+      <div class="st-name">術中</div>
+      <div class="st-data">
+        手寫評估單<br>
+        護理交班<br>
+        記憶 + 即時判讀
+      </div>
+    </div>
+
+    <div class="connector broken">
+      <div class="line"></div>
+      <div class="arrow-h"></div>
+      <div class="label">handoff broken</div>
+    </div>
+
+    <div class="station end">
+      <div class="st-num">Step 03</div>
+      <div class="st-name">PACU</div>
+      <div class="st-data">
+        重新評估疼痛 + 風險<br>
+        看不到術前 ASA、Airway<br>
+        看不到原本麻醉計劃理由
+      </div>
+    </div>
+
+    <div class="connector broken">
+      <div class="line"></div>
+      <div class="arrow-h"></div>
+      <div class="label">handoff broken</div>
+    </div>
+
+    <div class="station end">
+      <div class="st-num">Step 04</div>
+      <div class="st-name">QA / 病房</div>
+      <div class="st-data">
+        無法回看「術前怎麼預判」<br>
+        QA 統計只能事後 chart-review<br>
+        無法系統化學習
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bottom-callout">
+    <div class="bc-label">Foreshadow</div>
+    <div class="bc-text">
+      pre-op 評估的資料只要進了 DB，<em>同一份結構</em>就能流到術中、PACU、QA — 不再每一站都從頭問。<br>
+      <span style="color:var(--ink-3);font-size:16px;">（下一個 phase 的工作，今天不展開。）</span>
+    </div>
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>限制 5 · Disconnect from intra-op &amp; PACU</div>
+  <div class="en">麻醉前評估系統介紹 · v1</div>
+</div>
+
+</body>
+</html>

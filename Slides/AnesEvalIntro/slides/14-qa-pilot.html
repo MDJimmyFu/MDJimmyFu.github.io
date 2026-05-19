@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>P14 · Q&A / 怎麼參與 pilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../shared/tokens.css">
+<style>
+  .body {
+    position: absolute;
+    top: 64px; left: 0; right: 0; bottom: 56px;
+    padding: 80px 120px 64px;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 100px;
+    align-items: center;
+  }
+
+  .left h1 {
+    font-size: 168px;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+  .left h1 .amp {
+    color: var(--indigo-8);
+    font-family: var(--font-en);
+    font-style: italic;
+  }
+  .left .sub {
+    margin-top: 28px;
+    font-size: 28px;
+    color: var(--ink-2);
+    line-height: 1.55;
+  }
+  .left .sub strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .left .recap {
+    margin-top: 36px;
+    padding: 22px 26px;
+    background: var(--paper-2);
+    border-left: 4px solid var(--indigo-8);
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--ink-2);
+  }
+  .left .recap strong {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  /* 右：兩張 action card */
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .action-card {
+    background: #fff;
+    border: 1px solid var(--rule);
+    padding: 28px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .action-card .ac-tag {
+    display: inline-block;
+    align-self: flex-start;
+    background: var(--ink);
+    color: #fff;
+    padding: 4px 12px;
+    font-family: var(--font-en);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 700;
+    border-radius: 3px;
+  }
+  .action-card.pilot { border-top: 4px solid var(--teal-8); }
+  .action-card.pilot .ac-tag { background: var(--teal-8); }
+  .action-card.feedback { border-top: 4px solid var(--indigo-8); }
+  .action-card.feedback .ac-tag { background: var(--indigo-8); }
+
+  .ac-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .ac-desc {
+    font-size: 16px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+  .ac-desc strong { color: var(--ink); font-weight: 700; }
+
+  .ac-meta {
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 10px 16px;
+    font-size: 14px;
+  }
+  .ac-meta .k {
+    color: var(--ink-3);
+    font-family: var(--font-en);
+    letter-spacing: 0.04em;
+  }
+  .ac-meta .v {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .ac-meta .v.mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="ph-left">
+    <span class="ph-mark"></span>
+    <span>麻醉前評估系統 · 內部介紹</span>
+  </div>
+  <div class="ph-right">14 / 14</div>
+</div>
+
+<div class="body">
+
+  <div class="left">
+    <div class="kicker">Closing</div>
+    <h1>Q<span class="amp">&</span>A<br>＋<br>邀請</h1>
+    <div class="sub">
+      問題、質疑、不同意見 — <br>
+      都歡迎現在就提出來。<br><br>
+      <strong>不認同也是一種貢獻。</strong>
+    </div>
+
+    <div class="recap">
+      <strong>今天的重點：</strong>
+      紙是手寫容器，把資料搬到 DB ，
+      五個結構性限制一次解掉，<strong>AI 才有著力點</strong>。<br>
+      新 PDF = DB 的列印視圖 ， 紙本不再是事實源頭。
+    </div>
+  </div>
+
+  <div class="right">
+
+    <div class="action-card pilot">
+      <span class="ac-tag">Pilot</span>
+      <div class="ac-title">想試用看看？<br>歡迎加入 pilot 名單</div>
+      <div class="ac-desc">
+        Phase 1 上線時，希望先有 <strong>3-5 位</strong>麻醉同仁一起跑。<br>
+        新版與紙本並存，遇到問題隨時退回紙本，
+        資料不會強制收進系統。
+      </div>
+      <div class="ac-meta">
+        <div class="k">Start</div><div class="v">2026 Q3 內</div>
+        <div class="k">Commitment</div><div class="v">每週 1-2 位病人試用即可</div>
+        <div class="k">Opt-out</div><div class="v">隨時 — 我們會把資料還給你</div>
+      </div>
+    </div>
+
+    <div class="action-card feedback">
+      <span class="ac-tag">Feedback</span>
+      <div class="ac-title">給回饋的管道</div>
+      <div class="ac-desc">
+        現在說 / 會後找我 / mail / 走廊抓我都行。<br>
+        <strong>欄位設計、UX、安全疑慮</strong>都是寶貴回饋 — 愈早講愈好改。
+      </div>
+      <div class="ac-meta">
+        <div class="k">Email</div><div class="v mono">jimmy6291991@gmail.com</div>
+        <div class="k">In-person</div><div class="v">恢復室 / 麻醉醫師室</div>
+        <div class="k">Spec doc</div><div class="v">給有興趣深入了解者另約</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="page-footer">
+  <div>Q&amp;A · 怎麼參與 pilot</div>
+  <div class="en">Thank you · 傅俊銜　麻醉科 · 2026.05</div>
+</div>
+
+</body>
+</html>
